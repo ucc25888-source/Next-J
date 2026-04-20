@@ -1,13 +1,5 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import { Area, Subarea, Client, Copy, Counter, OptionItem } from '../types';
-
-const ssrSafeStorage = createJSONStorage(() => {
-  if (typeof window === 'undefined') {
-    return { getItem: () => null, setItem: () => {}, removeItem: () => {} } as Storage;
-  }
-  return localStorage;
-});
 
 interface SystemState {
   currentClient: Client | null;
@@ -79,125 +71,120 @@ const mockClient: Client = {
   created_at: '2026-01-01T00:00:00.000Z',
 };
 
-export const useSystemStore = create<SystemState>()(
-  persist(
-    (set, get) => ({
-      currentClient: mockClient,
-      areas: mockAreas,
-      subareas: mockSubareas,
-      copies: [],
-      counters: [{ key: 'LISTING_HC', value: 1, updated_at: '2026-01-01T00:00:00.000Z' }],
-      mainPoints: [
-        { value: '低於實價登錄 | Below market' },
-        { value: '低總價好入手 | Affordable' },
-        { value: '高投報收租 | High rental yield' },
-        { value: '可隔套/好出租 | Easy to rent' },
-        { value: '學區首選 | School district' },
-        { value: '近市區機能 | City convenience' },
-        { value: '交通便利/近車站 | Transit access' },
-        { value: '景觀採光佳 | View & sunlight' },
-        { value: '格局方正 | Great layout' },
-        { value: '有車位 | Parking' },
-        { value: '屋況佳/免整理 | Move-in ready' },
-        { value: '新屋/新裝潢 | New / renovated' },
-        { value: '稀有釋出 | Rare listing' },
-        { value: '急售可談 | Motivated seller' },
-        { value: '店住/金店面 | Shop + home' },
-        { value: '角間/面寬 | Corner / wide frontage' },
-        { value: '重劃/開發潛力 | Development potential' },
-        { value: '近公園/生活圈 | Near park' },
-        { value: '近海/山景 | Sea/Mountain view' },
-        { value: '電梯大樓管理佳 | Elevator & management' },
-        { value: '屋齡新 | Low age' },
-        { value: '低公設比 | Low shared area' },
-        { value: '一層一戶 | One unit per floor' },
-        { value: '邊間三面採光 | 3-side light' },
-        { value: '可當民宿/工作室 | B&B / studio' },
-      ],
-      targetBuyers: [
-        { value: '首購 | First-time buyer' },
-        { value: '小家庭 | Small family' },
-        { value: '換屋族 | Upgrader' },
-        { value: '投資收租 | Investor' },
-        { value: '退休養生 | Retirement' },
-        { value: '店面自營 | Business owner' },
-        { value: '民宿圓夢 | B&B dreamer' },
-        { value: '學區家長 | Parents' },
-        { value: '外地置產 | Out-of-town buyer' },
-        { value: '自住+保值 | Live + value' },
-      ],
-      propertyTypes: [
-        { value: '套房' },
-        { value: '華廈' },
-        { value: '電梯大樓' },
-        { value: '透天厝（住宅）' },
-        { value: '透天厝（店住）' },
-        { value: '別墅' },
-        { value: '土地' },
-        { value: '農地 / 農建地' },
-      ],
-      parkingOptions: [
-        { value: '無車位' },
-        { value: '有車位' },
-        { value: '可租車位' },
-        { value: '可另購車位' },
-      ],
-      statusNowOptions: [
-        { value: '新進案' },
-        { value: '銷售中' },
-        { value: '議價中' },
-        { value: '洽談中' },
-        { value: '已成交' },
-        { value: '暫停' },
-        { value: '評估排除' },
-      ],
-      statusPushOptions: [
-        { value: '待場勘拍照' },
-        { value: '文案排版中' },
-        { value: '全網熱銷中' },
-        { value: '追蹤議價回報' },
-        { value: '開發/續約洽談' },
-        { value: '同業狀況確認' },
-        { value: '結案撤稿' },
-        { value: '戰略放棄' },
-      ],
-      roomOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }, { value: '5' }, { value: '6+' }],
-      hallOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }],
-      bathOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }],
-      balconyOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }],
-      setCurrentClient: (client) => set({ currentClient: client }),
-      addCopy: (copy) => set((state) => ({ copies: [copy, ...state.copies] })),
-      markCopyAsUsed: (copy_id) =>
-        set((state) => ({
-          copies: state.copies.map((c) =>
-            c.copy_id === copy_id ? { ...c, used: true } : c
-          ),
-        })),
-      getNextListingId: (clientId, type, areaCode) => {
-        const today = new Date();
-        const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-        let key = '';
-        let prefix = '';
-        if (type === 'C') {
-          if (!areaCode) return '';
-          key = `LISTING_${clientId}_${areaCode}`;
-          prefix = `C${areaCode}`;
-        } else {
-          key = `BUYER_${clientId}_${dateStr}`;
-          prefix = `B${dateStr}-`;
-        }
-        const { counters } = get();
-        const counter = counters.find((c) => c.key === key);
-        const nextValue = counter ? counter.value + 1 : 1;
-        set((state) => {
-          const newCounters = state.counters.filter((c) => c.key !== key);
-          newCounters.push({ key, value: nextValue, updated_at: new Date().toISOString() });
-          return { counters: newCounters };
-        });
-        if (type === 'C') return `${prefix}${String(nextValue).padStart(4, '0')}`;
-        return `${prefix}${String(nextValue).padStart(2, '0')}`;
-      },
-    }),
-    { name: 'tobe-nexus-system-v1', storage: ssrSafeStorage }
-  )
-);
+export const useSystemStore = create<SystemState>()((set, get) => ({
+  currentClient: mockClient,
+  areas: mockAreas,
+  subareas: mockSubareas,
+  copies: [],
+  counters: [{ key: 'LISTING_HC', value: 1, updated_at: '2026-01-01T00:00:00.000Z' }],
+  mainPoints: [
+    { value: '低於實價登錄 | Below market' },
+    { value: '低總價好入手 | Affordable' },
+    { value: '高投報收租 | High rental yield' },
+    { value: '可隔套/好出租 | Easy to rent' },
+    { value: '學區首選 | School district' },
+    { value: '近市區機能 | City convenience' },
+    { value: '交通便利/近車站 | Transit access' },
+    { value: '景觀採光佳 | View & sunlight' },
+    { value: '格局方正 | Great layout' },
+    { value: '有車位 | Parking' },
+    { value: '屋況佳/免整理 | Move-in ready' },
+    { value: '新屋/新裝潢 | New / renovated' },
+    { value: '稀有釋出 | Rare listing' },
+    { value: '急售可談 | Motivated seller' },
+    { value: '店住/金店面 | Shop + home' },
+    { value: '角間/面寬 | Corner / wide frontage' },
+    { value: '重劃/開發潛力 | Development potential' },
+    { value: '近公園/生活圈 | Near park' },
+    { value: '近海/山景 | Sea/Mountain view' },
+    { value: '電梯大樓管理佳 | Elevator & management' },
+    { value: '屋齡新 | Low age' },
+    { value: '低公設比 | Low shared area' },
+    { value: '一層一戶 | One unit per floor' },
+    { value: '邊間三面採光 | 3-side light' },
+    { value: '可當民宿/工作室 | B&B / studio' },
+  ],
+  targetBuyers: [
+    { value: '首購 | First-time buyer' },
+    { value: '小家庭 | Small family' },
+    { value: '換屋族 | Upgrader' },
+    { value: '投資收租 | Investor' },
+    { value: '退休養生 | Retirement' },
+    { value: '店面自營 | Business owner' },
+    { value: '民宿圓夢 | B&B dreamer' },
+    { value: '學區家長 | Parents' },
+    { value: '外地置產 | Out-of-town buyer' },
+    { value: '自住+保值 | Live + value' },
+  ],
+  propertyTypes: [
+    { value: '套房' },
+    { value: '華廈' },
+    { value: '電梯大樓' },
+    { value: '透天厝（住宅）' },
+    { value: '透天厝（店住）' },
+    { value: '別墅' },
+    { value: '土地' },
+    { value: '農地 / 農建地' },
+  ],
+  parkingOptions: [
+    { value: '無車位' },
+    { value: '有車位' },
+    { value: '可租車位' },
+    { value: '可另購車位' },
+  ],
+  statusNowOptions: [
+    { value: '新進案' },
+    { value: '銷售中' },
+    { value: '議價中' },
+    { value: '洽談中' },
+    { value: '已成交' },
+    { value: '暫停' },
+    { value: '評估排除' },
+  ],
+  statusPushOptions: [
+    { value: '待場勘拍照' },
+    { value: '文案排版中' },
+    { value: '全網熱銷中' },
+    { value: '追蹤議價回報' },
+    { value: '開發/續約洽談' },
+    { value: '同業狀況確認' },
+    { value: '結案撤稿' },
+    { value: '戰略放棄' },
+  ],
+  roomOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }, { value: '5' }, { value: '6+' }],
+  hallOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }],
+  bathOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }],
+  balconyOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }],
+  setCurrentClient: (client) => set({ currentClient: client }),
+  addCopy: (copy) => set((state) => ({ copies: [copy, ...state.copies] })),
+  markCopyAsUsed: (copy_id) =>
+    set((state) => ({
+      copies: state.copies.map((c) =>
+        c.copy_id === copy_id ? { ...c, used: true } : c
+      ),
+    })),
+  getNextListingId: (clientId, type, areaCode) => {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+    let key = '';
+    let prefix = '';
+    if (type === 'C') {
+      if (!areaCode) return '';
+      key = `LISTING_${clientId}_${areaCode}`;
+      prefix = `C${areaCode}`;
+    } else {
+      key = `BUYER_${clientId}_${dateStr}`;
+      prefix = `B${dateStr}-`;
+    }
+    const { counters } = get();
+    const counter = counters.find((c) => c.key === key);
+    const nextValue = counter ? counter.value + 1 : 1;
+    set((state) => {
+      const newCounters = state.counters.filter((c) => c.key !== key);
+      newCounters.push({ key, value: nextValue, updated_at: new Date().toISOString() });
+      return { counters: newCounters };
+    });
+    if (type === 'C') return `${prefix}${String(nextValue).padStart(4, '0')}`;
+    return `${prefix}${String(nextValue).padStart(2, '0')}`;
+  },
+}));
