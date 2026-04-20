@@ -5,6 +5,9 @@ import ConditionalLayout from "@/components/ConditionalLayout";
 export const metadata: Metadata = {
   title: "TOBE Nexus | AI 成交戰略系統",
   description: "TOBE-Nexus Business AI Hub — 專為地產仲介設計的案件管理與 AI 文案生成系統",
+  other: {
+    google: "notranslate",
+  },
 };
 
 export default function RootLayout({
