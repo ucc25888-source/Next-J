@@ -1,209 +1,178 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { usePropertyStore } from "@/store/usePropertyStore";
 import PageHeader from "@/components/PageHeader";
 import {
-  Plus,
-  Search,
-  SlidersHorizontal,
-  MapPin,
-  BedDouble,
-  Bath,
-  Maximize2,
-  MoreHorizontal,
-  Upload,
+  Plus, Search, Building2, MapPin, Ruler,
+  PenTool, Trash2, Sparkles, Upload,
 } from "lucide-react";
 
-const mockProperties = [
-  {
-    id: "P-001",
-    title: "信義區精品三房",
-    address: "台北市信義區信義路五段",
-    price: "3,280",
-    type: "住宅",
-    rooms: "3房2廳2衛",
-    area: 42.5,
-    status: "上架中",
-  },
-  {
-    id: "P-002",
-    title: "大安區電梯二加一房",
-    address: "台北市大安區復興南路一段",
-    price: "2,150",
-    type: "住宅",
-    rooms: "2+1房1廳1衛",
-    area: 31.2,
-    status: "洽談中",
-  },
-  {
-    id: "P-003",
-    title: "中山區全新店面",
-    address: "台北市中山區南京東路二段",
-    price: "5,800",
-    type: "商業",
-    rooms: "1廳1衛",
-    area: 68.0,
-    status: "待處理",
-  },
-  {
-    id: "P-004",
-    title: "內湖科技園區辦公室",
-    address: "台北市內湖區瑞光路",
-    price: "4,100",
-    type: "辦公",
-    rooms: "開放格局",
-    area: 55.8,
-    status: "上架中",
-  },
-];
-
-const statusConfig: Record<string, { label: string; cls: string }> = {
-  上架中: {
-    label: "上架中",
-    cls: "bg-aurora-500/10 text-aurora-400 border-aurora-500/25",
-  },
-  洽談中: {
-    label: "洽談中",
-    cls: "bg-warning/10 text-warning border-warning/25",
-  },
-  待處理: {
-    label: "待處理",
-    cls: "bg-glacier-500/10 text-glacier-400 border-glacier-500/20",
-  },
-  已成交: {
-    label: "已成交",
-    cls: "bg-titanium-700/50 text-glacier-300 border-titanium-600/40",
-  },
-};
-
 export default function PropertiesPage() {
+  const { properties, deleteProperty } = usePropertyStore();
+  const [search, setSearch] = useState("");
+
+  const filtered = properties.filter(
+    (p) =>
+      p.subarea.includes(search) ||
+      p.listing_id?.includes(search) ||
+      p.property_type.includes(search) ||
+      p.address_note?.includes(search)
+  );
+
+  const getTitle = (p: typeof properties[0]) =>
+    `${p.listing_id ? `[${p.listing_id}] ` : ""}${p.subarea} ${p.property_type}`;
+
+  const statusCls: Record<string, string> = {
+    銷售中: "bg-aurora-500/10 text-aurora-400 border-aurora-500/25",
+    議價中: "bg-warning/10 text-warning border-warning/25",
+    新進案: "bg-glacier-500/10 text-glacier-400 border-glacier-500/20",
+    已成交: "bg-titanium-700/50 text-glacier-300 border-titanium-600/40",
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <PageHeader
         title="物件管理"
         badge="Properties"
-        subtitle="管理所有房產物件資訊與銷售狀態"
+        subtitle={`管理所有房產物件 · 共 ${properties.length} 件`}
         actions={
           <>
-            <button className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-glacier-300 bg-titanium-900 border border-glacier-200/[0.1] rounded-lg hover:border-glacier-200/20 hover:text-glacier-200 transition-all">
+            <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-glacier-300 bg-titanium-900 border border-glacier-200/[0.1] rounded-lg hover:border-glacier-200/20 hover:text-glacier-200 transition-all">
               <Upload className="w-3.5 h-3.5" />
               匯入資料
             </button>
-            <button className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm">
+            <Link
+              href="/properties/new"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm"
+            >
               <Plus className="w-3.5 h-3.5" />
               新增物件
-            </button>
+            </Link>
           </>
         }
       />
 
-      <main className="flex-1 p-8 space-y-5">
-        {/* Search & Filter */}
-        <div className="flex items-center gap-3">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-glacier-500" />
-            <input
-              type="text"
-              placeholder="搜尋物件地址、名稱或編號..."
-              className="w-full pl-10 pr-4 py-2.5 bg-titanium-900 border border-glacier-200/[0.08] rounded-lg text-sm text-glacier-200 placeholder-glacier-600 focus:outline-none focus:border-aurora-500/40 transition-colors"
-            />
-          </div>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-titanium-900 border border-glacier-200/[0.08] text-xs font-semibold text-glacier-400 rounded-lg hover:border-glacier-200/15 hover:text-glacier-300 transition-all">
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            篩選
-          </button>
+      <main className="flex-1 p-8 space-y-6">
+        {/* Search */}
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-glacier-500" />
+          <input
+            type="text"
+            placeholder="搜尋地段、編號、物件類型..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-titanium-900 border border-glacier-200/[0.08] rounded-lg text-sm text-glacier-200 placeholder-glacier-600 focus:outline-none focus:border-aurora-500/40 transition-colors"
+          />
         </div>
 
-        {/* Count */}
-        <p className="text-xs text-glacier-500">
-          共 {mockProperties.length} 筆物件（範例資料）
-        </p>
-
-        {/* Table */}
-        <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
-          {/* Header */}
-          <div className="grid grid-cols-[2fr_1fr_auto_auto_auto] gap-4 px-6 py-3 bg-titanium-950/40 border-b border-glacier-200/[0.06]">
-            {["物件資訊", "規格", "售價", "狀態", ""].map((h) => (
-              <span
-                key={h}
-                className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em]"
+        {/* Grid */}
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 bg-titanium-900 border-2 border-dashed border-glacier-200/[0.08] rounded-xl">
+            <Building2 className="w-12 h-12 text-glacier-600 mb-3" />
+            <p className="text-sm font-medium text-glacier-400">
+              {search ? "找不到符合的物件" : "尚無物件"}
+            </p>
+            <p className="text-xs text-glacier-600 mt-1">
+              {search ? "嘗試不同的關鍵字" : "點擊「新增物件」建立第一個房產物件"}
+            </p>
+            {!search && (
+              <Link
+                href="/properties/new"
+                className="mt-4 flex items-center gap-2 px-4 py-2 text-sm font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all"
               >
-                {h}
-              </span>
-            ))}
+                <Plus className="w-4 h-4" /> 新增物件
+              </Link>
+            )}
           </div>
-
-          {/* Rows */}
-          {mockProperties.map((p, idx) => {
-            const sc = statusConfig[p.status] ?? statusConfig["待處理"];
-            return (
-              <div
-                key={p.id}
-                className={`grid grid-cols-[2fr_1fr_auto_auto_auto] gap-4 items-center px-6 py-4 hover:bg-titanium-800/30 transition-colors cursor-pointer ${
-                  idx < mockProperties.length - 1
-                    ? "border-b border-glacier-200/[0.04]"
-                    : ""
-                }`}
-              >
-                {/* Info */}
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono text-glacier-600">
-                      {p.id}
-                    </span>
-                    <span className="text-[13px] font-semibold text-glacier-200">
-                      {p.title}
-                    </span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-titanium-700 text-glacier-500 border border-glacier-200/[0.08] font-medium">
-                      {p.type}
-                    </span>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((property) => {
+              const sc = statusCls[property.status_now] ?? statusCls["新進案"];
+              return (
+                <div
+                  key={property.id}
+                  className="group bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden hover:border-aurora-500/20 transition-all duration-200 flex flex-col"
+                >
+                  {/* Image */}
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-titanium-800">
+                    <img
+                      src={property.img1_url || "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=800"}
+                      alt={getTitle(property)}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    {property.status_now && (
+                      <div className={`absolute top-2 right-2 px-2 py-1 rounded-md text-[10px] font-semibold border ${sc}`}>
+                        {property.status_now}
+                      </div>
+                    )}
+                    {property.status_push === "強推" && (
+                      <div className="absolute top-2 left-2 px-2 py-1 rounded-md text-[10px] font-bold bg-aurora-500 text-titanium-950">
+                        強推
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1 mt-1">
-                    <MapPin className="w-3 h-3 text-glacier-600" />
-                    <span className="text-[11px] text-glacier-500">
-                      {p.address}
-                    </span>
+
+                  {/* Info */}
+                  <div className="flex flex-1 flex-col p-4">
+                    <div className="mb-2">
+                      <span className="inline-flex items-center text-[9px] px-1.5 py-0.5 rounded bg-titanium-700 text-glacier-500 border border-glacier-200/[0.06] font-medium">
+                        {property.rooms}房{property.halls}廳{property.baths}衛
+                      </span>
+                      <h3
+                        className="mt-1.5 text-[13px] font-bold text-glacier-200 truncate"
+                        title={getTitle(property)}
+                      >
+                        {getTitle(property)}
+                      </h3>
+                    </div>
+                    <p className="text-xl font-bold text-aurora-500 mb-3">
+                      {property.price_wan?.toLocaleString()}{" "}
+                      <span className="text-xs font-normal text-glacier-500">萬</span>
+                    </p>
+                    <div className="space-y-1.5 text-xs text-glacier-500 mb-4 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3 text-glacier-600 shrink-0" />
+                        <span className="truncate">{property.address_note || "無地址備註"}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Ruler className="w-3 h-3 text-glacier-600 shrink-0" />
+                        <span>{property.build_ping} 坪（建）</span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="mt-auto grid grid-cols-2 gap-2 pt-3 border-t border-glacier-200/[0.06]">
+                      <Link
+                        href={`/properties/${property.id}`}
+                        className="flex items-center justify-center gap-1 py-1.5 text-xs font-medium text-glacier-400 bg-titanium-800 border border-glacier-200/[0.08] rounded-lg hover:border-glacier-200/15 hover:text-glacier-200 transition-all"
+                      >
+                        <PenTool className="w-3 h-3" /> 編輯
+                      </Link>
+                      <Link
+                        href={`/generate/${property.id}`}
+                        className="flex items-center justify-center gap-1 py-1.5 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all"
+                      >
+                        <Sparkles className="w-3 h-3" /> FB 文案
+                      </Link>
+                      <button
+                        onClick={() => {
+                          if (window.confirm("確定要刪除這個物件嗎？")) {
+                            deleteProperty(property.id);
+                          }
+                        }}
+                        className="col-span-2 flex items-center justify-center gap-1 py-1.5 text-xs font-medium text-danger/70 bg-titanium-800 rounded-lg hover:bg-danger/10 hover:text-danger transition-all border border-transparent hover:border-danger/20"
+                      >
+                        <Trash2 className="w-3 h-3" /> 刪除物件
+                      </button>
+                    </div>
                   </div>
                 </div>
-
-                {/* Specs */}
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1 text-[11px] text-glacier-400">
-                    <BedDouble className="w-3.5 h-3.5 text-glacier-600" />
-                    {p.rooms}
-                  </span>
-                  <span className="flex items-center gap-1 text-[11px] text-glacier-400">
-                    <Maximize2 className="w-3.5 h-3.5 text-glacier-600" />
-                    {p.area}坪
-                  </span>
-                </div>
-
-                {/* Price */}
-                <div className="text-right">
-                  <span className="text-base font-bold text-glacier-200">
-                    {p.price}
-                  </span>
-                  <span className="text-xs text-glacier-500 ml-1">萬</span>
-                </div>
-
-                {/* Status */}
-                <div>
-                  <span
-                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold border ${sc.cls}`}
-                  >
-                    {sc.label}
-                  </span>
-                </div>
-
-                {/* Actions */}
-                <button className="p-1.5 rounded-lg text-glacier-600 hover:text-glacier-300 hover:bg-titanium-700/50 transition-all">
-                  <MoreHorizontal className="w-4 h-4" />
-                </button>
-              </div>
-            );
-          })}
-        </div>
-
-        <p className="text-center text-[11px] text-glacier-600">
-          以上為示範資料 — 上傳您的物件資料後將自動整合至此列表
-        </p>
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
   );
