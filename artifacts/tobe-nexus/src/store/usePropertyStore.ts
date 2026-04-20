@@ -46,8 +46,8 @@ const DEMO_PROPERTY: Property = {
   img2_url: '',
   img3_url: '',
   img4_url: '',
-  updated_at: new Date().toISOString(),
-  createdAt: new Date().toISOString(),
+  updated_at: '2026-01-01T00:00:00.000Z',
+  createdAt: '2026-01-01T00:00:00.000Z',
 };
 
 export const usePropertyStore = create<PropertyState>()(

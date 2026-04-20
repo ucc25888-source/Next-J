@@ -75,7 +75,7 @@ const mockClient: Client = {
   month_key: '202604',
   used_this_month: 0,
   status: 'active',
-  created_at: new Date().toISOString(),
+  created_at: '2026-01-01T00:00:00.000Z',
 };
 
 export const useSystemStore = create<SystemState>()(
@@ -85,7 +85,7 @@ export const useSystemStore = create<SystemState>()(
       areas: mockAreas,
       subareas: mockSubareas,
       copies: [],
-      counters: [{ key: 'LISTING_HC', value: 1, updated_at: new Date().toISOString() }],
+      counters: [{ key: 'LISTING_HC', value: 1, updated_at: '2026-01-01T00:00:00.000Z' }],
       mainPoints: [
         { value: '低於實價登錄 | Below market' },
         { value: '低總價好入手 | Affordable' },

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
-import StoreHydrator from "@/components/StoreHydrator";
+import ClientLayout from "@/components/ClientLayout";
 
 export const metadata: Metadata = {
   title: "TOBE-Nexus-AI-System | AI 成交戰略系統",
@@ -16,10 +16,9 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body className="flex min-h-screen bg-titanium-800">
-        <StoreHydrator />
         <Sidebar />
         <div className="flex-1 flex flex-col min-h-screen overflow-hidden bg-titanium-800">
-          {children}
+          <ClientLayout>{children}</ClientLayout>
         </div>
       </body>
     </html>
