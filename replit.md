@@ -59,13 +59,18 @@ artifacts/tobe-nexus/src/
 
 ## Copywriting System
 
-Local template-based generation (no AI cost). 6 post types × 5 hook types:
+**AI-powered** via `/api/generate-fb` (gpt-5.2 via Replit AI Integrations). 6 post types × 5 hook types:
 - **Post Types:** 物件開箱, 降價急售, 知識教學, 人設生活, 成交喜報, 開發徵件
 - **Hooks:** 無, 專業焦慮鉤, 知識佈道鉤, 利益誘惑鉤, 情感溫度鉤
+- **Inputs:** 貼文類型, HOOK開場白, 地點名稱（可覆寫）, 精華亮點（textarea）
+- **Output:** AI streams main copy → appends random human slogan (30 options in `data/humanSlogans.ts`) → appends fixed contact footer (0925-997779 / LINE)
+- **System prompt:** 珍選好福邸 brand format with 📍💰📏🏠 info block, ✅ highlights, 🎯 target buyer, and 4 hashtags
+- **Quota:** tracked in PostgreSQL `clients` table; also reflected in client-side Zustand store
 
 ## OpenAI Integration
 
-API route at `/api/generate-copy` (currently unused by main flow). Set `OPENAI_API_KEY` in Replit Secrets to enable enhanced generation.
+- **Primary:** `/api/generate-fb` — gpt-5.2 + streaming, uses `AI_INTEGRATIONS_OPENAI_BASE_URL` / `AI_INTEGRATIONS_OPENAI_API_KEY` (Replit AI Integrations, no own key required)
+- **Legacy:** `/api/generate-copy` — gpt-4o-mini, uses `OPENAI_API_KEY` secret
 
 ## State Persistence
 
