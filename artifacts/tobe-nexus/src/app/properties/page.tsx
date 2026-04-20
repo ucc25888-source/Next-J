@@ -107,9 +107,9 @@ export default function PropertiesPage() {
                         {property.status_now}
                       </div>
                     )}
-                    {property.status_push === "強推" && (
+                    {property.status_push === "全網強銷中" && (
                       <div className="absolute top-2 left-2 px-2 py-1 rounded-md text-[10px] font-bold bg-aurora-500 text-titanium-950">
-                        強推
+                        強銷中
                       </div>
                     )}
                   </div>
