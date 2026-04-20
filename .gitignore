@@ -8,7 +8,9 @@ out-tsc
 
 # Next.js build output (never commit — breaks the app when committed)
 .next/
+.next-build/
 artifacts/**/.next/
+artifacts/**/.next-build/
 .expo
 .expo-shared
 
