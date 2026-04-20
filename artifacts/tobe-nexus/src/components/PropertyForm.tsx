@@ -298,10 +298,10 @@ export default function PropertyForm({ id }: PropertyFormProps) {
             <input className={inputCls} type="number" min="0" required value={form.price_wan} onChange={(e) => set('price_wan', e.target.value)} placeholder="例：1280" />
           </Field>
           <Field label="建坪" required>
-            <input className={inputCls} type="number" min="0" step="0.1" required value={form.build_ping} onChange={(e) => set('build_ping', e.target.value)} placeholder="例：38.5" />
+            <input className={inputCls} type="text" inputMode="decimal" required value={form.build_ping} onChange={(e) => set('build_ping', e.target.value)} placeholder="例：38.5" />
           </Field>
           <Field label="地坪">
-            <input className={inputCls} type="number" min="0" step="0.1" value={form.land_ping} onChange={(e) => set('land_ping', e.target.value)} placeholder="例：5.2" />
+            <input className={inputCls} type="text" inputMode="decimal" value={form.land_ping} onChange={(e) => set('land_ping', e.target.value)} placeholder="例：5.2" />
           </Field>
 
           {/* Layout grid */}
