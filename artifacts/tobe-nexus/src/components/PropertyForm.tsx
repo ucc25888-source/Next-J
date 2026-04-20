@@ -304,8 +304,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
             <input className={inputCls} type="text" inputMode="decimal" value={form.land_ping} onChange={(e) => set('land_ping', e.target.value)} placeholder="例：5.2" />
           </Field>
 
-          {/* Layout grid */}
-          <div className="md:col-span-3">
+          {/* Layout grid — col-span both sm and md */}
+          <div className="sm:col-span-2 md:col-span-3">
             <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-3">格局</p>
             <div className="grid grid-cols-4 gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
               {[
@@ -314,21 +314,22 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                 { label: '衛', key: 'baths', max: 6 },
                 { label: '陽台', key: 'balconies', max: 6 },
               ].map(({ label, key, max }) => {
-                const val = parseInt((form as unknown as Record<string, string>)[key]) || 0;
+                const raw = (form as unknown as Record<string, string>)[key];
+                const val = raw === '' || raw === undefined ? 0 : (parseInt(raw) >= 0 ? parseInt(raw) : 0);
                 return (
                   <div key={key} className="flex flex-col items-center gap-2">
-                    <p className="text-[10px] text-glacier-500 text-center">{label}</p>
-                    <div className="flex items-center w-full bg-titanium-900 border border-glacier-200/[0.08] rounded-lg overflow-hidden">
+                    <p className="text-[11px] font-semibold text-slate-500 text-center">{label}</p>
+                    <div className="flex items-center w-full bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                       <button
                         type="button"
                         onClick={() => set(key, String(Math.max(0, val - 1)))}
-                        className="px-3 py-2.5 text-glacier-400 hover:text-aurora-400 hover:bg-titanium-700/50 transition-colors text-base font-bold leading-none select-none"
+                        className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-aurora-500 hover:bg-aurora-50 transition-colors text-lg font-bold leading-none select-none shrink-0"
                       >−</button>
-                      <span className="flex-1 text-center text-sm font-semibold text-glacier-200">{val}</span>
+                      <span className="flex-1 text-center text-base font-bold text-slate-800">{val}</span>
                       <button
                         type="button"
                         onClick={() => set(key, String(Math.min(max, val + 1)))}
-                        className="px-3 py-2.5 text-glacier-400 hover:text-aurora-400 hover:bg-titanium-700/50 transition-colors text-base font-bold leading-none select-none"
+                        className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-aurora-500 hover:bg-aurora-50 transition-colors text-lg font-bold leading-none select-none shrink-0"
                       >＋</button>
                     </div>
                   </div>

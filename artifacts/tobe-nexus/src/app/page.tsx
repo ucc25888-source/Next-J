@@ -14,14 +14,14 @@ export default function DashboardPage() {
   const copies = useSystemStore((s) => s.copies);
   const currentClient = useSystemStore((s) => s.currentClient);
 
-  const totalValue = properties.reduce((acc, p) => acc + (p.price_wan || 0), 0);
+  const activeListings = properties.filter((p) => p.status_now === '銷售中').length;
   const thisMonthNew = properties.filter(
     (p) => new Date(p.createdAt).getMonth() === new Date().getMonth()
   ).length;
 
   const stats = [
     { label: "總管理案件", value: String(properties.length), sub: "件", icon: Building2, accent: true },
-    { label: "總開價金額", value: totalValue.toLocaleString(), sub: "萬", icon: TrendingUp, accent: true },
+    { label: "銷售中案件", value: String(activeListings), sub: "件", icon: TrendingUp, accent: true },
     { label: "本月新增案件", value: String(thisMonthNew), sub: "件", icon: Building2, accent: false },
     { label: "AI 文案生成", value: String(copies.length), sub: "次", icon: Sparkles, accent: false },
   ];
@@ -139,7 +139,7 @@ export default function DashboardPage() {
             {[
               { label: "新增案件", desc: "登錄新的委託案件資訊", href: "/properties/new", icon: Plus },
               { label: "AI 文案生成", desc: "先到案件頁選擇案件後生成", href: "/properties", icon: Sparkles },
-              { label: "系統設定", desc: "設定 OpenAI API 金鑰", href: "/settings", icon: TrendingUp },
+              { label: "帳號資訊", desc: "查看帳號狀態與本月用量", href: "/settings", icon: TrendingUp },
             ].map((item) => {
               const Icon = item.icon;
               return (

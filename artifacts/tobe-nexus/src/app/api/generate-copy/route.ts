@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getSession } from "@/lib/session";
+import { queryOne, query } from "@/lib/db";
 
 const toneMap: Record<string, string> = {
   professional: "專業正式、值得信賴的語氣",
@@ -19,10 +21,41 @@ interface CopyRequest {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getSession();
+  if (!session.clientId) {
+    return NextResponse.json({ error: "請先登入" }, { status: 401 });
+  }
+
+  const currentMonthKey = new Date().toISOString().slice(0, 7).replace("-", "");
+
+  const clientRow = await queryOne<{
+    monthly_quota: number;
+    used_this_month: number;
+    month_key: string;
+    status: string;
+  }>(
+    "SELECT monthly_quota, used_this_month, month_key, status FROM clients WHERE client_id = $1",
+    [session.clientId]
+  );
+
+  if (!clientRow) {
+    return NextResponse.json({ error: "帳號不存在" }, { status: 404 });
+  }
+
+  const actualUsed =
+    clientRow.month_key !== currentMonthKey ? 0 : clientRow.used_this_month;
+
+  if (actualUsed >= clientRow.monthly_quota) {
+    return NextResponse.json(
+      { error: "本月 AI 文案配額已用盡，案件管理功能仍可正常使用" },
+      { status: 429 }
+    );
+  }
+
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      { error: "OpenAI API 金鑰未設定，請在環境變數中設定 OPENAI_API_KEY" },
+      { error: "AI 服務未設定，請聯繫管理員" },
       { status: 500 }
     );
   }
@@ -69,7 +102,25 @@ ${features ? `物件特色：${features}` : ""}
     });
 
     const copy = response.choices[0]?.message?.content ?? "";
-    return NextResponse.json({ copy });
+
+    await query(
+      `UPDATE clients
+       SET used_this_month = CASE WHEN month_key = $1 THEN used_this_month + 1 ELSE 1 END,
+           month_key = $1
+       WHERE client_id = $2`,
+      [currentMonthKey, session.clientId]
+    );
+
+    const updated = await queryOne<{ used_this_month: number; monthly_quota: number }>(
+      "SELECT used_this_month, monthly_quota FROM clients WHERE client_id = $1",
+      [session.clientId]
+    );
+
+    return NextResponse.json({
+      copy,
+      used_this_month: updated?.used_this_month ?? actualUsed + 1,
+      monthly_quota: updated?.monthly_quota ?? clientRow.monthly_quota,
+    });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "AI 生成失敗，請稍後再試";

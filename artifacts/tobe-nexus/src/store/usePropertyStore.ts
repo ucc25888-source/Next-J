@@ -3,69 +3,76 @@ import { Property } from '../types';
 
 interface PropertyState {
   properties: Property[];
-  addProperty: (property: Omit<Property, 'id' | 'createdAt' | 'updated_at'>) => void;
-  updateProperty: (id: string, property: Partial<Property>) => void;
-  deleteProperty: (id: string) => void;
+  setProperties: (properties: Property[]) => void;
+  addProperty: (property: Omit<Property, 'id' | 'createdAt' | 'updated_at'>) => Promise<void>;
+  updateProperty: (id: string, property: Partial<Property>) => Promise<void>;
+  deleteProperty: (id: string) => Promise<void>;
   getPropertyById: (id: string) => Property | undefined;
 }
 
-export const DEMO_PROPERTY: Property = {
-  id: 'demo-1',
-  client_id: 'A0001',
-  listing_type: 'C',
-  listing_id: 'CHC0001',
-  area_code: 'HC',
-  subarea: '美崙',
-  address_note: '海岸路（近海景公園）',
-  property_type: '電梯大樓 / 華廈',
-  price_wan: 1280,
-  build_ping: 38.5,
-  land_ping: 5.2,
-  rooms: '3',
-  halls: '2',
-  baths: '1',
-  balconies: '1',
-  parking: '無車位',
-  status_now: '銷售中',
-  status_push: '全網熱銷中',
-  main_point: '景觀採光佳 | View & sunlight',
-  second_point: '學區首選 | School district',
-  target_buyer: '首購 | First-time buyer',
-  must_say_3: '1. 步行至海岸5分鐘\n2. 明星學區環境\n3. 頂樓採光無遮蔽',
-  notes_private: '屋主誠意出售，底價可談',
-  img1_url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200',
-  img2_url: '',
-  img3_url: '',
-  img4_url: '',
-  updated_at: '2026-01-01T00:00:00.000Z',
-  createdAt: '2026-01-01T00:00:00.000Z',
-};
-
 export const usePropertyStore = create<PropertyState>()((set, get) => ({
-  properties: [DEMO_PROPERTY],
-  addProperty: (property) =>
-    set((state) => ({
-      properties: [
-        {
-          ...property,
-          id: crypto.randomUUID(),
-          createdAt: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        ...state.properties,
-      ],
-    })),
-  updateProperty: (id, updatedFields) =>
+  properties: [],
+
+  setProperties: (properties) => set({ properties }),
+
+  addProperty: async (property) => {
+    const tempId = crypto.randomUUID();
+    const now = new Date().toISOString();
+    const optimistic: Property = {
+      ...property,
+      id: tempId,
+      createdAt: now,
+      updated_at: now,
+    };
+    set((state) => ({ properties: [optimistic, ...state.properties] }));
+
+    try {
+      const res = await fetch('/api/properties', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...property, id: tempId }),
+      });
+      if (res.ok) {
+        const { property: saved } = await res.json();
+        set((state) => ({
+          properties: state.properties.map((p) => (p.id === tempId ? saved : p)),
+        }));
+      }
+    } catch {
+      // Keep optimistic update; will sync on next page load
+    }
+  },
+
+  updateProperty: async (id, updatedFields) => {
+    const now = new Date().toISOString();
     set((state) => ({
       properties: state.properties.map((p) =>
-        p.id === id
-          ? { ...p, ...updatedFields, updated_at: new Date().toISOString() }
-          : p
+        p.id === id ? { ...p, ...updatedFields, updated_at: now } : p
       ),
-    })),
-  deleteProperty: (id) =>
+    }));
+
+    try {
+      await fetch(`/api/properties/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedFields),
+      });
+    } catch {
+      // Optimistic update kept; will resync on refresh
+    }
+  },
+
+  deleteProperty: async (id) => {
     set((state) => ({
       properties: state.properties.filter((p) => p.id !== id),
-    })),
+    }));
+
+    try {
+      await fetch(`/api/properties/${id}`, { method: 'DELETE' });
+    } catch {
+      // Already removed from UI; DB will sync eventually
+    }
+  },
+
   getPropertyById: (id) => get().properties.find((p) => p.id === id),
 }));

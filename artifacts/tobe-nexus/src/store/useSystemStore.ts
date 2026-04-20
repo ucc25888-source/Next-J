@@ -25,17 +25,17 @@ interface SystemState {
 }
 
 const mockAreas: Area[] = [
-  { area_code: 'HC', area_name: '花蓮市', active: true },
-  { area_code: 'JA', area_name: '吉安鄉', active: true },
-  { area_code: 'XC', area_name: '新城鄉', active: true },
-  { area_code: 'FL', area_name: '鳳林鎮', active: true },
-  { area_code: 'YL', area_name: '玉里鎮', active: true },
-  { area_code: 'SF', area_name: '壽豐鄉', active: true },
-  { area_code: 'KF', area_name: '光復鄉', active: true },
-  { area_code: 'RS', area_name: '瑞穗鄉', active: true },
-  { area_code: 'FR', area_name: '富里鄉', active: true },
-  { area_code: 'OT', area_name: '其他', active: true },
-  { area_code: 'SL', area_name: '秀林鄉', active: true },
+  { area_code: 'HC', area_name: '花蓮市 | Hualien City', active: true },
+  { area_code: 'JA', area_name: '吉安 | Ji\'an', active: true },
+  { area_code: 'XC', area_name: '新城 / 北埔 | Xincheng', active: true },
+  { area_code: 'FL', area_name: '鳳林 | Fenglin', active: true },
+  { area_code: 'KF', area_name: '光復 | Guangfu', active: true },
+  { area_code: 'YL', area_name: '玉里 | Yuli', active: true },
+  { area_code: 'SF', area_name: '壽豐 | Shoufeng', active: true },
+  { area_code: 'RS', area_name: '瑞穗 | Ruisui', active: true },
+  { area_code: 'FR', area_name: '富里 | Fuli', active: true },
+  { area_code: 'SL', area_name: '秀林 | Xiulin', active: true },
+  { area_code: 'OT', area_name: '其他 | Other', active: true },
 ];
 
 const mockSubareas: Subarea[] = [
