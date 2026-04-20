@@ -20,9 +20,9 @@ export default function DashboardPage() {
   ).length;
 
   const stats = [
-    { label: "總管理物件", value: String(properties.length), sub: "件", icon: Building2, accent: true },
-    { label: "總掛牌金額", value: totalValue.toLocaleString(), sub: "萬", icon: TrendingUp, accent: true },
-    { label: "本月新增", value: String(thisMonthNew), sub: "件", icon: Building2, accent: false },
+    { label: "總管理案件", value: String(properties.length), sub: "件", icon: Building2, accent: true },
+    { label: "總開價金額", value: totalValue.toLocaleString(), sub: "萬", icon: TrendingUp, accent: true },
+    { label: "本月新增案件", value: String(thisMonthNew), sub: "件", icon: Building2, accent: false },
     { label: "AI 文案生成", value: String(copies.length), sub: "次", icon: Sparkles, accent: false },
   ];
 
@@ -33,15 +33,14 @@ export default function DashboardPage() {
     <div className="flex flex-col min-h-screen">
       <PageHeader
         title="總覽儀表板"
-        badge="Dashboard"
-        subtitle={`歡迎回來，${currentClient?.display_name ?? '用戶'} · TOBE-Nexus AI 成交戰略系統`}
+        subtitle={`歡迎回來，${currentClient?.display_name ?? '用戶'} · TOBE-Nexus Business AI Hub`}
         actions={
           <Link
             href="/properties/new"
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm"
           >
             <Plus className="w-3.5 h-3.5" />
-            新增物件
+            新增案件
           </Link>
         }
       />
@@ -77,7 +76,7 @@ export default function DashboardPage() {
         {/* Recent Properties */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase">最新物件</p>
+            <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase">最新案件</p>
             <Link href="/properties" className="flex items-center gap-1 text-xs text-aurora-500 hover:text-aurora-400 transition-colors font-medium">
               查看全部 <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -86,8 +85,8 @@ export default function DashboardPage() {
           {properties.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 bg-titanium-900 border border-glacier-200/[0.06] rounded-xl">
               <Building2 className="w-10 h-10 text-glacier-600 mb-3" />
-              <p className="text-sm font-medium text-glacier-400">尚無物件</p>
-              <p className="text-xs text-glacier-600 mt-1">點擊「新增物件」開始建立您的房產資料庫</p>
+              <p className="text-sm font-medium text-glacier-400">尚無案件</p>
+              <p className="text-xs text-glacier-600 mt-1">點擊「新增案件」開始建立您的委託案件資料庫</p>
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -138,8 +137,8 @@ export default function DashboardPage() {
           <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase mb-4">快捷操作</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { label: "新增物件", desc: "登錄新的房產物件資訊", href: "/properties/new", icon: Plus },
-              { label: "AI 文案生成", desc: "先到物件頁選擇物件後生成", href: "/properties", icon: Sparkles },
+              { label: "新增案件", desc: "登錄新的委託案件資訊", href: "/properties/new", icon: Plus },
+              { label: "AI 文案生成", desc: "先到案件頁選擇案件後生成", href: "/properties", icon: Sparkles },
               { label: "系統設定", desc: "設定 OpenAI API 金鑰", href: "/settings", icon: TrendingUp },
             ].map((item) => {
               const Icon = item.icon;

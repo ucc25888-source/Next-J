@@ -4,8 +4,8 @@ import Sidebar from "@/components/Sidebar";
 import StoreHydrator from "@/components/StoreHydrator";
 
 export const metadata: Metadata = {
-  title: "TOBE-Nexus-AI-System | AI 成交戰略系統",
-  description: "商業總部的 AI 戰略樞紐 — 專為房產仲介設計的物件管理與 AI 文案生成系統",
+  title: "TOBE Nexus | AI 成交戰略系統",
+  description: "TOBE-Nexus Business AI Hub — 專為地產仲介設計的案件管理與 AI 文案生成系統",
 };
 
 export default function RootLayout({

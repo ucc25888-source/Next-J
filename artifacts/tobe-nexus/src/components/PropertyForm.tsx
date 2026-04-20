@@ -204,10 +204,10 @@ export default function PropertyForm({ id }: PropertyFormProps) {
         </button>
         <div>
           <h1 className="text-lg font-bold text-glacier-200">
-            {isEditMode ? '編輯物件' : '新增物件'}
+            {isEditMode ? '編輯案件' : '新增案件'}
           </h1>
           <p className="text-xs text-glacier-500 mt-0.5">
-            {isEditMode ? '修改現有物件資料' : '登錄新的房產物件'}
+            {isEditMode ? '修改現有委託案件資料' : '登錄新的委託案件'}
           </p>
         </div>
       </div>

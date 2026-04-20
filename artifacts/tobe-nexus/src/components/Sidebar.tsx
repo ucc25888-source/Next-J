@@ -13,10 +13,10 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { label: "總覽儀表板", labelEn: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "物件管理", labelEn: "Properties", href: "/properties", icon: Building2 },
-  { label: "AI 文案生成", labelEn: "Copywriting", href: "/ai-copy", icon: Sparkles },
-  { label: "系統設定", labelEn: "Settings", href: "/settings", icon: Settings },
+  { label: "總覽儀表板", href: "/", icon: LayoutDashboard },
+  { label: "案件管理", href: "/properties", icon: Building2 },
+  { label: "AI 文案生成", href: "/ai-copy", icon: Sparkles },
+  { label: "系統設定", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -38,10 +38,10 @@ export default function Sidebar() {
           </div>
           <div>
             <p className="text-[12px] font-bold text-white tracking-tight leading-none">
-              【TOBE】AI
+              TOBE Nexus
             </p>
-            <p className="text-[9px] font-semibold text-aurora-500 tracking-[0.15em] uppercase mt-1 leading-none">
-              成交戰略推進系統
+            <p className="text-[9px] font-semibold text-aurora-500 tracking-[0.1em] mt-1 leading-none">
+              AI 成交戰略系統
             </p>
           </div>
         </div>

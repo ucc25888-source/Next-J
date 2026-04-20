@@ -37,9 +37,8 @@ export default function PropertiesPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <PageHeader
-        title="物件管理"
-        badge="Properties"
-        subtitle={`管理所有房產物件 · 共 ${properties.length} 件`}
+        title="案件管理"
+        subtitle={`管理所有委託案件 · 共 ${properties.length} 件`}
         actions={
           <>
             <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-glacier-300 bg-titanium-900 border border-glacier-200/[0.1] rounded-lg hover:border-glacier-200/20 hover:text-glacier-200 transition-all">
@@ -51,7 +50,7 @@ export default function PropertiesPage() {
               className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm"
             >
               <Plus className="w-3.5 h-3.5" />
-              新增物件
+              新增案件
             </Link>
           </>
         }
@@ -63,7 +62,7 @@ export default function PropertiesPage() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-glacier-500" />
           <input
             type="text"
-            placeholder="搜尋地段、編號、物件類型..."
+            placeholder="搜尋地段、編號、案件類型..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-titanium-900 border border-glacier-200/[0.08] rounded-lg text-sm text-glacier-200 placeholder-glacier-600 focus:outline-none focus:border-aurora-500/40 transition-colors"
@@ -75,17 +74,17 @@ export default function PropertiesPage() {
           <div className="flex flex-col items-center justify-center py-16 bg-titanium-900 border-2 border-dashed border-glacier-200/[0.08] rounded-xl">
             <Building2 className="w-12 h-12 text-glacier-600 mb-3" />
             <p className="text-sm font-medium text-glacier-400">
-              {search ? "找不到符合的物件" : "尚無物件"}
+              {search ? "找不到符合的案件" : "尚無案件"}
             </p>
             <p className="text-xs text-glacier-600 mt-1">
-              {search ? "嘗試不同的關鍵字" : "點擊「新增物件」建立第一個房產物件"}
+              {search ? "嘗試不同的關鍵字" : "點擊「新增案件」建立第一筆委託案件"}
             </p>
             {!search && (
               <Link
                 href="/properties/new"
                 className="mt-4 flex items-center gap-2 px-4 py-2 text-sm font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all"
               >
-                <Plus className="w-4 h-4" /> 新增物件
+                <Plus className="w-4 h-4" /> 新增案件
               </Link>
             )}
           </div>
