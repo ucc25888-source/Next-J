@@ -17,7 +17,7 @@ export const DEMO_PROPERTY: Property = {
   area_code: 'HC',
   subarea: '美崙',
   address_note: '海岸路（近海景公園）',
-  property_type: '電梯大樓',
+  property_type: '電梯大樓 / 華廈',
   price_wan: 1280,
   build_ping: 38.5,
   land_ping: 5.2,

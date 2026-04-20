@@ -17,7 +17,6 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const {
     areas, subareas, mainPoints, targetBuyers, propertyTypes,
     parkingOptions, statusNowOptions, statusPushOptions,
-    roomOptions, hallOptions, bathOptions, balconyOptions,
     getNextListingId, currentClient,
   } = useSystemStore();
 
@@ -138,8 +137,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       address_note: form.address_note,
       property_type: form.property_type,
       price_wan: Number(form.price_wan) || 0,
-      build_ping: Number(form.build_ping) || 0,
-      land_ping: Number(form.land_ping) || 0,
+      build_ping: parseFloat(Number(form.build_ping).toFixed(1)) || 0,
+      land_ping: parseFloat(Number(form.land_ping).toFixed(1)) || 0,
       rooms: form.rooms,
       halls: form.halls,
       baths: form.baths,
@@ -299,10 +298,10 @@ export default function PropertyForm({ id }: PropertyFormProps) {
             <input className={inputCls} type="number" min="0" required value={form.price_wan} onChange={(e) => set('price_wan', e.target.value)} placeholder="例：1280" />
           </Field>
           <Field label="建坪" required>
-            <input className={inputCls} type="number" min="0" step="0.01" required value={form.build_ping} onChange={(e) => set('build_ping', e.target.value)} placeholder="例：38.5" />
+            <input className={inputCls} type="number" min="0" step="0.1" required value={form.build_ping} onChange={(e) => set('build_ping', e.target.value)} placeholder="例：38.5" />
           </Field>
           <Field label="地坪">
-            <input className={inputCls} type="number" min="0" step="0.01" value={form.land_ping} onChange={(e) => set('land_ping', e.target.value)} placeholder="例：5.2" />
+            <input className={inputCls} type="number" min="0" step="0.1" value={form.land_ping} onChange={(e) => set('land_ping', e.target.value)} placeholder="例：5.2" />
           </Field>
 
           {/* Layout grid */}
@@ -310,18 +309,31 @@ export default function PropertyForm({ id }: PropertyFormProps) {
             <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-3">格局</p>
             <div className="grid grid-cols-4 gap-3 bg-titanium-950/40 p-4 rounded-lg border border-glacier-200/[0.06]">
               {[
-                { label: '房', key: 'rooms', opts: roomOptions },
-                { label: '廳', key: 'halls', opts: hallOptions },
-                { label: '衛', key: 'baths', opts: bathOptions },
-                { label: '陽台', key: 'balconies', opts: balconyOptions },
-              ].map(({ label, key, opts }) => (
-                <div key={key}>
-                  <p className="text-[10px] text-glacier-500 mb-1.5 text-center">{label}</p>
-                  <select className={selectCls + ' text-center'} value={(form as unknown as Record<string, string>)[key]} onChange={(e) => set(key, e.target.value)}>
-                    {opts.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
-                  </select>
-                </div>
-              ))}
+                { label: '房', key: 'rooms', max: 6 },
+                { label: '廳', key: 'halls', max: 6 },
+                { label: '衛', key: 'baths', max: 6 },
+                { label: '陽台', key: 'balconies', max: 6 },
+              ].map(({ label, key, max }) => {
+                const val = parseInt((form as unknown as Record<string, string>)[key]) || 0;
+                return (
+                  <div key={key} className="flex flex-col items-center gap-2">
+                    <p className="text-[10px] text-glacier-500 text-center">{label}</p>
+                    <div className="flex items-center w-full bg-titanium-900 border border-glacier-200/[0.08] rounded-lg overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => set(key, String(Math.max(0, val - 1)))}
+                        className="px-3 py-2.5 text-glacier-400 hover:text-aurora-400 hover:bg-titanium-700/50 transition-colors text-base font-bold leading-none select-none"
+                      >−</button>
+                      <span className="flex-1 text-center text-sm font-semibold text-glacier-200">{val}</span>
+                      <button
+                        type="button"
+                        onClick={() => set(key, String(Math.min(max, val + 1)))}
+                        className="px-3 py-2.5 text-glacier-400 hover:text-aurora-400 hover:bg-titanium-700/50 transition-colors text-base font-bold leading-none select-none"
+                      >＋</button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
