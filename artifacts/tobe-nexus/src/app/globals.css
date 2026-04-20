@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Titanium Gray scale ── */
+  --color-titanium-950: #1C1C1C;
+  --color-titanium-900: #242424;
+  --color-titanium-800: #2C2C2C;
+  --color-titanium-700: #363636;
+  --color-titanium-600: #444444;
+  --color-titanium-500: #5A5A5A;
+  --color-titanium-400: #7A7A7A;
+  --color-titanium-300: #A0A0A0;
+
+  /* ── Glacier Silver (text & borders) ── */
+  --color-glacier-100: #F8FAFC;
+  --color-glacier-200: #E2E8F0;
+  --color-glacier-300: #CBD5E1;
+  --color-glacier-400: #94A3B8;
+  --color-glacier-500: #64748B;
+
+  /* ── Aurora Blue (accent) ── */
+  --color-aurora-300: #66EFFF;
+  --color-aurora-400: #33EAFF;
+  --color-aurora-500: #00E5FF;
+  --color-aurora-600: #00C4DB;
+  --color-aurora-700: #009BB5;
+
+  /* ── Semantic ── */
+  --color-danger: #EF4444;
+  --color-warning: #F59E0B;
+
+  --font-sans: "Inter", "Noto Sans TC", system-ui, sans-serif;
+}
+
+html,
+body {
+  background-color: #2C2C2C;
+  color: #E2E8F0;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #242424;
+}
+::-webkit-scrollbar-thumb {
+  background: #444444;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00E5FF;
+}
+
+/* Aurora glow effect utility */
+.glow-aurora {
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+}
+.glow-aurora-sm {
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+}
