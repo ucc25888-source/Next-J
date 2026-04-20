@@ -20,6 +20,7 @@ interface SystemState {
   setCurrentClient: (client: Client | null) => void;
   addCopy: (copy: Copy) => void;
   markCopyAsUsed: (copy_id: string) => void;
+  incrementUsage: () => void;
   getNextListingId: (clientId: string, type: 'C' | 'B', areaCode?: string) => string;
 }
 
@@ -157,6 +158,16 @@ export const useSystemStore = create<SystemState>()((set, get) => ({
   balconyOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }, { value: '5' }, { value: '6' }],
   setCurrentClient: (client) => set({ currentClient: client }),
   addCopy: (copy) => set((state) => ({ copies: [copy, ...state.copies] })),
+  incrementUsage: () =>
+    set((state) => {
+      if (!state.currentClient) return state;
+      return {
+        currentClient: {
+          ...state.currentClient,
+          used_this_month: state.currentClient.used_this_month + 1,
+        },
+      };
+    }),
   markCopyAsUsed: (copy_id) =>
     set((state) => ({
       copies: state.copies.map((c) =>

@@ -32,7 +32,7 @@ const HOOK_TYPES: { value: HookType; label: string }[] = [
 export default function CopywritingPage({ id }: { id: string }) {
   const router = useRouter();
   const { getPropertyById } = usePropertyStore();
-  const { currentClient, addCopy } = useSystemStore();
+  const { currentClient, addCopy, incrementUsage } = useSystemStore();
 
   const [postType, setPostType] = useState<PostType>('物件開箱');
   const [hookType, setHookType] = useState<HookType>('情感溫度鉤');
@@ -42,6 +42,11 @@ export default function CopywritingPage({ id }: { id: string }) {
   const [saved, setSaved] = useState(false);
 
   const property = getPropertyById(id);
+
+  const used = currentClient?.used_this_month ?? 0;
+  const quota = currentClient?.monthly_quota ?? 30;
+  const isOverQuota = used >= quota;
+  const usagePct = Math.min((used / quota) * 100, 100);
 
   useEffect(() => {
     if (!property) {
@@ -53,6 +58,7 @@ export default function CopywritingPage({ id }: { id: string }) {
 
   const handleGenerate = (pType: PostType, hType: HookType) => {
     if (!property || !currentClient) return;
+    if (isOverQuota) return;
     setIsGenerating(true);
     setPostType(pType);
     setHookType(hType);
@@ -78,6 +84,7 @@ export default function CopywritingPage({ id }: { id: string }) {
         used: false,
       };
       addCopy(copyRecord);
+      incrementUsage();
       setIsGenerating(false);
       setSaved(true);
     }, 600);
@@ -165,21 +172,43 @@ export default function CopywritingPage({ id }: { id: string }) {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-glacier-200/[0.06]">
+              {/* Quota bar */}
+              <div className="pt-3 border-t border-glacier-200/[0.06] space-y-2">
+                <div className="flex items-center justify-between text-[10px] text-glacier-500">
+                  <span>本月文案用量</span>
+                  <span className={isOverQuota ? 'text-red-500 font-bold' : 'text-glacier-400'}>
+                    {used} / {quota} 次
+                  </span>
+                </div>
+                <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${isOverQuota ? 'bg-red-500' : usagePct >= 80 ? 'bg-aurora-400' : 'bg-aurora-500'}`}
+                    style={{ width: `${usagePct}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-1">
                 <span className="flex items-center gap-1.5 text-[10px] text-glacier-600">
                   {saved && <><CheckCircle2 className="w-3 h-3 text-aurora-500" /> 已儲存至文案紀錄</>}
                 </span>
-                <button
-                  onClick={() => handleGenerate(postType, hookType)}
-                  disabled={isGenerating}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all glow-aurora-sm"
-                >
-                  {isGenerating ? (
-                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> 生成中...</>
-                  ) : (
-                    <><Sparkles className="w-3.5 h-3.5" /> 生成策略文案</>
-                  )}
-                </button>
+                {isOverQuota ? (
+                  <div className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-red-500 bg-red-50 border border-red-200 rounded-lg cursor-not-allowed">
+                    <Sparkles className="w-3.5 h-3.5" /> 本月配額已用盡
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleGenerate(postType, hookType)}
+                    disabled={isGenerating}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all glow-aurora-sm"
+                  >
+                    {isGenerating ? (
+                      <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> 生成中...</>
+                    ) : (
+                      <><Sparkles className="w-3.5 h-3.5" /> 生成策略文案</>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>
