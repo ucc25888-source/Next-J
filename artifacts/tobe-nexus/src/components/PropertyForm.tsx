@@ -6,6 +6,7 @@ import { usePropertyStore } from '@/store/usePropertyStore';
 import { useSystemStore } from '@/store/useSystemStore';
 import { compressImage } from '@/utils/image';
 import { ArrowLeft, Save, ImagePlus, X } from 'lucide-react';
+import { NoTranslateSelect } from './NoTranslateSelect';
 
 interface PropertyFormProps {
   id?: string;
@@ -240,31 +241,21 @@ export default function PropertyForm({ id }: PropertyFormProps) {
             />
           </Field>
           <Field label="區域" required>
-            <select
-              className={selectCls}
+            <NoTranslateSelect
               value={form.area_code}
-              onChange={(e) => set('area_code', e.target.value)}
-              required
-            >
-              <option value="">請選擇區域</option>
-              {areas.filter((a) => a.active).map((a) => (
-                <option key={a.area_code} value={a.area_code} translate="no">{a.area_name}</option>
-              ))}
-            </select>
+              onChange={(v) => { set('area_code', v); set('subarea', ''); }}
+              options={areas.filter((a) => a.active).map((a) => ({ value: a.area_code, label: a.area_name }))}
+              placeholder="請選擇區域"
+            />
           </Field>
           <Field label="地段 / 小區域" required>
-            <select
-              className={selectCls}
+            <NoTranslateSelect
               value={form.subarea}
-              onChange={(e) => set('subarea', e.target.value)}
-              required
+              onChange={(v) => set('subarea', v)}
+              options={availableSubareas.map((s) => ({ value: s.subarea, label: s.subarea }))}
+              placeholder="請選擇地段"
               disabled={!form.area_code}
-            >
-              <option value="">請選擇地段</option>
-              {availableSubareas.map((s) => (
-                <option key={s.subarea} value={s.subarea} translate="no">{s.subarea}</option>
-              ))}
-            </select>
+            />
           </Field>
           <div className="md:col-span-2">
             <Field label="地址備註（不含門牌）">

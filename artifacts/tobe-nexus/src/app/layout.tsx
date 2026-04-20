@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-TW">
+    <html lang="zh-TW" translate="no" className="notranslate">
       <body className="flex min-h-screen bg-titanium-800">
         <ConditionalLayout>{children}</ConditionalLayout>
       </body>
