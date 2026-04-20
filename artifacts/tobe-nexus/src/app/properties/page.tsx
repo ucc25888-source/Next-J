@@ -25,10 +25,13 @@ export default function PropertiesPage() {
     `${p.listing_id ? `[${p.listing_id}] ` : ""}${p.subarea} ${p.property_type}`;
 
   const statusCls: Record<string, string> = {
-    銷售中: "bg-aurora-500/10 text-aurora-400 border-aurora-500/25",
-    議價中: "bg-warning/10 text-warning border-warning/25",
-    新進案: "bg-glacier-500/10 text-glacier-400 border-glacier-500/20",
-    已成交: "bg-titanium-700/50 text-glacier-300 border-titanium-600/40",
+    銷售中:   "bg-aurora-500/10 text-aurora-400 border-aurora-500/25",
+    新進案:   "bg-glacier-500/10 text-glacier-400 border-glacier-500/20",
+    議價中:   "bg-yellow-500/10 text-yellow-400 border-yellow-500/25",
+    洽談中:   "bg-orange-500/10 text-orange-400 border-orange-500/25",
+    已成交:   "bg-titanium-700/50 text-glacier-300 border-titanium-600/40",
+    暫停:     "bg-titanium-700/30 text-glacier-500 border-titanium-600/30",
+    評估排除: "bg-red-500/10 text-red-400 border-red-500/20",
   };
 
   return (
