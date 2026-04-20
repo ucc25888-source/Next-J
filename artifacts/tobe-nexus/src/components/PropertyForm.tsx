@@ -244,7 +244,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
             >
               <option value="">請選擇區域</option>
               {areas.filter((a) => a.active).map((a) => (
-                <option key={a.area_code} value={a.area_code}>{a.area_name}</option>
+                <option key={a.area_code} value={a.area_code} translate="no">{a.area_name}</option>
               ))}
             </select>
           </Field>
@@ -258,7 +258,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
             >
               <option value="">請選擇地段</option>
               {availableSubareas.map((s) => (
-                <option key={s.subarea} value={s.subarea}>{s.subarea}</option>
+                <option key={s.subarea} value={s.subarea} translate="no">{s.subarea}</option>
               ))}
             </select>
           </Field>
