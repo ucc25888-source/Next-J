@@ -106,7 +106,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
   const handleImageUpload = async (file: File, index: 1 | 2 | 3 | 4) => {
     try {
-      const base64Url = await compressImage(file, 1200, 0.8);
+      const base64Url = await compressImage(file, 1200, 0.85, 900);
       setForm((prev) => ({ ...prev, [`img${index}_url`]: base64Url }));
     } catch {
       alert('圖片上傳失敗，請稍後再試');
@@ -338,19 +338,19 @@ export default function PropertyForm({ id }: PropertyFormProps) {
           <Field label="主賣點">
             <select className={selectCls} value={form.main_point} onChange={(e) => set('main_point', e.target.value)}>
               <option value="">請選擇</option>
-              {mainPoints.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
+              {mainPoints.map((o) => <option key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
             </select>
           </Field>
           <Field label="次賣點（可空）">
             <select className={selectCls} value={form.second_point} onChange={(e) => set('second_point', e.target.value)}>
               <option value="">無</option>
-              {mainPoints.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
+              {mainPoints.map((o) => <option key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
             </select>
           </Field>
           <Field label="目標客群">
             <select className={selectCls} value={form.target_buyer} onChange={(e) => set('target_buyer', e.target.value)}>
               <option value="">請選擇</option>
-              {targetBuyers.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
+              {targetBuyers.map((o) => <option key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
             </select>
           </Field>
 

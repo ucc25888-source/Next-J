@@ -152,9 +152,9 @@ export const useSystemStore = create<SystemState>()((set, get) => ({
     { value: '戰略放棄' },
   ],
   roomOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }, { value: '5' }, { value: '6+' }],
-  hallOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }],
-  bathOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }],
-  balconyOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }],
+  hallOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }, { value: '5' }, { value: '6' }],
+  bathOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }, { value: '5' }, { value: '6' }],
+  balconyOptions: [{ value: '0' }, { value: '1' }, { value: '2' }, { value: '3' }, { value: '4' }, { value: '5' }, { value: '6' }],
   setCurrentClient: (client) => set({ currentClient: client }),
   addCopy: (copy) => set((state) => ({ copies: [copy, ...state.copies] })),
   markCopyAsUsed: (copy_id) =>

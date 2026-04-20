@@ -1,7 +1,8 @@
 export const compressImage = (
   file: File,
   maxWidth = 1200,
-  quality = 0.8
+  quality = 0.85,
+  maxHeight = 900,
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -11,10 +12,11 @@ export const compressImage = (
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
+        const widthRatio = maxWidth / width;
+        const heightRatio = maxHeight / height;
+        const scale = Math.min(1, widthRatio, heightRatio);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
