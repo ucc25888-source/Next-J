@@ -11,9 +11,9 @@ export const SESSION_OPTIONS: SessionOptions = {
   password: process.env.SESSION_SECRET ?? 'fallback-secret-change-me-in-production-32chars',
   cookieName: 'tobe-nexus-session',
   cookieOptions: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: 'none',
     maxAge: 60 * 60 * 24 * 30,
   },
 };
