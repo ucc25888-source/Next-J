@@ -131,7 +131,6 @@ export default function SettingsPage() {
             </div>
 
             <div className="p-6 space-y-3 text-xs text-glacier-500 leading-relaxed">
-              <p>• AI 文案功能由 <span className="text-glacier-300 font-medium">TOBE Nexus Business AI Hub</span> 集中授權，您不需要自行設定任何 API 金鑰。</p>
               <p>• 每個帳號有固定月度文案生成次數上限，超過後文案功能暫停，但案件登錄、管理功能照常可用。</p>
               <p>• 配額每月一日自動重置。如有特殊需求，請聯繫您的業務窗口申請調整。</p>
             </div>
