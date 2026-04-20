@@ -29,8 +29,8 @@ const HOOK_TYPES: { value: HookType; label: string }[] = [
 ];
 
 const FIXED_FOOTER = `👇 好案不等人，點擊預約看屋：
-📞 撥打專線：0925-997779
-💬 直通LINE專線：https://bit.ly/4sJhSzs
+📞 專線：0925-997779
+💬 LINE：https://bit.ly/4sJhSzs
 👤 杜美珍 & 周福良 (福哥)`;
 
 export default function CopywritingPage({ id }: { id: string }) {
@@ -89,6 +89,8 @@ export default function CopywritingPage({ id }: { id: string }) {
           price: property.price_wan,
           ping: property.build_ping,
           layout: defaultLayout,
+          propertyType: property.property_type || '',
+          parking: property.parking || '',
           hookType: hType,
           highlights: highlightsText || property.must_say_3 || '',
         }),

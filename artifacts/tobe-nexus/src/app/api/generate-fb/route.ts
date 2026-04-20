@@ -40,33 +40,49 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { postType, location, price, ping, layout, hookType, highlights } = await req.json();
+  const { postType, location, price, ping, layout, propertyType, parking, hookType, highlights } = await req.json();
+
+  const infoLine2 = [
+    `💰 總價 ${price}萬`,
+    `${ping}坪`,
+    parking ? parking : null,
+    layout,
+  ].filter(Boolean).join('｜');
 
   const systemPrompt = `你是 TOBE Nexus 系統特助。代表「花蓮房產顧問福哥」與「杜美珍」產出精品級 FB 文案。
 
-[視覺與結構規範]
+嚴格依照以下 7 段結構輸出，不可增減段落：
 
-標題：【珍選好福邸｜${postType}】（10字內）
+【第 1 段：戰略頭銜】
+【珍選好福邸｜${postType}】
 
-大字資訊區：
-📍 ${location}
-💰 ${price}萬｜📏 ${ping}坪｜🏠 ${layout}
+【第 2 段：物件黃金資訊】
+📍 ${location}｜${propertyType || '精選物件'}
+${infoLine2}
 
-戰略分隔（必須原樣保留這行）：
+【第 3 段：核心 HOOK（必須精確保留兩條分隔線與引號）】
+—————————————————
+「根據「${hookType}」方向，在此一句話點出最強賣點，30字內，震撼感十足」
 —————————————————
 
-中間內容：根據「${hookType}」方向，產出一句高吸睛戰略重擊金句（不超過30字）。
+【第 4 段：戰略重點】
+✅ （精華亮點一，區域優勢或生活機能）
+✅ （精華亮點二，投資價值或稀缺性）
+✅ （精華亮點三，結合輸入的精華亮點）
 
-精華整理：3個✅點，包含區域優勢與投資價值（結合下方輸入的精華亮點）。
+【第 5 段：精準畫像】
+🎯 適合對象：（一句話精準定位目標客群）
 
-對象：🎯 適合對象：（根據物件特性與地點精準定位客群，一句話）。
-
-強制品牌標籤（必須獨立成行放在文案最末端，不可省略）：
+【第 6 段：品牌標籤（必須獨立成行，不可省略）】
 #珍選好福邸
 #花蓮房產顧問福哥
 #TOBENexus
 
-注意：請直接輸出 FB 文案本文，不要加任何前言或解釋。不要生成聯繫電話、LINE 或署名，系統會自動附加。`;
+規則：
+- 直接輸出文案，不加任何說明或前言
+- Hook 金句必須用「」括住，且前後各有一條 ————————————————— 分隔線
+- 不生成聯繫電話、LINE 或署名，系統自動附加
+- 標題【】保留，不要重複打「第X段」標籤`;
 
   try {
     const stream = await openai.chat.completions.create({
