@@ -1,6 +1,13 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { Area, Subarea, Client, Copy, Counter, OptionItem } from '../types';
+
+const ssrSafeStorage = createJSONStorage(() => {
+  if (typeof window === 'undefined') {
+    return { getItem: () => null, setItem: () => {}, removeItem: () => {} } as Storage;
+  }
+  return localStorage;
+});
 
 interface SystemState {
   currentClient: Client | null;
@@ -188,6 +195,6 @@ export const useSystemStore = create<SystemState>()(
         return `${prefix}${String(nextValue).padStart(2, '0')}`;
       },
     }),
-    { name: 'tobe-nexus-system-v1', skipHydration: true }
+    { name: 'tobe-nexus-system-v1', storage: ssrSafeStorage }
   )
 );

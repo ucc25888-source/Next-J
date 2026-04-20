@@ -1,6 +1,13 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { Property } from '../types';
+
+const ssrSafeStorage = createJSONStorage(() => {
+  if (typeof window === 'undefined') {
+    return { getItem: () => null, setItem: () => {}, removeItem: () => {} } as Storage;
+  }
+  return localStorage;
+});
 
 interface PropertyState {
   properties: Property[];
@@ -75,7 +82,7 @@ export const usePropertyStore = create<PropertyState>()(
     }),
     {
       name: 'tobe-nexus-properties-v1',
-      skipHydration: true,
+      storage: ssrSafeStorage,
     }
   )
 );
