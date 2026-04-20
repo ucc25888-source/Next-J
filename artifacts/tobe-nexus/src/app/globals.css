@@ -81,10 +81,22 @@ body {
 }
 .nt-block {
   display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .nt-block::before {
   content: attr(data-t);
 }
+
+/* ── Block Chrome GT's <font> injections ──
+   Chrome Translate adds <font style="vertical-align:inherit"> siblings.
+   Hiding them removes duplicated text without affecting our CSS-generated content. */
+.nt ~ font,
+.nt-block ~ font,
+[data-t] ~ font,
+h3 > font {
+  display: none !important;
+}
+
+/* Prevent Chrome GT's wide injections from causing a horizontal page scrollbar */
+body { overflow-x: hidden; }
+html { overflow-x: hidden; }
