@@ -49,10 +49,10 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
-          <div className="w-14 h-14 rounded-2xl bg-aurora-500 flex items-center justify-center mb-5 glow-aurora-sm shadow-lg">
-            <Network className="w-7 h-7 text-titanium-950" />
+          <div className="w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center mb-5 glow-aurora-sm shadow-lg shadow-orange-500/20">
+            <Network className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-black text-glacier-100 tracking-tight">TOBE Nexus</h1>
+          <h1 className="text-2xl font-black tracking-tight gradient-brand-text">TOBE Nexus</h1>
           <p className="text-sm text-glacier-500 mt-1 font-medium tracking-wide">
             AI 成交戰略系統
           </p>
@@ -117,10 +117,10 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !clientId || !loginToken}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-aurora-500 text-titanium-950 text-sm font-bold rounded-xl hover:bg-aurora-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all glow-aurora-sm"
+              className="w-full flex items-center justify-center gap-2 py-3 gradient-brand text-white text-sm font-bold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all glow-aurora-sm"
             >
               {loading ? (
-                <div className="w-4 h-4 border-2 border-titanium-950/30 border-t-titanium-950 rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <LogIn className="w-4 h-4" />
               )}
@@ -131,7 +131,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-[11px] text-glacier-600 mt-6">
-          TOBE-Nexus Business AI Hub &nbsp;·&nbsp; 花蓮地產成交戰略平台
+          TOBE-Nexus Business AI Hub &nbsp;·&nbsp; 全台房仲 AI 成交戰略平台
         </p>
       </div>
     </div>
