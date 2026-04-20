@@ -50,8 +50,11 @@ export function NoTranslateSelect({
     setOpen((o) => !o);
   }
 
+  const displayLabel = selected ? selected.label : placeholder;
+  const isPlaceholder = !selected;
+
   return (
-    <div className={`relative ${className}`} translate="no" lang="zh-Hans">
+    <div className={`relative ${className}`}>
       <button
         ref={btnRef}
         type="button"
@@ -61,19 +64,19 @@ export function NoTranslateSelect({
           disabled ? "opacity-50 cursor-not-allowed bg-slate-50" : "cursor-pointer"
         } ${open ? "border-slate-300" : ""}`}
       >
-        <span className={selected ? "text-glacier-200" : "text-glacier-500"}>
-          {selected ? selected.label : placeholder}
-        </span>
+        {/* Text rendered via CSS attr() — invisible to Chrome GT */}
+        <span
+          className={`nt-block flex-1 min-w-0 ${isPlaceholder ? "text-glacier-500" : "text-glacier-200"}`}
+          data-t={displayLabel}
+        />
         <ChevronDown
-          className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-100 ${open ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-slate-400 shrink-0 ml-1 transition-transform duration-100 ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && typeof window !== "undefined" &&
         createPortal(
           <div
-            translate="no"
-            lang="zh-Hans"
             style={{
               position: "absolute",
               top: dropPos.top,
@@ -88,17 +91,16 @@ export function NoTranslateSelect({
               <button
                 key={opt.value}
                 type="button"
-                lang="zh-Hans"
-                translate="no"
                 onClick={() => {
                   onChange(opt.value);
                   setOpen(false);
                 }}
-                className={`w-full px-3 py-2 text-sm text-left text-glacier-300 hover:bg-slate-50 transition-colors ${
+                className={`w-full px-3 py-2 text-sm text-left text-glacier-300 hover:bg-slate-50 transition-colors flex items-center ${
                   opt.value === value ? "font-semibold text-glacier-200 bg-slate-50" : ""
                 }`}
               >
-                {opt.label}
+                {/* Text rendered via CSS attr() — Chrome GT cannot touch this */}
+                <span className="nt" data-t={opt.label} />
               </button>
             ))}
           </div>,

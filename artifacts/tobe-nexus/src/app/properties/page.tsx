@@ -123,11 +123,10 @@ export default function PropertiesPage() {
                         {property.rooms}房{property.halls}廳{property.baths}衛
                       </span>
                       <h3
-                        className="mt-1.5 text-[13px] font-bold text-glacier-200 truncate"
+                        className="mt-1.5 text-[13px] font-bold text-glacier-200"
                         title={getTitle(property)}
-                        translate="no"
                       >
-                        {getTitle(property)}
+                        <span className="nt-block" data-t={getTitle(property)} />
                       </h3>
                     </div>
                     <p className="text-xl font-bold text-aurora-500 mb-3">
@@ -141,7 +140,7 @@ export default function PropertiesPage() {
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Ruler className="w-3 h-3 text-glacier-600 shrink-0" />
-                        <span>{property.build_ping} 坪（建）</span>
+                        <span className="nt" data-t={`${property.build_ping} 坪（建）`} />
                       </div>
                     </div>
 
