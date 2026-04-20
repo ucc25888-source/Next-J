@@ -153,7 +153,7 @@ export const useSystemStore = create<SystemState>()(
       statusPushOptions: [
         { value: '待場勘拍照' },
         { value: '文案排版中' },
-        { value: '全網強銷中' },
+        { value: '全網熱銷中' },
         { value: '追蹤議價回報' },
         { value: '開發/續約洽談' },
         { value: '同業狀況確認' },

@@ -35,7 +35,7 @@ const DEMO_PROPERTY: Property = {
   balconies: '1',
   parking: '無車位',
   status_now: '銷售中',
-  status_push: '全網強銷中',
+  status_push: '全網熱銷中',
   main_point: '景觀採光佳 | View & sunlight',
   second_point: '學區首選 | School district',
   target_buyer: '首購 | First-time buyer',
