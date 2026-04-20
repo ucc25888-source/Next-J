@@ -112,7 +112,8 @@ export default function CopywritingPage({ id }: { id: string }) {
         setContent(fullText);
       }
 
-      const finalContent = `${fullText}\n\n—————————————————\n${slogan}\n\n${FIXED_FOOTER}`;
+      const HASHTAGS = `#珍選好福邸\n#花蓮房產顧問福哥\n#TOBENexus`;
+      const finalContent = `${fullText}\n\n· · · · · · · · · · · · · · ·\n${slogan}\n\n${HASHTAGS}\n\n${FIXED_FOOTER}`;
       setContent(finalContent);
 
       const copyRecord: Copy = {
