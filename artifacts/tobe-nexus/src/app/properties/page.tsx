@@ -125,6 +125,7 @@ export default function PropertiesPage() {
                       <h3
                         className="mt-1.5 text-[13px] font-bold text-glacier-200 truncate"
                         title={getTitle(property)}
+                        translate="no"
                       >
                         {getTitle(property)}
                       </h3>

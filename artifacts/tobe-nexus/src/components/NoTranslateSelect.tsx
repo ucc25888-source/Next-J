@@ -40,41 +40,37 @@ export function NoTranslateSelect({
   }, []);
 
   return (
-    <div className={`relative ${className}`} ref={ref} translate="no">
+    <div className={`relative ${className}`} ref={ref} translate="no" lang="zh-Hans">
       <button
         type="button"
         disabled={disabled}
         onClick={() => setOpen((o) => !o)}
-        className={`w-full bg-white border rounded-lg px-3 py-2.5 text-sm text-left flex items-center justify-between transition-colors ${
+        className={`w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-left flex items-center justify-between transition-colors ${
           disabled ? "opacity-50 cursor-not-allowed bg-slate-50" : "cursor-pointer"
-        } ${
-          open
-            ? "border-aurora-500/60 ring-1 ring-aurora-500/20"
-            : "border-slate-200"
-        }`}
+        } ${open ? "border-slate-300" : ""}`}
       >
         <span className={selected ? "text-glacier-200" : "text-glacier-500"}>
           {selected ? selected.label : placeholder}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-100 ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
-        <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden max-h-64 overflow-y-auto">
+        <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden max-h-64 overflow-y-auto">
           {options.map((opt) => (
             <button
               key={opt.value}
               type="button"
+              lang="zh-Hans"
+              translate="no"
               onClick={() => {
                 onChange(opt.value);
                 setOpen(false);
               }}
-              className={`w-full px-3 py-2.5 text-sm text-left transition-colors ${
-                opt.value === value
-                  ? "bg-aurora-500/10 text-aurora-600 font-semibold"
-                  : "text-glacier-300 hover:bg-slate-50 hover:text-glacier-200"
+              className={`w-full px-3 py-2 text-sm text-left transition-colors text-glacier-300 hover:bg-slate-50 ${
+                opt.value === value ? "font-semibold text-glacier-200 bg-slate-50" : ""
               }`}
             >
               {opt.label}

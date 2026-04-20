@@ -105,7 +105,7 @@ export default function DashboardPage() {
                         {property.rooms}房{property.halls}廳{property.baths}衛
                       </span>
                     </div>
-                    <h3 className="text-[13px] font-bold text-glacier-200 truncate" title={getTitle(property)}>
+                    <h3 className="text-[13px] font-bold text-glacier-200 truncate" title={getTitle(property)} translate="no">
                       {getTitle(property)}
                     </h3>
                     <p className="text-lg font-bold text-aurora-500 mt-1">
