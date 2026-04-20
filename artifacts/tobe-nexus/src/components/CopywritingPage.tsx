@@ -103,7 +103,7 @@ export default function CopywritingPage({ id }: { id: string }) {
 
   if (!property) return null;
 
-  const selectCls = 'w-full appearance-none bg-titanium-800 border border-glacier-200/[0.08] rounded-lg px-3 py-2.5 text-sm text-glacier-200 focus:outline-none focus:border-aurora-500/50 transition-colors cursor-pointer pr-8';
+  const selectCls = 'w-full appearance-none bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-glacier-200 focus:outline-none focus:border-aurora-500/60 focus:ring-1 focus:ring-aurora-500/20 transition-colors cursor-pointer pr-8';
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -128,7 +128,7 @@ export default function CopywritingPage({ id }: { id: string }) {
         <div className="space-y-5">
           {/* Strategy panel */}
           <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
-            <div className="px-6 py-3.5 border-b border-glacier-200/[0.06] bg-titanium-950/30">
+            <div className="px-6 py-3.5 border-b border-slate-100 bg-slate-50">
               <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">1. 選擇發文策略</h2>
             </div>
             <div className="p-6 space-y-4">
@@ -186,18 +186,18 @@ export default function CopywritingPage({ id }: { id: string }) {
 
           {/* Edit panel */}
           <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
-            <div className="px-6 py-3.5 border-b border-glacier-200/[0.06] bg-titanium-950/30 flex items-center justify-between">
+            <div className="px-6 py-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
               <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">2. 文案微調</h2>
               <div className="flex gap-2">
                 <button
                   onClick={handleDownloadImages}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-glacier-400 bg-titanium-800 border border-glacier-200/[0.08] rounded-lg hover:border-glacier-200/15 transition-all"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-glacier-400 bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition-all"
                 >
                   <Download className="w-3 h-3" /> 下載照片
                 </button>
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium bg-titanium-800 border border-glacier-200/[0.08] rounded-lg hover:border-aurora-500/30 hover:text-aurora-400 transition-all text-glacier-400"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium bg-white border border-slate-200 rounded-lg hover:border-aurora-500/40 hover:text-aurora-500 transition-all text-glacier-400"
                 >
                   <CopyIcon className="w-3 h-3" />
                   {copied ? '已複製！' : '一鍵複製'}
@@ -206,7 +206,7 @@ export default function CopywritingPage({ id }: { id: string }) {
             </div>
             <div className="p-5">
               <textarea
-                className="w-full bg-titanium-800 border border-glacier-200/[0.08] rounded-lg px-4 py-3 text-sm text-glacier-200 font-mono leading-relaxed resize-none focus:outline-none focus:border-aurora-500/40 transition-colors"
+                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-sm text-glacier-200 font-mono leading-relaxed resize-none focus:outline-none focus:border-aurora-500/60 focus:ring-1 focus:ring-aurora-500/20 transition-colors"
                 rows={14}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}

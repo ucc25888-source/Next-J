@@ -1,29 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Titanium Gray scale ── */
-  --color-titanium-950: #1C1C1C;
-  --color-titanium-900: #242424;
-  --color-titanium-800: #2C2C2C;
-  --color-titanium-700: #363636;
-  --color-titanium-600: #444444;
-  --color-titanium-500: #5A5A5A;
-  --color-titanium-400: #7A7A7A;
-  --color-titanium-300: #A0A0A0;
+  /* ── Sidebar dark navy ── */
+  --color-titanium-950: #0B1426;
+  --color-titanium-900: #FFFFFF;
+  --color-titanium-800: #F0F4FA;
+  --color-titanium-700: #E8EDF5;
+  --color-titanium-600: #CDD5E4;
+  --color-titanium-500: #8896B3;
+  --color-titanium-400: #667080;
+  --color-titanium-300: #9FADC0;
 
-  /* ── Glacier Silver (text & borders) ── */
+  /* ── Text (dark scale for light backgrounds) ── */
   --color-glacier-100: #F8FAFC;
-  --color-glacier-200: #E2E8F0;
-  --color-glacier-300: #CBD5E1;
-  --color-glacier-400: #94A3B8;
-  --color-glacier-500: #64748B;
+  --color-glacier-200: #1A2130;
+  --color-glacier-300: #2D3A52;
+  --color-glacier-400: #4A5870;
+  --color-glacier-500: #6B7A90;
+  --color-glacier-600: #8896A8;
 
-  /* ── Aurora Blue (accent) ── */
-  --color-aurora-300: #66EFFF;
-  --color-aurora-400: #33EAFF;
-  --color-aurora-500: #00E5FF;
-  --color-aurora-600: #00C4DB;
-  --color-aurora-700: #009BB5;
+  /* ── Amber gold accent ── */
+  --color-aurora-300: #FCD34D;
+  --color-aurora-400: #FBBF24;
+  --color-aurora-500: #F59E0B;
+  --color-aurora-600: #D97706;
+  --color-aurora-700: #B45309;
 
   /* ── Semantic ── */
   --color-danger: #EF4444;
@@ -34,8 +35,8 @@
 
 html,
 body {
-  background-color: #2C2C2C;
-  color: #E2E8F0;
+  background-color: #F0F4FA;
+  color: #1A2130;
   font-family: var(--font-sans);
   min-height: 100vh;
 }
@@ -45,20 +46,20 @@ body {
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #242424;
+  background: #E8EDF5;
 }
 ::-webkit-scrollbar-thumb {
-  background: #444444;
+  background: #CDD5E4;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #00E5FF;
+  background: #F59E0B;
 }
 
-/* Aurora glow effect utility */
+/* Amber glow effect utility (replaces aurora glow) */
 .glow-aurora {
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
 }
 .glow-aurora-sm {
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
 }

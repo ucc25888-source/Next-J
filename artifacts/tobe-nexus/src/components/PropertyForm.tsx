@@ -176,12 +176,12 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     </div>
   );
 
-  const inputCls = 'w-full bg-titanium-800 border border-glacier-200/[0.08] rounded-lg px-3 py-2.5 text-sm text-glacier-200 placeholder-glacier-600 focus:outline-none focus:border-aurora-500/50 transition-colors';
+  const inputCls = 'w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-glacier-200 placeholder:text-glacier-500 focus:outline-none focus:border-aurora-500/60 focus:ring-1 focus:ring-aurora-500/20 transition-colors';
   const selectCls = `${inputCls} cursor-pointer`;
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
-      <div className="px-6 py-3.5 border-b border-glacier-200/[0.06] bg-titanium-950/30">
+      <div className="px-6 py-3.5 border-b border-slate-100 bg-slate-50">
         <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">{title}</h2>
       </div>
       <div className="p-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">{children}</div>
@@ -307,7 +307,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
           {/* Layout grid */}
           <div className="md:col-span-3">
             <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-3">格局</p>
-            <div className="grid grid-cols-4 gap-3 bg-titanium-950/40 p-4 rounded-lg border border-glacier-200/[0.06]">
+            <div className="grid grid-cols-4 gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
               {[
                 { label: '房', key: 'rooms', max: 6 },
                 { label: '廳', key: 'halls', max: 6 },
@@ -397,7 +397,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
         {/* Private Notes */}
         <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
-          <div className="px-6 py-3.5 border-b border-glacier-200/[0.06] bg-titanium-950/30">
+          <div className="px-6 py-3.5 border-b border-slate-100 bg-slate-50">
             <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">關鍵情報（私密備註）</h2>
           </div>
           <div className="p-6">
@@ -413,7 +413,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
         {/* Images */}
         <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
-          <div className="px-6 py-3.5 border-b border-glacier-200/[0.06] bg-titanium-950/30">
+          <div className="px-6 py-3.5 border-b border-slate-100 bg-slate-50">
             <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">物件照片（最多 4 張）</h2>
           </div>
           <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -427,7 +427,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                       <button
                         type="button"
                         onClick={() => setForm((prev) => ({ ...prev, [imgKeys[slot]]: '' }))}
-                        className="absolute top-2 right-2 p-1 rounded-full bg-titanium-950/80 text-glacier-400 hover:text-danger transition-colors"
+                        className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white hover:text-danger transition-colors"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
