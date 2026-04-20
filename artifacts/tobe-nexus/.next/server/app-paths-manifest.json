@@ -1,3 +1,6 @@
 {
-  "/properties/new/page": "app/properties/new/page.js"
+  "/page": "app/page.js",
+  "/properties/page": "app/properties/page.js",
+  "/properties/new/page": "app/properties/new/page.js",
+  "/ai-copy/page": "app/ai-copy/page.js"
 }
