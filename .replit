@@ -29,7 +29,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "NEXT_TELEMETRY_DISABLED=1 pnpm --filter @workspace/tobe-nexus run build && pnpm --filter @workspace/tobe-nexus run start"
+args = "sh -c 'test -f /home/runner/workspace/artifacts/tobe-nexus/.next-build/BUILD_ID && pnpm --filter @workspace/tobe-nexus run start || (NEXT_TELEMETRY_DISABLED=1 pnpm --filter @workspace/tobe-nexus run build && pnpm --filter @workspace/tobe-nexus run start)'"
 waitForPort = 3000
 
 [agent]
