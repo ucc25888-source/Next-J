@@ -188,6 +188,6 @@ export const useSystemStore = create<SystemState>()(
         return `${prefix}${String(nextValue).padStart(2, '0')}`;
       },
     }),
-    { name: 'tobe-nexus-system-v1' }
+    { name: 'tobe-nexus-system-v1', skipHydration: true }
   )
 );

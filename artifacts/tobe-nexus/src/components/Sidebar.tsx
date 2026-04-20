@@ -37,8 +37,8 @@ export default function Sidebar() {
             <Zap className="w-[18px] h-[18px] text-titanium-950" />
           </div>
           <div>
-            <p className="text-[13px] font-bold text-glacier-200 tracking-tight leading-none">
-              TOBE-Nexus
+            <p className="text-[12px] font-bold text-glacier-200 tracking-tight leading-none">
+              TOBE-Nexus-AI-System
             </p>
             <p className="text-[9px] font-semibold text-aurora-500 tracking-[0.15em] uppercase mt-1 leading-none">
               AI 成交戰略系統

@@ -75,6 +75,7 @@ export const usePropertyStore = create<PropertyState>()(
     }),
     {
       name: 'tobe-nexus-properties-v1',
+      skipHydration: true,
     }
   )
 );
