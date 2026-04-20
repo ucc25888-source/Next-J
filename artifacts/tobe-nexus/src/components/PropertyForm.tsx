@@ -317,7 +317,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
               ].map(({ label, key, opts }) => (
                 <div key={key}>
                   <p className="text-[10px] text-glacier-500 mb-1.5 text-center">{label}</p>
-                  <select className={selectCls + ' text-center'} value={(form as Record<string, string>)[key]} onChange={(e) => set(key, e.target.value)}>
+                  <select className={selectCls + ' text-center'} value={(form as unknown as Record<string, string>)[key]} onChange={(e) => set(key, e.target.value)}>
                     {opts.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
                   </select>
                 </div>
