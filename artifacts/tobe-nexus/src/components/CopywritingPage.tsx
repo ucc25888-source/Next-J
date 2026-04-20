@@ -113,7 +113,7 @@ export default function CopywritingPage({ id }: { id: string }) {
       }
 
       const HASHTAGS = `#珍選好福邸\n#花蓮房產顧問福哥\n#TOBENexus`;
-      const finalContent = `${fullText}\n\n${slogan}\n\n${FIXED_FOOTER}\n\n${HASHTAGS}`;
+      const finalContent = `${fullText}\n· · · · · · · · · · · · · · ·\n${slogan}\n\n${FIXED_FOOTER}\n\n${HASHTAGS}`;
       setContent(finalContent);
 
       const copyRecord: Copy = {
