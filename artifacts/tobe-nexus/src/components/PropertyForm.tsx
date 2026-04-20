@@ -11,6 +11,31 @@ interface PropertyFormProps {
   id?: string;
 }
 
+function Field({ label, required, hint, children }: {
+  label: string; required?: boolean; hint?: string; children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className="block text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-2" translate="no">
+        {label} {required && <span className="text-aurora-500 normal-case">*</span>}
+      </label>
+      {children}
+      {hint && <p className="mt-1.5 text-[10px] text-glacier-600">{hint}</p>}
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
+      <div className="px-6 py-3.5 border-b border-slate-100 bg-slate-50">
+        <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]" translate="no">{title}</h2>
+      </div>
+      <div className="p-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">{children}</div>
+    </div>
+  );
+}
+
 export default function PropertyForm({ id }: PropertyFormProps) {
   const router = useRouter();
   const { addProperty, updateProperty, getPropertyById } = usePropertyStore();
@@ -164,29 +189,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     router.push('/properties');
   };
 
-  const Field = ({
-    label, required, hint, children,
-  }: { label: string; required?: boolean; hint?: string; children: React.ReactNode }) => (
-    <div>
-      <label className="block text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-2">
-        {label} {required && <span className="text-aurora-500 normal-case">*</span>}
-      </label>
-      {children}
-      {hint && <p className="mt-1.5 text-[10px] text-glacier-600">{hint}</p>}
-    </div>
-  );
-
   const inputCls = 'w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-glacier-200 placeholder:text-glacier-500 focus:outline-none focus:border-aurora-500/60 focus:ring-1 focus:ring-aurora-500/20 transition-colors';
   const selectCls = `${inputCls} cursor-pointer`;
-
-  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
-      <div className="px-6 py-3.5 border-b border-slate-100 bg-slate-50">
-        <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">{title}</h2>
-      </div>
-      <div className="p-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">{children}</div>
-    </div>
-  );
 
   const imageSlots = [1, 2, 3, 4] as const;
   const imgKeys = { 1: 'img1_url', 2: 'img2_url', 3: 'img3_url', 4: 'img4_url' } as const;
@@ -212,7 +216,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" translate="no">
         {/* System & Area */}
         <Section title="基本資訊（系統 / 區域）">
           <Field label="案件類型" required>
@@ -304,37 +308,29 @@ export default function PropertyForm({ id }: PropertyFormProps) {
             <input className={inputCls} type="text" inputMode="decimal" value={form.land_ping} onChange={(e) => set('land_ping', e.target.value)} placeholder="例：5.2" />
           </Field>
 
-          {/* Layout grid — col-span both sm and md */}
+          {/* Layout — dropdowns */}
           <div className="sm:col-span-2 md:col-span-3">
-            <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-3">格局</p>
-            <div className="grid grid-cols-4 gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
-              {[
-                { label: '房', key: 'rooms', max: 6 },
-                { label: '廳', key: 'halls', max: 6 },
-                { label: '衛', key: 'baths', max: 6 },
-                { label: '陽台', key: 'balconies', max: 6 },
-              ].map(({ label, key, max }) => {
-                const raw = (form as unknown as Record<string, string>)[key];
-                const val = raw === '' || raw === undefined ? 0 : (parseInt(raw) >= 0 ? parseInt(raw) : 0);
-                return (
-                  <div key={key} className="flex flex-col items-center gap-2">
-                    <p className="text-[11px] font-semibold text-slate-500 text-center">{label}</p>
-                    <div className="flex items-center w-full bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                      <button
-                        type="button"
-                        onClick={() => set(key, String(Math.max(0, val - 1)))}
-                        className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-aurora-500 hover:bg-aurora-50 transition-colors text-lg font-bold leading-none select-none shrink-0"
-                      >−</button>
-                      <span className="flex-1 text-center text-base font-bold text-slate-800">{val}</span>
-                      <button
-                        type="button"
-                        onClick={() => set(key, String(Math.min(max, val + 1)))}
-                        className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-aurora-500 hover:bg-aurora-50 transition-colors text-lg font-bold leading-none select-none shrink-0"
-                      >＋</button>
-                    </div>
-                  </div>
-                );
-              })}
+            <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-3" translate="no">格局</p>
+            <div className="grid grid-cols-4 gap-3">
+              {([
+                { label: '房', key: 'rooms' },
+                { label: '廳', key: 'halls' },
+                { label: '衛', key: 'baths' },
+                { label: '陽台', key: 'balconies' },
+              ] as const).map(({ label, key }) => (
+                <div key={key} className="flex flex-col gap-1.5">
+                  <p className="text-[11px] font-semibold text-slate-500 text-center" translate="no">{label}</p>
+                  <select
+                    className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-center text-base font-bold text-slate-800 focus:outline-none focus:border-aurora-500/60 focus:ring-1 focus:ring-aurora-500/20 transition-colors cursor-pointer appearance-none"
+                    value={(form as unknown as Record<string, string>)[key] || '0'}
+                    onChange={(e) => set(key, e.target.value)}
+                  >
+                    {[0, 1, 2, 3, 4, 5, 6].map((n) => (
+                      <option key={n} value={String(n)}>{n}</option>
+                    ))}
+                  </select>
+                </div>
+              ))}
             </div>
           </div>
 
