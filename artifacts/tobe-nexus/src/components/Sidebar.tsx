@@ -8,15 +8,15 @@ import {
   Sparkles,
   Settings,
   ChevronRight,
-  Zap,
+  Coins,
   Activity,
 } from "lucide-react";
 
 const navItems = [
-  { label: "總覽儀表板", href: "/", icon: LayoutDashboard },
-  { label: "案件管理", href: "/properties", icon: Building2 },
-  { label: "AI 文案生成", href: "/ai-copy", icon: Sparkles },
-  { label: "系統設定", href: "/settings", icon: Settings },
+  { label: "總覽儀表板", labelEn: "Dashboard", href: "/", icon: LayoutDashboard },
+  { label: "案件管理", labelEn: "Properties", href: "/properties", icon: Building2 },
+  { label: "AI 文案生成", labelEn: "Copywriting", href: "/ai-copy", icon: Sparkles },
+  { label: "系統設定", labelEn: "Settings", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -34,13 +34,13 @@ export default function Sidebar() {
       <div className="px-5 pt-6 pb-5 border-b border-white/[0.07]">
         <div className="flex items-center gap-3">
           <div className="relative w-9 h-9 rounded-xl bg-aurora-500 flex items-center justify-center shrink-0 glow-aurora-sm">
-            <Zap className="w-[18px] h-[18px] text-titanium-950" />
+            <Coins className="w-[18px] h-[18px] text-titanium-950" />
           </div>
           <div>
-            <p className="text-[12px] font-bold text-white tracking-tight leading-none">
+            <p className="text-[11px] font-bold text-white tracking-tight leading-none">
               TOBE Nexus
             </p>
-            <p className="text-[9px] font-semibold text-aurora-500 tracking-[0.1em] mt-1 leading-none">
+            <p className="text-[9px] font-semibold text-aurora-500 tracking-[0.05em] mt-1 leading-none">
               AI 成交戰略系統
             </p>
           </div>
@@ -71,8 +71,13 @@ export default function Sidebar() {
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-aurora-500 rounded-r-full" />
               )}
               <Icon className={`w-[15px] h-[15px] shrink-0 ${active ? "text-aurora-500" : "text-slate-500 group-hover:text-slate-300"}`} />
-              <span className="flex-1">{item.label}</span>
-              {active && <ChevronRight className="w-3 h-3 text-aurora-500/60" />}
+              <span className="flex-1 min-w-0">
+                <span className="block text-[13px]">{item.label}</span>
+                <span className={`block text-[9px] tracking-wide mt-0.5 ${active ? "text-aurora-500/60" : "text-slate-600 group-hover:text-slate-500"}`}>
+                  {item.labelEn}
+                </span>
+              </span>
+              {active && <ChevronRight className="w-3 h-3 text-aurora-500/60 shrink-0" />}
             </Link>
           );
         })}
