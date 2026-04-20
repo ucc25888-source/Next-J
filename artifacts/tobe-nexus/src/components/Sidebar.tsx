@@ -8,7 +8,7 @@ import {
   Sparkles,
   Settings,
   ChevronRight,
-  Coins,
+  Network,
   Activity,
 } from "lucide-react";
 
@@ -34,7 +34,7 @@ export default function Sidebar() {
       <div className="px-5 pt-6 pb-5 border-b border-white/[0.07]">
         <div className="flex items-center gap-3">
           <div className="relative w-9 h-9 rounded-xl bg-aurora-500 flex items-center justify-center shrink-0 glow-aurora-sm">
-            <Coins className="w-[18px] h-[18px] text-titanium-950" />
+            <Network className="w-[18px] h-[18px] text-titanium-950" />
           </div>
           <div>
             <p className="text-[11px] font-bold text-white tracking-tight leading-none">
