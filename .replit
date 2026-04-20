@@ -24,13 +24,13 @@ args = "TOBE-Nexus"
 name = "TOBE-Nexus"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/tobe-nexus run dev"
-waitForPort = 3000
-
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "NEXT_TELEMETRY_DISABLED=1 pnpm --filter @workspace/tobe-nexus run build && pnpm --filter @workspace/tobe-nexus run start"
+waitForPort = 3000
 
 [agent]
 stack = "PNPM_WORKSPACE"
