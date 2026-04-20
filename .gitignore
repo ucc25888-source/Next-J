@@ -5,6 +5,10 @@ dist
 tmp
 out-tsc
 *.tsbuildinfo
+
+# Next.js build output (never commit — breaks the app when committed)
+.next/
+artifacts/**/.next/
 .expo
 .expo-shared
 
