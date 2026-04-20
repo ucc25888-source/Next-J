@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown } from "lucide-react";
 
 interface Option {
@@ -26,12 +27,13 @@ export function NoTranslateSelect({
   className = "",
 }: NoTranslateSelectProps) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0, width: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
   const selected = options.find((o) => o.value === value);
 
   useEffect(() => {
     function handleOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+      if (btnRef.current && !btnRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
@@ -39,12 +41,22 @@ export function NoTranslateSelect({
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
+  function handleOpen() {
+    if (disabled) return;
+    if (!open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setDropPos({ top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX, width: r.width });
+    }
+    setOpen((o) => !o);
+  }
+
   return (
-    <div className={`relative ${className}`} ref={ref} translate="no" lang="zh-Hans">
+    <div className={`relative ${className}`} translate="no" lang="zh-Hans">
       <button
+        ref={btnRef}
         type="button"
         disabled={disabled}
-        onClick={() => setOpen((o) => !o)}
+        onClick={handleOpen}
         className={`w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-left flex items-center justify-between transition-colors ${
           disabled ? "opacity-50 cursor-not-allowed bg-slate-50" : "cursor-pointer"
         } ${open ? "border-slate-300" : ""}`}
@@ -57,27 +69,41 @@ export function NoTranslateSelect({
         />
       </button>
 
-      {open && (
-        <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden max-h-64 overflow-y-auto">
-          {options.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              lang="zh-Hans"
-              translate="no"
-              onClick={() => {
-                onChange(opt.value);
-                setOpen(false);
-              }}
-              className={`w-full px-3 py-2 text-sm text-left transition-colors text-glacier-300 hover:bg-slate-50 ${
-                opt.value === value ? "font-semibold text-glacier-200 bg-slate-50" : ""
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
+      {open && typeof window !== "undefined" &&
+        createPortal(
+          <div
+            translate="no"
+            lang="zh-Hans"
+            style={{
+              position: "absolute",
+              top: dropPos.top,
+              left: dropPos.left,
+              width: dropPos.width,
+              zIndex: 9999,
+            }}
+            className="bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden max-h-64 overflow-y-auto"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                lang="zh-Hans"
+                translate="no"
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+                className={`w-full px-3 py-2 text-sm text-left text-glacier-300 hover:bg-slate-50 transition-colors ${
+                  opt.value === value ? "font-semibold text-glacier-200 bg-slate-50" : ""
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
