@@ -47,6 +47,13 @@ function dbRowToProperty(row: Record<string, unknown>): Property {
     img2_url: (row.img2_url as string) ?? '',
     img3_url: (row.img3_url as string) ?? '',
     img4_url: (row.img4_url as string) ?? '',
+    owner_follow_up_date: (() => {
+      const v = row.owner_follow_up_date;
+      if (!v) return null;
+      if (v instanceof Date) return v.toISOString().slice(0, 10);
+      return String(v).slice(0, 10);
+    })(),
+    owner_follow_up_notes: (row.owner_follow_up_notes as string) ?? '',
     last_generated_at: row.last_generated_at as string | undefined,
     last_fingerprint: row.last_fingerprint as string | undefined,
     createdAt: (row.created_at as string) ?? new Date().toISOString(),
@@ -91,12 +98,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     'main_point', 'second_point', 'target_buyer', 'must_say_3', 'notes_private',
     'img1_url', 'img2_url', 'img3_url', 'img4_url',
     'last_generated_at', 'last_fingerprint',
+    'owner_follow_up_date', 'owner_follow_up_notes',
   ];
 
   for (const key of allowed) {
     if (key in body) {
       const val = body[key];
-      if ((key === 'contract_start_date' || key === 'contract_end_date') && val === '') {
+      if ((key === 'contract_start_date' || key === 'contract_end_date' || key === 'owner_follow_up_date') && val === '') {
         fields.push(`${key} = $${idx++}`);
         values.push(null);
       } else {
