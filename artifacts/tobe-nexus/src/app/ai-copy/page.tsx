@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePropertyStore } from "@/store/usePropertyStore";
 import PageHeader from "@/components/PageHeader";
 import { Sparkles, Building2, ArrowRight, Plus } from "lucide-react";
+import { getAreaDisplayCompact } from "@/utils/areaDisplay";
 
 export default function AiCopyPage() {
   const properties = usePropertyStore((s) => s.properties);
@@ -59,7 +60,7 @@ export default function AiCopyPage() {
                       <div>
                         <p className="text-[12px] font-bold text-glacier-200 truncate">{title}</p>
                         <p className="text-xs text-glacier-500 mt-0.5">
-                          {property.rooms}房{property.halls}廳 · {property.build_ping > 0 ? `建坪 ${property.build_ping}` : property.land_ping > 0 ? `地坪 ${property.land_ping}` : '坪數未填'}坪
+                          {property.rooms}房{property.halls}廳 · {getAreaDisplayCompact(property.property_type, property.build_ping, property.land_ping)}
                         </p>
                       </div>
                       <div className="flex items-center justify-between mt-2">

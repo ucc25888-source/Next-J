@@ -8,6 +8,7 @@ import { randomHumanSlogan } from '@/data/humanSlogans';
 import { randomPostTheme } from '@/data/postThemes';
 import { randomCTA } from '@/data/ctaSentences';
 import { randomHighEmotionSentence } from '@/data/highEmotionContent';
+import { getAreaDisplay } from '@/utils/areaDisplay';
 import { PostType, HookType, Copy } from '@/types';
 import {
   ArrowLeft, Copy as CopyIcon, Sparkles, CheckCircle2,
@@ -253,7 +254,7 @@ export default function CopywritingPage({ id }: { id: string }) {
                   💰 {property.price_wan?.toLocaleString()} 萬
                 </span>
                 <span className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
-                  📏 {property.build_ping > 0 ? `建坪 ${property.build_ping}` : property.land_ping > 0 ? `地坪 ${property.land_ping}` : '坪數未填'} 坪
+                  📏 {getAreaDisplay(property.property_type, property.build_ping, property.land_ping)}
                 </span>
                 <span className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
                   🏠 {defaultLayout}

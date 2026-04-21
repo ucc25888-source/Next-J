@@ -8,6 +8,7 @@ import {
   Plus, Search, Building2, MapPin, Ruler,
   PenTool, Trash2, Sparkles, Upload,
 } from "lucide-react";
+import { getAreaDisplay } from "@/utils/areaDisplay";
 
 export default function PropertiesPage() {
   const { properties, deleteProperty } = usePropertyStore();
@@ -142,11 +143,7 @@ export default function PropertiesPage() {
                       <div className="flex items-center gap-1.5">
                         <Ruler className="w-3 h-3 text-glacier-600 shrink-0" />
                         <span translate="no">
-                          {property.build_ping > 0
-                            ? `建坪 ${property.build_ping} 坪`
-                            : property.land_ping > 0
-                              ? `地坪 ${property.land_ping} 坪`
-                              : '坪數未填'}
+                          {getAreaDisplay(property.property_type, property.build_ping, property.land_ping)}
                         </span>
                       </div>
                     </div>
