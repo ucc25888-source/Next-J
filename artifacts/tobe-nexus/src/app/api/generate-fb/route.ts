@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { postType, hookType, location, price, ping, landPing, isLandProperty, isShopProperty, layout, propertyType, parking, highlights, mainPoint, secondPoint, property_id } = await req.json();
+  const { postType, hookType, location, price, ping, landPing, isLandProperty, isShopProperty, layout, propertyType, parking, highlights, mainPoint, secondPoint, aiNote, property_id } = await req.json();
 
   const infoLine2 = isLandProperty
     ? [
@@ -71,6 +71,10 @@ export async function POST(req: NextRequest) {
 
   const emotionAxisLine = (mainPoint || secondPoint)
     ? `\n【AI 情緒主軸 — HOOK 核心】\n${mainPoint ? `- 主賣點：${mainPoint}（文案的最強情緒錨點，HOOK 開場白與整篇語氣必須圍繞此核心展開）` : ''}${secondPoint ? `\n- 次賣點：${secondPoint}（文案中段的支撐點，強化主賣點的說服力）` : ''}`
+    : '';
+
+  const aiNoteLine = aiNote
+    ? `\n【📝 物件強項放大備註 — 必須融入文案中段】\n以下是仲介特別標注的物件優勢，文案中段（HOOK 後、賣點前或賣點間）必須將這些內容轉化為有衝擊力的描述，讓讀者印象深刻：\n${aiNote}`
     : '';
 
   const COPY_ANGLES = isShopProperty ? [
@@ -105,7 +109,7 @@ export async function POST(req: NextRequest) {
 - 貼文類型：${postType}
 - HOOK 風格：${hookType}（${hookStyleDesc}）
 - 物件性質：${propertyContext}
-- 🎯 本次指定切入角度（必須嚴格執行）：${randomAngle}${emotionAxisLine}
+- 🎯 本次指定切入角度（必須嚴格執行）：${randomAngle}${emotionAxisLine}${aiNoteLine}
 
 【標題與副標生成規則（嚴格遵守）】
 - 第一行「標題」：緊扣物件類型與${postType}主題，繁體中文，10字以內（不含標點），語氣精煉有力

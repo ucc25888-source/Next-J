@@ -55,6 +55,7 @@ function dbRowToProperty(row: Record<string, unknown>): Property {
       return String(v).slice(0, 10);
     })(),
     owner_follow_up_notes: (row.owner_follow_up_notes as string) ?? '',
+    ai_note: (row.ai_note as string) ?? '',
     colisting_company: (row.colisting_company as string) ?? '',
     colisting_contact: (row.colisting_contact as string) ?? '',
     colisting_last_check: (() => {
@@ -103,12 +104,13 @@ export async function POST(req: NextRequest) {
       fb_post_count, img1_url, img2_url, img3_url, img4_url,
       garden_area,
       owner_follow_up_date, owner_follow_up_notes,
+      ai_note,
       colisting_company, colisting_contact, colisting_last_check,
       created_at, updated_at
     ) VALUES (
       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,
       $18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,
-      $33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50
+      $33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51
     ) RETURNING *`,
     [
       id, session.clientId, body.listing_type ?? 'C', body.listing_id ?? '',
@@ -132,6 +134,7 @@ export async function POST(req: NextRequest) {
       body.garden_area ?? '',
       body.owner_follow_up_date || null,
       body.owner_follow_up_notes ?? '',
+      body.ai_note ?? '',
       body.colisting_company ?? '',
       body.colisting_contact ?? '',
       body.colisting_last_check || null,

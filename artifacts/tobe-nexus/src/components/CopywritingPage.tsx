@@ -177,6 +177,7 @@ export default function CopywritingPage({ id }: { id: string }) {
           highlights: highlightsText || property.must_say_3 || '',
           mainPoint: property.main_point || '',
           secondPoint: property.second_point || '',
+          aiNote: property.ai_note || '',
           property_id: property.id,
         }),
       });

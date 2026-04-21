@@ -44,6 +44,7 @@ export interface Property {
   garden_area?: string;
   owner_follow_up_date?: string | null;
   owner_follow_up_notes?: string;
+  ai_note?: string;
   colisting_company?: string;
   colisting_contact?: string;
   colisting_last_check?: string | null;

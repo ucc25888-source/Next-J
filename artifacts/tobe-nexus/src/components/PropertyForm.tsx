@@ -96,6 +96,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     status_push: '',
     alert_level: 'green',
     negotiation_progress: '',
+    ai_note: '',
     fb_post_count: 0,
     img1_url: '',
     img2_url: '',
@@ -166,6 +167,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       status_push: property.status_push,
       alert_level: property.alert_level ?? 'green',
       negotiation_progress: property.negotiation_progress ?? '',
+      ai_note: property.ai_note ?? '',
       fb_post_count: property.fb_post_count ?? 0,
       img1_url: property.img1_url,
       img2_url: property.img2_url,
@@ -288,6 +290,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       status_push: form.status_push,
       alert_level: form.alert_level,
       negotiation_progress: form.negotiation_progress,
+      ai_note: form.ai_note,
       fb_post_count: 0,
       img1_url: form.img1_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=1200',
       img2_url: form.img2_url,
@@ -551,6 +554,23 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                 </div>
               </div>
             )}
+
+            {/* AI Note */}
+            <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
+              <div className="px-6 py-3.5 border-b border-slate-100 bg-slate-50">
+                <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">🤖 AI 參考備註（強項／優勢放大說明）</h2>
+              </div>
+              <div className="p-6">
+                <textarea
+                  rows={4}
+                  className={inputCls + ' resize-none w-full'}
+                  value={form.ai_note}
+                  onChange={(e) => set('ai_note', e.target.value)}
+                  placeholder="詳細描述這個物件的強項或特殊優勢，AI 會把這段內容放進文案的中間段落，讓印象更深刻。例如：角間三面採光、正門面向主幹道人流量大、附近百貨商圈帶來穩定客群..."
+                />
+                <p className="mt-2 text-[11px] text-glacier-600">此欄僅供 AI 文案生成參考，不對外顯示</p>
+              </div>
+            </div>
 
             {/* Photos */}
             <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
