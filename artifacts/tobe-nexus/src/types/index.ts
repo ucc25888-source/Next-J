@@ -115,6 +115,27 @@ export type HookType =
   | '情感溫度鉤'
   | '無';
 
+export interface Buyer {
+  id: string;
+  client_id: string;
+  name: string;
+  phone: string;
+  email: string;
+  line_id: string;
+  source: string;
+  budget_min: number;
+  budget_max: number;
+  pref_property_type: string;
+  pref_area: string;
+  pref_rooms: string;
+  pref_min_ping: number;
+  status: string;
+  notes: string;
+  last_contact_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Showing {
   id: string;
   client_id: string;
