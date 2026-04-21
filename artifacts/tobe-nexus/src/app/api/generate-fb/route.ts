@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { postType, title, subtitle, location, price, ping, layout, propertyType, parking, hookType, highlights } = await req.json();
+  const { postType, title, subtitle, hookSentence, location, price, ping, layout, propertyType, parking, highlights } = await req.json();
 
   const infoLine2 = [
     `💰 總價 ${price}萬`,
@@ -54,6 +54,8 @@ export async function POST(req: NextRequest) {
 請嚴格依照下方「輸出格式」逐字輸出，除了括號內標示需要生成的文字，其餘符號、換行與標點全部原樣保留。
 絕對禁止在輸出中加入任何說明文字、段落標題、前言、結語。
 
+核心句規則：核心句欄位已由品牌內容庫預先指定，必須原文照出，一字不改，這是不可違反的強制規定。
+
 === 輸出格式 ===
 
 【珍選好福邸｜${title}】
@@ -63,7 +65,7 @@ ${subtitle}
 ${infoLine2}
 
 · · · · · · · · · · · · · · ·
-「（根據「${hookType}」方向，寫一句震撼賣點金句，30字以內）」
+${hookSentence}
 · · · · · · · · · · · · · · ·
 
 ✅ （賣點一，15字以內，一行）
@@ -77,7 +79,8 @@ ${infoLine2}
 注意事項：
 - 完全禁止輸出「第X段」、「輸出格式」、「===」等任何說明性文字
 - 禁止生成 hashtag、電話、LINE 或署名
-- 每個✅點必須獨立一行且控制在15字以內`;
+- 每個✅點必須獨立一行且控制在15字以內
+- 核心句原文原字，絕對禁止修改`;
 
   try {
     const stream = await openai.chat.completions.create({

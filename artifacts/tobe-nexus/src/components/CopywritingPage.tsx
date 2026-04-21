@@ -7,6 +7,7 @@ import { useSystemStore } from '@/store/useSystemStore';
 import { randomHumanSlogan } from '@/data/humanSlogans';
 import { randomPostTheme } from '@/data/postThemes';
 import { randomCTA } from '@/data/ctaSentences';
+import { randomHighEmotionSentence } from '@/data/highEmotionContent';
 import { PostType, HookType, Copy } from '@/types';
 import {
   ArrowLeft, Copy as CopyIcon, Sparkles, CheckCircle2,
@@ -20,6 +21,9 @@ const POST_TYPES: { value: PostType; label: string }[] = [
   { value: '人設生活', label: '人設生活' },
   { value: '成交喜報', label: '成交喜報' },
   { value: '開發徵件', label: '開發徵件' },
+  { value: '資產配置', label: '資產配置' },
+  { value: '土地潛力', label: '土地潛力' },
+  { value: '成家圓夢', label: '成家圓夢' },
 ];
 
 const HOOK_TYPES: { value: HookType; label: string }[] = [
@@ -81,6 +85,7 @@ export default function CopywritingPage({ id }: { id: string }) {
     const slogan = randomHumanSlogan();
     const cta = randomCTA();
     const theme = randomPostTheme(pType);
+    const hookSentence = randomHighEmotionSentence(pType);
 
     try {
       const resp = await fetch('/api/generate-fb', {
@@ -90,13 +95,13 @@ export default function CopywritingPage({ id }: { id: string }) {
           postType: pType,
           title: theme.title,
           subtitle: theme.subtitle,
+          hookSentence,
           location: locationOverride || property.subarea,
           price: property.price_wan,
           ping: property.build_ping,
           layout: defaultLayout,
           propertyType: property.property_type || '',
           parking: property.parking || '',
-          hookType: hType,
           highlights: highlightsText || property.must_say_3 || '',
         }),
       });
