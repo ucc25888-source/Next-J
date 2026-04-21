@@ -181,11 +181,15 @@ export default function CopywritingPage({ id }: { id: string }) {
       }
 
       const HASHTAGS = `#珍選好福邸 #花蓮房產顧問福哥 #TOBENexus`;
-      const SLOGAN_MARKER = '=== 珍選好福邸 ===';
-      const firstIdx = fullText.indexOf(SLOGAN_MARKER);
-      const cleanText = firstIdx !== -1
-        ? fullText.slice(0, firstIdx + SLOGAN_MARKER.length) + fullText.slice(firstIdx + SLOGAN_MARKER.length).replace(new RegExp(`\\n*${SLOGAN_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*$`), '')
-        : fullText;
+      const sloganSectionRe = /===\s*珍選好福邸\s*===/g;
+      const matches = [...fullText.matchAll(sloganSectionRe)];
+      let cleanText = fullText;
+      if (matches.length > 1) {
+        // Keep only content up to the end of the last three slogan lines after the first marker
+        const secondMatchIdx = matches[1].index!;
+        // Remove from the second marker onwards (including its slogan lines)
+        cleanText = fullText.slice(0, secondMatchIdx).trimEnd();
+      }
       const finalContent = `${cleanText}\n\n${cta}\n${CONTACT_BLOCK}\n\n${HASHTAGS}`;
       setContent(finalContent);
 
