@@ -483,11 +483,11 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                   <Field label="面寬（米）">
                     <input className={inputCls} value={form.face_width} onChange={(e) => set('face_width', e.target.value)} placeholder="例：18M" />
                   </Field>
-                  <Field label="路寬（米）">
-                    <input className={inputCls} value={form.road_width} onChange={(e) => set('road_width', e.target.value)} placeholder="例：12M" />
-                  </Field>
                   <Field label="深度（米）">
                     <input className={inputCls} value={form.depth_m} onChange={(e) => set('depth_m', e.target.value)} placeholder="例：40M" />
+                  </Field>
+                  <Field label="臨路寬（米）">
+                    <input className={inputCls} value={form.road_width} onChange={(e) => set('road_width', e.target.value)} placeholder="例：12M" />
                   </Field>
                   <Field label="農業分區">
                     <select translate="no" className={selectCls} value={form.agri_zone_type} onChange={(e) => set('agri_zone_type', e.target.value)}>
