@@ -8,7 +8,7 @@ import {
   X, Save, Pencil, Trash2, Search, ChevronDown,
   Target, Home, MapPin, BadgeCheck, Clock,
   CalendarCheck, Star, Smile, Meh, Frown, TrendingUp,
-  ChevronUp, MessageSquare,
+  ChevronUp, MessageSquare, Bell,
 } from "lucide-react";
 import type { Buyer, Showing } from "@/types";
 
@@ -83,13 +83,13 @@ const blankForm = {
   name: "", phone: "", email: "", line_id: "",
   source: "平台", budget_min: "", budget_max: "",
   pref_property_type: "", pref_area: "", pref_rooms: "", pref_min_ping: "",
-  status: "潛在", notes: "", last_contact_at: "",
+  status: "潛在", notes: "", last_contact_at: "", next_follow_up_date: "",
 };
 type FormState = typeof blankForm;
 
 const blankShowingForm = {
   showing_date: todayStr, property_id: "",
-  reaction: "有點興趣", offer_wan: "", follow_up: "", notes: "",
+  reaction: "有點興趣", offer_wan: "", follow_up: "", follow_up_date: "", notes: "",
 };
 
 function toForm(b: Buyer): FormState {
@@ -102,6 +102,7 @@ function toForm(b: Buyer): FormState {
     pref_rooms: b.pref_rooms,
     pref_min_ping: b.pref_min_ping > 0 ? String(b.pref_min_ping) : "",
     status: b.status, notes: b.notes, last_contact_at: b.last_contact_at ?? "",
+    next_follow_up_date: b.next_follow_up_date ?? "",
   };
 }
 
@@ -121,6 +122,7 @@ export default function BuyersPage() {
 
   const [showShowingModal, setShowShowingModal]       = useState(false);
   const [showingTarget, setShowingTarget]             = useState<Buyer | null>(null);
+  const [editShowing, setEditShowing]                 = useState<Showing | null>(null);
   const [showingForm, setShowingForm]                 = useState({ ...blankShowingForm });
   const [savingShowing, setSavingShowing]             = useState(false);
   const [expandedBuyers, setExpandedBuyers]           = useState<Set<string>>(new Set());
@@ -192,35 +194,80 @@ export default function BuyersPage() {
 
   const openShowingModal = (buyer: Buyer) => {
     setShowingTarget(buyer);
+    setEditShowing(null);
     setShowingForm({ ...blankShowingForm });
     setShowShowingModal(true);
+  };
+
+  const closeShowingModal = () => {
+    setShowShowingModal(false);
+    setEditShowing(null);
   };
 
   const handleSaveShowing = async () => {
     if (!showingTarget) return;
     setSavingShowing(true);
     try {
-      const res = await fetch("/api/showings", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          buyer_id:     showingTarget.id,
-          buyer_name:   showingTarget.name,
-          buyer_phone:  showingTarget.phone,
-          buyer_source: showingTarget.source,
-          property_id:  showingForm.property_id || null,
-          showing_date: showingForm.showing_date,
-          reaction:     showingForm.reaction,
-          offer_wan:    Number(showingForm.offer_wan) || 0,
-          follow_up:    showingForm.follow_up,
-          notes:        showingForm.notes,
-        }),
-      });
-      if (res.ok) {
-        const d = await res.json();
-        setAllShowings((p) => [d.showing, ...p]);
-        setShowShowingModal(false);
+      if (editShowing) {
+        /* ── EDIT mode ── */
+        const res = await fetch(`/api/showings/${editShowing.id}`, {
+          method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            property_id:   showingForm.property_id || null,
+            showing_date:  showingForm.showing_date,
+            reaction:      showingForm.reaction,
+            offer_wan:     Number(showingForm.offer_wan) || 0,
+            follow_up:     showingForm.follow_up,
+            follow_up_date: showingForm.follow_up_date || null,
+            notes:         showingForm.notes,
+          }),
+        });
+        if (res.ok) {
+          const d = await res.json();
+          setAllShowings((p) => p.map((s) => s.id === editShowing.id ? d.showing : s));
+          setShowShowingModal(false);
+          setEditShowing(null);
+        }
+      } else {
+        /* ── ADD mode ── */
+        const res = await fetch("/api/showings", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            buyer_id:      showingTarget.id,
+            buyer_name:    showingTarget.name,
+            buyer_phone:   showingTarget.phone,
+            buyer_source:  showingTarget.source,
+            property_id:   showingForm.property_id || null,
+            showing_date:  showingForm.showing_date,
+            reaction:      showingForm.reaction,
+            offer_wan:     Number(showingForm.offer_wan) || 0,
+            follow_up:     showingForm.follow_up,
+            follow_up_date: showingForm.follow_up_date || null,
+            notes:         showingForm.notes,
+          }),
+        });
+        if (res.ok) {
+          const d = await res.json();
+          setAllShowings((p) => [d.showing, ...p]);
+          setShowShowingModal(false);
+        }
       }
     } finally { setSavingShowing(false); }
+  };
+
+  const openEditShowing = (buyer: Buyer, showing: Showing) => {
+    setShowingTarget(buyer);
+    setEditShowing(showing);
+    setShowingForm({
+      property_id:   showing.property_id ?? "",
+      showing_date:  showing.showing_date?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
+      reaction:      showing.reaction ?? "有點興趣",
+      offer_wan:     showing.offer_wan ? String(showing.offer_wan) : "",
+      follow_up:     showing.follow_up ?? "",
+      follow_up_date: showing.follow_up_date?.slice(0, 10) ?? "",
+      notes:         showing.notes ?? "",
+    });
+    setShowShowingModal(true);
   };
 
   const handleDeleteShowing = async (showingId: string) => {
@@ -424,6 +471,24 @@ export default function BuyersPage() {
                       </div>
                     )}
 
+                    {/* Next follow-up date */}
+                    {b.next_follow_up_date && (() => {
+                      const d = b.next_follow_up_date.slice(0, 10);
+                      const isOverdue = d < todayStr;
+                      const isToday = d === todayStr;
+                      return (
+                        <div className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border ${
+                          isOverdue ? "bg-red-50 border-red-200" : isToday ? "bg-amber-50 border-amber-300" : "bg-blue-50 border-blue-200"
+                        }`}>
+                          <Bell className={`w-3 h-3 shrink-0 ${isOverdue ? "text-red-500" : isToday ? "text-amber-600" : "text-blue-500"}`} />
+                          <span className={`text-[11px] font-bold ${isOverdue ? "text-red-600" : isToday ? "text-amber-700" : "text-blue-600"}`}>
+                            {isOverdue ? "⚠ 逾期追蹤：" : isToday ? "今日追蹤：" : "下次追蹤："}
+                            {new Date(d).toLocaleDateString("zh-TW", { month: "numeric", day: "numeric" })}
+                          </span>
+                        </div>
+                      );
+                    })()}
+
                     {/* Notes */}
                     {b.notes && (
                       <p className="text-[11px] text-glacier-500 leading-relaxed line-clamp-2 border-t border-glacier-200/[0.06] pt-2">{b.notes}</p>
@@ -485,11 +550,21 @@ export default function BuyersPage() {
                                     </p>
                                   )}
                                 </div>
-                                <button
-                                  onClick={() => handleDeleteShowing(s.id)}
-                                  className="opacity-0 group-hover/row:opacity-100 p-0.5 rounded text-glacier-600 hover:text-red-400 transition-all shrink-0">
-                                  <X className="w-2.5 h-2.5" />
-                                </button>
+                                {/* edit + delete buttons */}
+                                <div className="flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100 transition-all shrink-0">
+                                  <button
+                                    onClick={() => openEditShowing(b, s)}
+                                    className="p-0.5 rounded text-glacier-600 hover:text-blue-500 transition-all"
+                                    title="編輯">
+                                    <Pencil className="w-2.5 h-2.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteShowing(s.id)}
+                                    className="p-0.5 rounded text-glacier-600 hover:text-red-400 transition-all"
+                                    title="刪除">
+                                    <X className="w-2.5 h-2.5" />
+                                  </button>
+                                </div>
                               </div>
                             );
                           })}
@@ -538,7 +613,9 @@ export default function BuyersPage() {
                   <CalendarCheck className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-bold text-glacier-200">新增帶看紀錄</h2>
+                  <h2 className="text-sm font-bold text-glacier-200">
+                    {editShowing ? "編輯帶看紀錄" : "新增帶看紀錄"}
+                  </h2>
                   <p className="text-[10px] text-glacier-500 mt-0.5">
                     <span className={`inline-flex items-center gap-1 font-bold ${STATUS_AVATAR[showingTarget.status]?.text ?? "text-aurora-600"}`}>
                       {showingTarget.name}
@@ -547,7 +624,7 @@ export default function BuyersPage() {
                   </p>
                 </div>
               </div>
-              <button onClick={() => setShowShowingModal(false)}
+              <button onClick={closeShowingModal}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
                 <X className="w-4 h-4" />
               </button>
@@ -611,6 +688,12 @@ export default function BuyersPage() {
               </div>
 
               <div>
+                <label className={labelCls + " text-blue-600"}>🔔 下次回訪日（自動加入每日重點）</label>
+                <input type="date" className={inputCls + " border-blue-200 focus:border-blue-400"} value={showingForm.follow_up_date}
+                  onChange={(e) => setShowingForm((f) => ({ ...f, follow_up_date: e.target.value }))} />
+              </div>
+
+              <div>
                 <label className={labelCls}>備註</label>
                 <textarea className={inputCls + " resize-none"} rows={2} value={showingForm.notes}
                   onChange={(e) => setShowingForm((f) => ({ ...f, notes: e.target.value }))}
@@ -620,14 +703,14 @@ export default function BuyersPage() {
 
             {/* footer */}
             <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-slate-100 bg-slate-50 shrink-0">
-              <button onClick={() => setShowShowingModal(false)}
+              <button onClick={closeShowingModal}
                 className="px-4 py-2 text-sm font-medium text-glacier-400 bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition-all">
                 取消
               </button>
               <button onClick={handleSaveShowing} disabled={savingShowing}
                 className="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-aurora-500 rounded-lg hover:bg-aurora-400 disabled:opacity-50 transition-all glow-aurora-sm">
                 <Save className="w-3.5 h-3.5" />
-                {savingShowing ? "儲存中..." : "儲存帶看"}
+                {savingShowing ? "儲存中..." : editShowing ? "儲存修改" : "儲存帶看"}
               </button>
             </div>
           </div>
@@ -737,10 +820,17 @@ export default function BuyersPage() {
                     onChange={(e) => setForm((f) => ({ ...f, pref_min_ping: e.target.value }))} min="0" />
                 </div>
               </div>
-              <div>
-                <label className={labelCls}>最後聯繫日期</label>
-                <input type="date" className={inputCls} value={form.last_contact_at}
-                  onChange={(e) => setForm((f) => ({ ...f, last_contact_at: e.target.value }))} />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls}>最後聯繫日期</label>
+                  <input type="date" className={inputCls} value={form.last_contact_at}
+                    onChange={(e) => setForm((f) => ({ ...f, last_contact_at: e.target.value }))} />
+                </div>
+                <div>
+                  <label className={labelCls + " text-blue-600"}>🔔 下次追蹤日</label>
+                  <input type="date" className={inputCls + " border-blue-200 focus:border-blue-400"} value={form.next_follow_up_date}
+                    onChange={(e) => setForm((f) => ({ ...f, next_follow_up_date: e.target.value }))} />
+                </div>
               </div>
               <div>
                 <label className={labelCls}>備註</label>

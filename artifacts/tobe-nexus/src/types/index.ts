@@ -133,6 +133,7 @@ export interface Buyer {
   status: string;
   notes: string;
   last_contact_at: string | null;
+  next_follow_up_date: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -149,6 +150,19 @@ export interface Showing {
   reaction: string;
   offer_wan: number;
   follow_up: string;
+  follow_up_date: string | null;
+  follow_up_done: boolean;
   notes: string;
   created_at: string;
+}
+
+export interface DailyFocusItem {
+  id: string;
+  type: 'buyer' | 'showing' | 'property';
+  source_id: string;
+  title: string;
+  subtitle: string;
+  date: string;
+  is_overdue: boolean;
+  done: boolean;
 }
