@@ -5,9 +5,7 @@ import { useRouter } from 'next/navigation';
 import { usePropertyStore } from '@/store/usePropertyStore';
 import { useSystemStore } from '@/store/useSystemStore';
 import { randomHumanSlogan } from '@/data/humanSlogans';
-import { randomPostTheme } from '@/data/postThemes';
 import { randomCTA } from '@/data/ctaSentences';
-import { randomHighEmotionSentence } from '@/data/highEmotionContent';
 import { getAreaDisplay } from '@/utils/areaDisplay';
 import { PostType, HookType, Copy } from '@/types';
 import {
@@ -142,8 +140,6 @@ export default function CopywritingPage({ id }: { id: string }) {
 
     const slogan = randomHumanSlogan();
     const cta = randomCTA();
-    const theme = randomPostTheme(pType, isShopProperty, isLandProperty);
-    const hookSentence = randomHighEmotionSentence(pType, isShopProperty);
 
     try {
       const resp = await fetch('/api/generate-fb', {
@@ -152,9 +148,6 @@ export default function CopywritingPage({ id }: { id: string }) {
         body: JSON.stringify({
           postType: pType,
           hookType: hType,
-          title: theme.title,
-          subtitle: theme.subtitle,
-          hookSentence,
           location: locationOverride || property.subarea,
           price: property.price_wan,
           ping: property.build_ping,

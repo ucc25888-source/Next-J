@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { postType, hookType, title, subtitle, hookSentence, location, price, ping, landPing, isLandProperty, isShopProperty, layout, propertyType, parking, highlights, mainPoint, secondPoint, property_id } = await req.json();
+  const { postType, hookType, location, price, ping, landPing, isLandProperty, isShopProperty, layout, propertyType, parking, highlights, mainPoint, secondPoint, property_id } = await req.json();
 
   const infoLine2 = isLandProperty
     ? [
@@ -80,6 +80,17 @@ export async function POST(req: NextRequest) {
 - HOOK 風格：${hookType}（${hookStyleDesc}）
 - 物件性質：${propertyContext}${emotionAxisLine}
 
+【標題與副標生成規則（嚴格遵守）】
+- 第一行「標題」：緊扣物件類型與${postType}主題，繁體中文，10字以內（不含標點），語氣精煉有力
+- 第二行「副標」：延伸標題、帶情緒或誘因，繁體中文，14字以內（不含標點），禁止使用「你的第一間房」「回家」「家人」等住宅語彙來描述商用或土地物件
+
+【HOOK 開場句生成規則】
+- 依照 HOOK 風格（${hookType}）產出一句高情緒價值的開場白
+- 緊扣主賣點，句子要有畫面感或衝擊力，約20-30字
+- 商用物件：聚焦地段、人流、商機、投報，禁止住宅語彙
+- 土地物件：聚焦開發、增值、稀有性、地形優勢
+- 住宅物件：可用生活感、家庭溫度、環境機能
+
 【✅賣點生成規則（最重要）】
 - 使用者已提供「精華亮點」作為賣點來源，這是第一優先依據
 - 三個✅賣點必須直接取材自或改寫自精華亮點，不可自行捏造與精華亮點無關的內容
@@ -90,18 +101,17 @@ export async function POST(req: NextRequest) {
 - 完全禁止輸出任何說明文字、段落標題、前言、結語、注意事項
 - 禁止輸出「===」、「輸出格式」、「第X段」、「注意事項」等任何非內容文字
 - 禁止生成 hashtag、電話、LINE 或署名
-- 核心句欄位已由品牌內容庫預先指定，必須原文照出，一字不改
 
 請嚴格依照下方格式逐字輸出。括號內標示為需要生成的內容，其餘符號、換行、標點全部原樣保留，不得增減任何字元。
 
-【珍選好福邸｜${title}】
-${subtitle}
+【珍選好福邸｜（標題，10字以內，緊扣${postType}與物件類型）】
+（副標，14字以內，延伸標題帶情緒誘因）
 
 📍 ${location}｜${propertyType || '精選物件'}
 ${infoLine2}
 
 · · · · · · · · · · · · · · ·
-${hookSentence}
+（HOOK 開場句，20-30字，依 ${hookType} 風格，緊扣主賣點，高情緒價值）
 · · · · · · · · · · · · · · ·
 
 ✅ （取材自精華亮點的賣點一，15字以內）
