@@ -140,6 +140,7 @@ export interface Buyer {
 export interface Showing {
   id: string;
   client_id: string;
+  buyer_id: string | null;
   property_id: string | null;
   showing_date: string;
   buyer_name: string;
