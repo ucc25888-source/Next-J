@@ -326,37 +326,39 @@ export default function PropertyForm({ id }: PropertyFormProps) {
               </div>
               <div className="p-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                 <Field label="物件類型" required>
-                  <select className={selectCls} value={form.property_type} onChange={(e) => set('property_type', e.target.value)} required>
-                    <option value="">請選擇</option>
-                    {propertyTypes.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
+                  <select translate="no" className={selectCls} value={form.property_type} onChange={(e) => set('property_type', e.target.value)} required>
+                    <option translate="no" value="">請選擇</option>
+                    {propertyTypes.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value}</option>)}
                   </select>
                 </Field>
 
                 <Field label="區域" required>
                   <select
+                    translate="no"
                     className={selectCls}
                     value={form.region_key}
                     onChange={(e) => set('region_key', e.target.value)}
                     required
                   >
-                    <option value="">請選擇區域</option>
+                    <option translate="no" value="">請選擇區域</option>
                     {Object.keys(GEOGRAPHIC_DATA).map((key) => (
-                      <option key={key} value={key}>{key}</option>
+                      <option translate="no" key={key} value={key}>{key.split(' | ')[0]}</option>
                     ))}
                   </select>
                 </Field>
 
                 <Field label="小區域" required>
                   <select
+                    translate="no"
                     className={selectCls}
                     value={form.subarea}
                     onChange={(e) => set('subarea', e.target.value)}
                     disabled={!form.region_key}
                     required
                   >
-                    <option value="">{form.region_key ? '請選擇小區域' : '請先選區域'}</option>
+                    <option translate="no" value="">{form.region_key ? '請選擇小區域' : '請先選區域'}</option>
                     {availableSubareas.map((s) => (
-                      <option key={s} value={s}>{s}</option>
+                      <option translate="no" key={s} value={s}>{s}</option>
                     ))}
                   </select>
                 </Field>
@@ -417,12 +419,13 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                         <div key={key} className="flex flex-col gap-1.5">
                           <p className="text-[11px] font-semibold text-slate-500 text-center">{label}</p>
                           <select
+                            translate="no"
                             className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-center text-base font-bold text-slate-800 focus:outline-none focus:border-aurora-500/60 cursor-pointer appearance-none"
                             value={(form as unknown as Record<string, string>)[key] || '0'}
                             onChange={(e) => set(key, e.target.value)}
                           >
                             {[0, 1, 2, 3, 4, 5, 6].map((n) => (
-                              <option key={n} value={String(n)}>{n}</option>
+                              <option translate="no" key={n} value={String(n)}>{n}</option>
                             ))}
                           </select>
                         </div>
@@ -431,9 +434,9 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                   </div>
 
                   <Field label="車位">
-                    <select className={selectCls} value={form.parking} onChange={(e) => set('parking', e.target.value)}>
-                      <option value="">請選擇</option>
-                      {parkingOptions.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
+                    <select translate="no" className={selectCls} value={form.parking} onChange={(e) => set('parking', e.target.value)}>
+                      <option translate="no" value="">請選擇</option>
+                      {parkingOptions.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value}</option>)}
                     </select>
                   </Field>
                 </div>
@@ -457,16 +460,16 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                     <input className={inputCls} value={form.depth_m} onChange={(e) => set('depth_m', e.target.value)} placeholder="例：40M" />
                   </Field>
                   <Field label="農業分區">
-                    <select className={selectCls} value={form.agri_zone_type} onChange={(e) => set('agri_zone_type', e.target.value)}>
-                      <option value="">請選擇</option>
-                      <option value="特定農業區">特定農業區</option>
-                      <option value="一般農業區">一般農業區</option>
-                      <option value="山坡地保育區">山坡地保育區</option>
-                      <option value="風景區">風景區</option>
-                      <option value="一般商業區">一般商業區</option>
-                      <option value="住宅區">住宅區</option>
-                      <option value="工業區">工業區</option>
-                      <option value="非都市土地">非都市土地</option>
+                    <select translate="no" className={selectCls} value={form.agri_zone_type} onChange={(e) => set('agri_zone_type', e.target.value)}>
+                      <option translate="no" value="">請選擇</option>
+                      <option translate="no" value="特定農業區">特定農業區</option>
+                      <option translate="no" value="一般農業區">一般農業區</option>
+                      <option translate="no" value="山坡地保育區">山坡地保育區</option>
+                      <option translate="no" value="風景區">風景區</option>
+                      <option translate="no" value="一般商業區">一般商業區</option>
+                      <option translate="no" value="住宅區">住宅區</option>
+                      <option translate="no" value="工業區">工業區</option>
+                      <option translate="no" value="非都市土地">非都市土地</option>
                     </select>
                   </Field>
                   <Field label="產權狀況" className="md:col-span-2">
@@ -651,13 +654,14 @@ export default function PropertyForm({ id }: PropertyFormProps) {
               <div className="p-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                 <Field label="案件類型">
                   <select
+                    translate="no"
                     className={selectCls}
                     value={form.listing_type}
                     onChange={(e) => set('listing_type', e.target.value)}
                     disabled={isEditMode}
                   >
-                    <option value="C">屋主案件（賣方）</option>
-                    <option value="B">買方案件</option>
+                    <option translate="no" value="C">屋主案件（賣方）</option>
+                    <option translate="no" value="B">買方案件</option>
                   </select>
                 </Field>
                 <Field label="案件編號" hint={isEditMode ? '' : '儲存時自動生成'}>
@@ -710,16 +714,16 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                 </Field>
 
                 <Field label="目前狀態">
-                  <select className={selectCls} value={form.status_now} onChange={(e) => set('status_now', e.target.value)}>
-                    <option value="">請選擇</option>
-                    {statusNowOptions.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
+                  <select translate="no" className={selectCls} value={form.status_now} onChange={(e) => set('status_now', e.target.value)}>
+                    <option translate="no" value="">請選擇</option>
+                    {statusNowOptions.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value}</option>)}
                   </select>
                 </Field>
 
                 <Field label="推進狀況">
-                  <select className={selectCls} value={form.status_push} onChange={(e) => set('status_push', e.target.value)}>
-                    <option value="">請選擇</option>
-                    {statusPushOptions.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
+                  <select translate="no" className={selectCls} value={form.status_push} onChange={(e) => set('status_push', e.target.value)}>
+                    <option translate="no" value="">請選擇</option>
+                    {statusPushOptions.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value}</option>)}
                   </select>
                 </Field>
 

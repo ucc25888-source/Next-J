@@ -23,7 +23,30 @@ export default function StoreHydrator() {
       } catch {}
     });
 
-    return () => unsub();
+    const removeTranslateArtifacts = () => {
+      document
+        .querySelectorAll(
+          '[class*="VIpgJd"], .skiptranslate, #goog-gt-tt, ' +
+          '.goog-te-banner-frame, .goog-te-spinner-pos, ' +
+          '.goog-te-menu-frame, #goog-gt-vt'
+        )
+        .forEach((el) => (el as HTMLElement).remove());
+    };
+
+    removeTranslateArtifacts();
+
+    const observer = new MutationObserver(() => {
+      removeTranslateArtifacts();
+    });
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      unsub();
+      observer.disconnect();
+    };
   }, []);
 
   return null;

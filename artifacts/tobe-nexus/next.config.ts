@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
     "*.spock.replit.dev",
     "*.repl.co",
   ],
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "Content-Language", value: "zh-TW" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
