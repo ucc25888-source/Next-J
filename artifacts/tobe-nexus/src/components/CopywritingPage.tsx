@@ -142,7 +142,7 @@ export default function CopywritingPage({ id }: { id: string }) {
 
     const slogan = randomHumanSlogan();
     const cta = randomCTA();
-    const theme = randomPostTheme(pType);
+    const theme = randomPostTheme(pType, isShopProperty, isLandProperty);
     const hookSentence = randomHighEmotionSentence(pType, isShopProperty);
 
     try {

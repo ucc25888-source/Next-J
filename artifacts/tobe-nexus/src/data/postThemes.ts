@@ -264,7 +264,64 @@ export const POST_THEMES: Record<PostType, PostTheme[]> = {
   ],
 };
 
-export function randomPostTheme(postType: PostType): PostTheme {
+export const SHOP_THEMES: Partial<Record<PostType, PostTheme[]>> = {
+  物件開箱: [
+    { title: '黃金店面曝光', subtitle: '一樓臨路，每天就是免費廣告板' },
+    { title: '角間三面曝光', subtitle: '三面臨路，招牌一掛全區都看到' },
+    { title: '開箱這間店面', subtitle: '人流這麼旺，開什麼都有勝算' },
+    { title: '主幹道商機', subtitle: '車流天天跑，地段就是最強廣告' },
+    { title: '收租不費力', subtitle: '穩定租金入帳，一間解決資產配置' },
+    { title: '店住合一商機', subtitle: '自住自營兩不誤，投報超划算' },
+    { title: '純商業稀有釋出', subtitle: '商業分區物件，機會來了就要抓' },
+    { title: '開業首選好店面', subtitle: '旺地釋出，屋況好直接開店' },
+    { title: '商圈精華地段', subtitle: '觀光人潮加持，來客率遠超預期' },
+    { title: '批發市場旁好店', subtitle: '批發人潮不斷，做什麼都差不了' },
+    { title: '餐飲首選黃金位', subtitle: '人流×地段，天天座無虛席的密碼' },
+    { title: '整棟商辦釋出', subtitle: '稀有整棟，靈活規劃最自由' },
+    { title: '附設停車店面', subtitle: '停車方便客流穩，這條件難找' },
+    { title: '設備轉讓即開業', subtitle: '前裝潢設備全留，省時省力省錢' },
+    { title: '低總價商用首選', subtitle: '總價親民，入手門檻低投報高' },
+  ],
+  降價急售: [
+    { title: '稀有店面急釋出', subtitle: '屋主急售，黃金地段千載難逢' },
+    { title: '低於行情急出手', subtitle: '不比不知道，這價格真的搶先機' },
+    { title: '商用地段破盤價', subtitle: '地段一流、價格二流，出手就賺' },
+    { title: '店面誠意售', subtitle: '人流這麼旺的地方，這價格請快' },
+    { title: '一樓金店急尋主', subtitle: '屋主換現，這機會不等任何人' },
+    { title: '收租型物件急售', subtitle: '現租金直接接手，一鍵開始收益' },
+  ],
+};
+
+export const LAND_THEMES: Partial<Record<PostType, PostTheme[]>> = {
+  物件開箱: [
+    { title: '開箱這塊好地', subtitle: '地形方正、產權單純，可以直接規劃' },
+    { title: '臨路大面寬土地', subtitle: '大馬路邊好進出，開發首選無疑問' },
+    { title: '建商最愛的條件', subtitle: '坪數夠大地形正，開發規劃首選地' },
+    { title: '農地轉型潛力大', subtitle: '農業區轉型機率高，早入手早獲利' },
+    { title: '稀有大面積地', subtitle: '連片土地一次入手，掌握未來主動權' },
+    { title: '花蓮精華地段', subtitle: '位置指定了漲幅，這塊土地值得佈局' },
+    { title: '投資土地看這間', subtitle: '產權清晰地形優，福哥親選強推' },
+    { title: '水電俱全好建地', subtitle: '基礎建設完整，蓋房建廠都便利' },
+  ],
+};
+
+export function randomPostTheme(
+  postType: PostType,
+  isShopProperty = false,
+  isLandProperty = false,
+): PostTheme {
+  if (isShopProperty) {
+    const shopPool = SHOP_THEMES[postType];
+    if (shopPool && shopPool.length > 0) {
+      return shopPool[Math.floor(Math.random() * shopPool.length)];
+    }
+  }
+  if (isLandProperty) {
+    const landPool = LAND_THEMES[postType];
+    if (landPool && landPool.length > 0) {
+      return landPool[Math.floor(Math.random() * landPool.length)];
+    }
+  }
   const themes = POST_THEMES[postType];
   return themes[Math.floor(Math.random() * themes.length)];
 }
