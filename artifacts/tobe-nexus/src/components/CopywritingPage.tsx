@@ -48,6 +48,7 @@ const LAND_POST_TYPES: PostType[] = ['土地潛力', '資產配置', '知識教�
 const SHOP_POST_TYPES: PostType[] = ['商辦店面', '物件開箱', '降價急售', '知識教學', '人設生活', '成交喜報'];
 
 const POST_TYPES: { value: PostType; label: string }[] = [
+  { value: '無', label: '無' },
   { value: '物件開箱', label: '物件開箱' },
   { value: '降價急售', label: '降價急售' },
   { value: '知識教學', label: '知識教學' },
@@ -82,8 +83,8 @@ export default function CopywritingPage({ id }: { id: string }) {
     ? `${property.rooms}房${property.halls}廳${property.baths}衛`
     : '';
 
-  const [postType, setPostType] = useState<PostType>('物件開箱');
-  const [hookType, setHookType] = useState<HookType>('情感溫度鉤');
+  const [postType, setPostType] = useState<PostType>('無');
+  const [hookType, setHookType] = useState<HookType>('無');
   const [locationOverride, setLocationOverride] = useState(property?.subarea ?? '');
   const [highlightsText, setHighlightsText] = useState('');
   const [content, setContent] = useState('');

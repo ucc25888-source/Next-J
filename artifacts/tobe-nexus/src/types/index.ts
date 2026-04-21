@@ -110,6 +110,7 @@ export interface OptionItem {
 export type DailyFocusType = 'buyer' | 'showing' | 'property' | 'colisting';
 
 export type PostType =
+  | '無'
   | '物件開箱'
   | '降價急售'
   | '知識教學'

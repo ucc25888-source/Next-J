@@ -100,19 +100,25 @@ export async function POST(req: NextRequest) {
   ];
   const randomAngle = COPY_ANGLES[Math.floor(Math.random() * COPY_ANGLES.length)];
 
+  const postTypeDisplay = postType === '無' ? '不指定（由AI根據物件與賣點自行判斷）' : postType;
+  const titleGuide = postType === '無' ? '緊扣物件類型' : `緊扣物件類型與${postType}主題`;
+  const hookBlock = hookType === '無'
+    ? ''
+    : `\n· · · · · · · · · · · · · · ·\n（HOOK 開場段，一段不換行，約35字最多40字，依 ${hookType} 風格，綜合主賣點、次賣點與精華亮點，帶出最強張力與情緒價值）\n· · · · · · · · · · · · · · ·\n`;
+
   const systemPrompt = `你是 TOBE Nexus 系統特助。代表「花蓮房產顧問福哥」與「杜美珍」產出精品級 FB 房產文案。
 
 【強制多樣性規則】
 本次文案必須完全獨立、與先前任何版本截然不同。開場句、關鍵詞、比喻、結構順序都必須全新，禁止複製或相似於任何已生成過的內容。
 
 【本次文案設定】
-- 貼文類型：${postType}
-- HOOK 風格：${hookType}（${hookStyleDesc}）
+- 貼文類型：${postTypeDisplay}
+- HOOK 風格：${hookType === '無' ? '無（不使用開場白，直接從✅賣點展開）' : `${hookType}（${hookStyleDesc}）`}
 - 物件性質：${propertyContext}
 - 🎯 本次指定切入角度（必須嚴格執行）：${randomAngle}${emotionAxisLine}${aiNoteLine}
 
 【標題與副標生成規則（嚴格遵守）】
-- 第一行「標題」：緊扣物件類型與${postType}主題，繁體中文，10字以內（不含標點），語氣精煉有力
+- 第一行「標題」：${titleGuide}，繁體中文，10字以內（不含標點），語氣精煉有力
 - 第二行「副標」：必須嚴格遵守以下格式：【前段5–7字】+【全形逗號】+【後段5–7字】，前後段合計漢字數12–14字，禁止整行不加逗號；禁止使用「你的第一間房」「回家」「家人」等住宅語彙來描述商用或土地物件
   - 正確示例：「三面曝光旺地段，商機財源滾滾來」（前6後6=12字✓）
   - 正確示例：「稀有角間搶先看，投報利潤逐年旺」（前6後6=12字✓）
@@ -168,15 +174,11 @@ export async function POST(req: NextRequest) {
 
 請嚴格依照下方格式逐字輸出。括號內標示為需要生成的內容，其餘符號、換行、標點全部原樣保留，不得增減任何字元。
 
-【珍選好福邸｜（標題，10字以內，緊扣${postType}與物件類型）】
+【珍選好福邸｜（標題，10字以內，${titleGuide}）】
 （副標前段5–7漢字），（副標後段5–7漢字）
 
 📍 ${location}｜${propertyType || '精選物件'}
-${infoLine2}
-
-· · · · · · · · · · · · · · ·
-（HOOK 開場段，一段不換行，約35字最多40字，依 ${hookType} 風格，緊扣主次賣點與AI備註，有溫度／專業／故事／高情緒價值）
-· · · · · · · · · · · · · · ·
+${infoLine2}${hookBlock}
 
 ✅ （取材自精華亮點的賣點一，15字以內）
 ✅ （取材自精華亮點的賣點二，15字以內）
