@@ -80,21 +80,24 @@ export async function GET() {
   }
 
   /* ── 3. Properties contract expiring within 7 days ── */
-  const propRows = await query(
+  /* Fetch without date comparison in SQL to avoid cast errors on empty/text values */
+  const allPropRows = await query(
     `SELECT id, listing_id, subarea, property_type, contract_end_date, status_now
      FROM properties
      WHERE client_id = $1
        AND contract_end_date IS NOT NULL
        AND contract_end_date != ''
-       AND contract_end_date <= $2
-       AND contract_end_date >= $3
      ORDER BY contract_end_date ASC`,
-    [clientId, sevenDaysLater, todayStr]
+    [clientId]
   );
 
-  for (const r of propRows) {
-    const rawCED = r.contract_end_date as string | Date;
-    const date = (rawCED instanceof Date ? rawCED.toISOString() : String(rawCED)).slice(0, 10);
+  for (const r of allPropRows) {
+    const raw = r.contract_end_date as string;
+    /* Skip non-date-looking values */
+    if (!/^\d{4}-\d{2}-\d{2}/.test(raw)) continue;
+    const date = raw.slice(0, 10);
+    /* Only include if contract ends between today and 7 days from now */
+    if (date < todayStr || date > sevenDaysLater) continue;
     const daysLeft = Math.ceil((new Date(date).getTime() - Date.now()) / 86400000);
     items.push({
       id: `property-${r.id as string}`,
