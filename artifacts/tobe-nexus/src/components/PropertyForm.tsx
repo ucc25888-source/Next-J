@@ -28,9 +28,9 @@ function Field({ label, required, hint, children }: {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
+    <div translate="no" className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
       <div className="px-6 py-3.5 border-b border-slate-100 bg-slate-50">
-        <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]" translate="no">{title}</h2>
+        <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">{title}</h2>
       </div>
       <div className="p-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">{children}</div>
     </div>
