@@ -4,6 +4,8 @@ import { query, getPool } from '@/lib/db';
 import type { Buyer } from '@/types';
 import { dbRowToBuyer } from './_utils';
 
+export const dynamic = 'force-dynamic';
+
 async function nextBuyerNo(clientId: string): Promise<string> {
   const now = new Date();
   const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');

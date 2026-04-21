@@ -3,6 +3,9 @@ import { getSession } from '@/lib/session';
 import { query } from '@/lib/db';
 import type { DailyFocusItem } from '@/types';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   const session = await getSession();
   if (!session.clientId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
