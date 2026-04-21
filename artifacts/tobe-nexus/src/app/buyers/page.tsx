@@ -125,7 +125,14 @@ export default function BuyersPage() {
   const [editShowing, setEditShowing]                 = useState<Showing | null>(null);
   const [showingForm, setShowingForm]                 = useState({ ...blankShowingForm });
   const [savingShowing, setSavingShowing]             = useState(false);
-  const [expandedBuyers, setExpandedBuyers]           = useState<Set<string>>(new Set());
+  const [expandedBuyers, setExpandedBuyers] = useState<Set<string>>(new Set());
+  const [showStatsPanel, setShowStatsPanel] = useState(false);
+  const [showingStats, setShowingStats] = useState<{
+    totals: { total: number; this_month: number; pending_followup: number; overdue_followup: number };
+    reactions: { reaction: string; cnt: number }[];
+    trend: { month: string; cnt: number }[];
+    topProperties: { subarea: string; address_note: string; listing_id: string; shown_count: number; hot_count: number }[];
+  } | null>(null);
 
   /* group showings by buyer_id */
   const showingsMap = useMemo(() => {
@@ -142,9 +149,14 @@ export default function BuyersPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [bRes, sRes] = await Promise.all([fetch("/api/buyers"), fetch("/api/showings")]);
+      const [bRes, sRes, stRes] = await Promise.all([
+        fetch("/api/buyers"),
+        fetch("/api/showings"),
+        fetch("/api/showings/stats"),
+      ]);
       if (bRes.ok) setBuyers((await bRes.json()).buyers ?? []);
       if (sRes.ok) setAllShowings((await sRes.json()).showings ?? []);
+      if (stRes.ok) setShowingStats(await stRes.json());
     } finally { setLoading(false); }
   }, []);
 
@@ -316,6 +328,131 @@ export default function BuyersPage() {
       />
 
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-4 lg:space-y-5">
+
+        {/* ── 帶看統計摘要 ── */}
+        {showingStats && (
+          <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-2xl overflow-hidden">
+            {/* Header row — always visible */}
+            <button
+              onClick={() => setShowStatsPanel((p) => !p)}
+              className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-titanium-800/40 transition-colors"
+            >
+              <TrendingUp className="w-4 h-4 text-aurora-500 shrink-0" />
+              <span className="text-sm font-black text-glacier-200">帶看統計摘要</span>
+
+              {/* Inline key numbers */}
+              <div className="flex items-center gap-3 ml-3 flex-1 overflow-x-auto">
+                {[
+                  { label: '本月帶看', value: showingStats.totals.this_month, color: 'text-aurora-400' },
+                  { label: '累計帶看', value: showingStats.totals.total,      color: 'text-glacier-300' },
+                  { label: '待回訪',   value: showingStats.totals.pending_followup, color: 'text-blue-400' },
+                  { label: '逾期回訪', value: showingStats.totals.overdue_followup, color: 'text-red-400' },
+                ].map(({ label, value, color }) => (
+                  <div key={label} className="flex items-center gap-1.5 shrink-0">
+                    <span className={`text-lg font-black tabular-nums ${color}`}>{value}</span>
+                    <span className="text-[10px] text-glacier-500">{label}</span>
+                  </div>
+                ))}
+              </div>
+
+              <ChevronDown className={`w-4 h-4 text-glacier-500 shrink-0 transition-transform ${showStatsPanel ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Expandable detail */}
+            {showStatsPanel && (
+              <div className="border-t border-glacier-200/[0.06] px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                {/* Reaction breakdown */}
+                <div>
+                  <p className="text-[10px] font-black text-glacier-500 uppercase tracking-[0.12em] mb-3">帶看反應分佈</p>
+                  {showingStats.reactions.length === 0 ? (
+                    <p className="text-xs text-glacier-600">尚無帶看紀錄</p>
+                  ) : (() => {
+                    const total = showingStats.reactions.reduce((a, r) => a + r.cnt, 0);
+                    const REACTION_COLOR: Record<string, string> = {
+                      '很有興趣': 'bg-emerald-500', '有點興趣': 'bg-amber-400',
+                      '普通': 'bg-slate-400', '否定': 'bg-red-400',
+                    };
+                    return (
+                      <div className="space-y-2.5">
+                        {showingStats.reactions.map((r) => (
+                          <div key={r.reaction} className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-glacier-300">{r.reaction}</span>
+                              <span className="text-xs text-glacier-500 tabular-nums">
+                                {r.cnt} 次（{Math.round((r.cnt / total) * 100)}%）
+                              </span>
+                            </div>
+                            <div className="h-2 bg-titanium-700 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${REACTION_COLOR[r.reaction] ?? 'bg-glacier-500'}`}
+                                style={{ width: `${Math.round((r.cnt / total) * 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Top 5 properties */}
+                <div>
+                  <p className="text-[10px] font-black text-glacier-500 uppercase tracking-[0.12em] mb-3">帶看最多物件 Top 5</p>
+                  {showingStats.topProperties.length === 0 ? (
+                    <p className="text-xs text-glacier-600">尚無帶看紀錄</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {showingStats.topProperties.map((p, i) => (
+                        <div key={i} className="flex items-center gap-2.5">
+                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
+                            i === 0 ? 'bg-aurora-500 text-titanium-950' : 'bg-titanium-700 text-glacier-400'
+                          }`}>{i + 1}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-glacier-200 truncate">
+                              {p.listing_id ? `[${p.listing_id}] ` : ''}{p.subarea}
+                            </p>
+                            <p className="text-[10px] text-glacier-600 truncate">{p.address_note}</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-xs font-black text-aurora-400">{p.shown_count} 次</p>
+                            {p.hot_count > 0 && (
+                              <p className="text-[10px] text-emerald-400">🔥 {p.hot_count} 組很有興趣</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Monthly trend */}
+                {showingStats.trend.length > 0 && (
+                  <div className="md:col-span-2">
+                    <p className="text-[10px] font-black text-glacier-500 uppercase tracking-[0.12em] mb-3">近 6 個月帶看趨勢</p>
+                    <div className="flex items-end gap-2 h-16">
+                      {(() => {
+                        const max = Math.max(...showingStats.trend.map((t) => t.cnt), 1);
+                        return showingStats.trend.map((t) => (
+                          <div key={t.month} className="flex-1 flex flex-col items-center gap-1">
+                            <span className="text-[9px] text-aurora-400 font-bold">{t.cnt}</span>
+                            <div
+                              className="w-full bg-aurora-500/70 rounded-t"
+                              style={{ height: `${Math.max((t.cnt / max) * 48, 4)}px` }}
+                            />
+                            <span className="text-[8px] text-glacier-600">
+                              {t.month.slice(5)}月
+                            </span>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Status stats */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
