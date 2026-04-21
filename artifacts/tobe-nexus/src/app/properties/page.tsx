@@ -6,7 +6,7 @@ import { usePropertyStore } from "@/store/usePropertyStore";
 import PageHeader from "@/components/PageHeader";
 import {
   Plus, Search, Building2, MapPin, Ruler,
-  PenTool, Trash2, Upload, CalendarClock, Phone,
+  PenTool, Trash2, CalendarClock, Phone,
 } from "lucide-react";
 import { getAreaDisplay } from "@/utils/areaDisplay";
 
@@ -56,10 +56,6 @@ export default function PropertiesPage() {
         subtitle={`管理所有委託案件 · 共 ${properties.length} 件`}
         actions={
           <>
-            <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-glacier-300 bg-titanium-900 border border-glacier-200/[0.1] rounded-lg hover:border-glacier-200/20 hover:text-glacier-200 transition-all">
-              <Upload className="w-3.5 h-3.5" />
-              匯入資料
-            </button>
             <Link
               href="/properties/new"
               className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm"
