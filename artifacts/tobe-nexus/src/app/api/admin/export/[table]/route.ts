@@ -4,7 +4,7 @@ import { query } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-/* ── BOM + CSV builder ── */
+/* ── UTF-8 BOM CSV builder ── */
 function toCSV(rows: Record<string, unknown>[]): string {
   if (rows.length === 0) return '\uFEFF（無資料）\n';
   const headers = Object.keys(rows[0]);
@@ -17,7 +17,7 @@ function toCSV(rows: Record<string, unknown>[]): string {
     headers.join(','),
     ...rows.map((r) => headers.map((h) => escape(r[h])).join(',')),
   ];
-  return '\uFEFF' + lines.join('\r\n'); // UTF-8 BOM for Excel
+  return '\uFEFF' + lines.join('\r\n');
 }
 
 function fmtDate(v: unknown) {
@@ -30,86 +30,96 @@ function fmtDate(v: unknown) {
 const QUERIES: Record<string, (clientId: string) => Promise<Record<string, unknown>[]>> = {
 
   properties: async (clientId) => {
+    const isAll = clientId === 'ALL';
     const rows = await query(
-      `SELECT id, title, location, price, land_price, ping, land_ping,
-              property_type, layout, parking,
-              highlights, secondary_highlights, target_buyers,
-              listing_date, listing_expiry, status,
-              colisting_agent, colisting_phone, colisting_fee,
-              fb_post_count, created_at
-       FROM properties WHERE client_id = $1 ORDER BY created_at DESC`,
-      [clientId]
+      `SELECT p.*, c.display_name AS client_name
+       FROM properties p
+       LEFT JOIN clients c ON c.client_id = p.client_id
+       ${isAll ? '' : 'WHERE p.client_id = $1'}
+       ORDER BY p.created_at DESC`,
+      isAll ? [] : [clientId]
     );
     return rows.map((r) => ({
-      物件編號: r.id,
-      物件名稱: r.title,
-      地址: r.location,
-      售價萬: r.price,
-      土地價格萬: r.land_price,
-      坪數: r.ping,
-      地坪: r.land_ping,
+      ...(isAll ? { 所屬客戶: r.client_name } : {}),
+      物件編號: r.listing_id,
+      地段: r.subarea,
+      地址備注: r.address_note,
       類型: r.property_type,
-      格局: r.layout,
+      售價萬: r.price_wan,
+      底價萬: r.reserve_price_wan,
+      建坪: r.build_ping,
+      地坪: r.land_ping,
+      格局: `${r.rooms}房${r.halls}廳${r.baths}衛`,
+      樓層: r.floor_num ? `${r.floor_num}/${r.total_floors}F` : '',
       車位: r.parking,
-      主賣點: r.highlights,
-      次賣點: r.secondary_highlights,
-      目標客群: r.target_buyers,
-      委託日期: fmtDate(r.listing_date),
-      委託到期: fmtDate(r.listing_expiry),
-      狀態: r.status,
-      同業聯賣代理人: r.colisting_agent,
-      同業聯賣電話: r.colisting_phone,
-      同業服務費: r.colisting_fee,
-      FB文案次數: r.fb_post_count,
+      委託類型: r.commission_type,
+      委託起: r.contract_start_date,
+      委託迄: r.contract_end_date,
+      現況: r.status_now,
+      主要賣點: r.main_point,
+      次要賣點: r.second_point,
+      目標買方: r.target_buyer,
+      私人備注: r.notes_private,
+      同業公司: r.colisting_company,
+      同業聯絡人: r.colisting_contact,
+      FB發文次數: r.fb_post_count,
       建立時間: fmtDate(r.created_at),
     }));
   },
 
   buyers: async (clientId) => {
+    const isAll = clientId === 'ALL';
     const rows = await query(
-      `SELECT id, name, phone, email, source, status,
-              budget_min, budget_max, preferred_area, preferred_type,
-              notes, next_follow_up_date, created_at
-       FROM buyers WHERE client_id = $1 ORDER BY created_at DESC`,
-      [clientId]
+      `SELECT b.*, c.display_name AS client_name
+       FROM buyers b
+       LEFT JOIN clients c ON c.client_id = b.client_id
+       ${isAll ? '' : 'WHERE b.client_id = $1'}
+       ORDER BY b.updated_at DESC`,
+      isAll ? [] : [clientId]
     );
     return rows.map((r) => ({
-      買方編號: r.id,
+      ...(isAll ? { 所屬客戶: r.client_name } : {}),
+      買方編號: r.buyer_no,
       姓名: r.name,
       電話: r.phone,
       Email: r.email,
+      LINE: r.line_id,
       來源: r.source,
       狀態: r.status,
       預算下限萬: r.budget_min,
       預算上限萬: r.budget_max,
-      偏好地區: r.preferred_area,
-      偏好類型: r.preferred_type,
-      備注: r.notes,
+      偏好類型: r.pref_property_type,
+      偏好地區: r.pref_area,
+      偏好格局: r.pref_rooms,
+      偏好最小坪數: r.pref_min_ping,
+      最後聯繫: fmtDate(r.last_contact_at),
       下次跟進日: r.next_follow_up_date,
+      備注: r.notes,
       建立時間: fmtDate(r.created_at),
     }));
   },
 
   showings: async (clientId) => {
+    const isAll = clientId === 'ALL';
     const rows = await query(
-      `SELECT s.id, s.showing_date, s.status, s.reaction,
-              s.follow_up_date, s.follow_up_done, s.notes,
-              b.name AS buyer_name, b.phone AS buyer_phone,
-              p.title AS property_title, p.location AS property_location,
-              s.created_at
+      `SELECT s.*, b.name AS buyer_name, b.phone AS buyer_phone,
+              p.subarea AS property_subarea, p.address_note AS property_address,
+              c.display_name AS client_name
        FROM showings s
        LEFT JOIN buyers b ON b.id = s.buyer_id
        LEFT JOIN properties p ON p.id = s.property_id
-       WHERE s.client_id = $1 ORDER BY s.showing_date DESC`,
-      [clientId]
+       LEFT JOIN clients c ON c.client_id = s.client_id
+       ${isAll ? '' : 'WHERE s.client_id = $1'}
+       ORDER BY s.showing_date DESC`,
+      isAll ? [] : [clientId]
     );
     return rows.map((r) => ({
-      帶看編號: r.id,
+      ...(isAll ? { 所屬客戶: r.client_name } : {}),
       帶看日期: fmtDate(r.showing_date),
       買方姓名: r.buyer_name,
       買方電話: r.buyer_phone,
-      物件名稱: r.property_title,
-      物件地址: r.property_location,
+      物件地段: r.property_subarea,
+      物件地址: r.property_address,
       狀態: r.status,
       反應: r.reaction,
       回訪日期: r.follow_up_date,
@@ -120,12 +130,12 @@ const QUERIES: Record<string, (clientId: string) => Promise<Record<string, unkno
   },
 
   ai_logs: async (clientId) => {
+    const isAll = clientId === 'ALL';
     const rows = await query(
-      `SELECT id, client_id, display_name, action, property_id, tokens_used, created_at
-       FROM ai_logs
-       WHERE ($1 = 'ALL' OR client_id = $1)
+      `SELECT * FROM ai_logs
+       ${isAll ? '' : 'WHERE client_id = $1'}
        ORDER BY created_at DESC`,
-      [clientId]
+      isAll ? [] : [clientId]
     );
     return rows.map((r) => ({
       序號: r.id,
@@ -135,24 +145,6 @@ const QUERIES: Record<string, (clientId: string) => Promise<Record<string, unkno
       物件編號: r.property_id ?? '',
       消耗Tokens: r.tokens_used,
       執行時間: fmtDate(r.created_at),
-    }));
-  },
-
-  copies: async (clientId) => {
-    const rows = await query(
-      `SELECT c.id, c.copy_type, c.content, c.created_at,
-              p.title AS property_title
-       FROM copies c
-       LEFT JOIN properties p ON p.id = c.property_id::uuid OR p.id = c.property_id
-       WHERE c.client_id = $1 ORDER BY c.created_at DESC`,
-      [clientId]
-    );
-    return rows.map((r) => ({
-      文案編號: r.id,
-      類型: r.copy_type,
-      物件名稱: r.property_title ?? '',
-      文案內容: r.content,
-      建立時間: fmtDate(r.created_at),
     }));
   },
 };
@@ -168,7 +160,6 @@ export async function GET(
 
   const { table } = await context.params;
   const url = new URL(req.url);
-  /* Admin can export any client, or pass ?client=ALL for ai_logs */
   const targetClient = session.isAdmin
     ? (url.searchParams.get('client') ?? 'ALL')
     : (session.clientId as string);
@@ -183,7 +174,8 @@ export async function GET(
     const csv = toCSV(rows);
 
     const now = new Date().toLocaleDateString('zh-TW').replace(/\//g, '');
-    const filename = `TOBE_${table}_${now}.csv`;
+    const clientLabel = targetClient === 'ALL' ? '全部' : targetClient;
+    const filename = `TOBE_${table}_${clientLabel}_${now}.csv`;
 
     return new NextResponse(csv, {
       headers: {
@@ -193,6 +185,6 @@ export async function GET(
     });
   } catch (err) {
     console.error('Export error', err);
-    return NextResponse.json({ error: '匯出失敗' }, { status: 500 });
+    return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }

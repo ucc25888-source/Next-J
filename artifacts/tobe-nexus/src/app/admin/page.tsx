@@ -148,6 +148,9 @@ export default function AdminPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'clients' | 'monitor' | 'export'>('clients');
   const [exportingTable, setExportingTable] = useState<string | null>(null);
+  const [exportClientMap, setExportClientMap] = useState<Record<string, string>>({
+    properties: 'ALL', buyers: 'ALL', showings: 'ALL', ai_logs: 'ALL',
+  });
   const [clients, setClients] = useState<AdminClient[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -231,17 +234,23 @@ export default function AdminPage() {
     } finally { setAddLoading(false); }
   };
 
-  const handleExport = async (table: string, clientId = 'ALL') => {
+  const handleExport = async (table: string, clientId?: string) => {
+    const target = clientId ?? exportClientMap[table] ?? 'ALL';
     setExportingTable(table);
     try {
-      const res = await fetch(`/api/admin/export/${table}?client=${clientId}`);
-      if (!res.ok) { alert('匯出失敗，請稍後再試'); return; }
+      const res = await fetch(`/api/admin/export/${table}?client=${target}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(`匯出失敗：${err.error ?? '請稍後再試'}`);
+        return;
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       const now = new Date().toLocaleDateString('zh-TW').replace(/\//g, '');
-      a.download = `TOBE_${table}_${now}.csv`;
+      const label = target === 'ALL' ? '全部' : target;
+      a.download = `TOBE_${table}_${label}_${now}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } finally { setExportingTable(null); }
@@ -568,34 +577,36 @@ export default function AdminPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {([
                 {
-                  table: 'properties', label: '物件清單', desc: '所有物件的完整資料，含售價、地址、委託日期、主賣點等',
+                  table: 'properties', label: '物件清單', desc: '物件完整資料，含售價、地址、委託日期、主賣點等',
                   icon: Building2, color: 'text-aurora-400', bg: 'bg-aurora-500/10 border-aurora-500/20',
-                  fields: ['物件編號', '物件名稱', '地址', '售價', '坪數', '格局', '委託日期', '狀態', '...'],
+                  fields: ['物件編號', '地段', '地址備注', '售價萬', '建坪', '格局', '委託類型', '現況', '...'],
+                  hasClientFilter: true,
                 },
                 {
-                  table: 'buyers', label: '買方 CRM', desc: '所有買方聯絡人資料，含預算、偏好地區、狀態、備注',
+                  table: 'buyers', label: '買方 CRM', desc: '買方聯絡人資料，含預算、偏好地區、狀態、備注',
                   icon: UserRound, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20',
-                  fields: ['姓名', '電話', 'Email', '來源', '狀態', '預算範圍', '偏好地區', '...'],
+                  fields: ['買方編號', '姓名', '電話', 'LINE', '來源', '狀態', '預算', '偏好地區', '...'],
+                  hasClientFilter: true,
                 },
                 {
                   table: 'showings', label: '帶看記錄', desc: '所有帶看紀錄，含買方姓名、物件、反應、回訪情況',
                   icon: CalendarCheck, color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/20',
-                  fields: ['帶看日期', '買方姓名', '物件名稱', '反應', '回訪日期', '已完成', '...'],
+                  fields: ['帶看日期', '買方姓名', '物件地段', '反應', '回訪日期', '已完成', '...'],
+                  hasClientFilter: true,
                 },
                 {
                   table: 'ai_logs', label: 'AI 使用日誌', desc: '所有客戶的 AI 文案生成紀錄，含時間、操作類型、Token 消耗',
                   icon: Bot, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20',
                   fields: ['客戶代碼', '客戶名稱', '操作', '物件編號', '消耗Tokens', '時間', '...'],
+                  hasClientFilter: false,
                 },
-              ]).map(({ table, label, desc, icon: Icon, color, bg, fields }) => (
+              ]).map(({ table, label, desc, icon: Icon, color, bg, fields, hasClientFilter }) => (
                 <div key={table} className={`rounded-2xl border p-5 ${bg} bg-titanium-900`}>
                   <div className="flex items-center gap-2.5 mb-3">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${bg}`}>
                       <Icon className={`w-5 h-5 ${color}`} />
                     </div>
-                    <div>
-                      <p className="text-sm font-black text-glacier-200">{label}</p>
-                    </div>
+                    <p className="text-sm font-black text-glacier-200">{label}</p>
                   </div>
                   <p className="text-xs text-glacier-500 mb-3 leading-relaxed">{desc}</p>
                   <div className="flex flex-wrap gap-1 mb-4">
@@ -603,13 +614,35 @@ export default function AdminPage() {
                       <span key={f} className="text-[10px] bg-white/[0.06] text-glacier-400 px-1.5 py-0.5 rounded font-mono">{f}</span>
                     ))}
                   </div>
+
+                  {/* Client filter dropdown */}
+                  {hasClientFilter && clients.length > 0 && (
+                    <div className="mb-3">
+                      <label className="block text-[10px] font-bold text-glacier-500 uppercase tracking-[0.1em] mb-1.5">
+                        下載範圍
+                      </label>
+                      <select
+                        value={exportClientMap[table] ?? 'ALL'}
+                        onChange={(e) => setExportClientMap((prev) => ({ ...prev, [table]: e.target.value }))}
+                        className="w-full bg-titanium-800 border border-glacier-200/[0.12] rounded-lg px-3 py-2 text-xs text-glacier-200 focus:outline-none focus:border-aurora-500/40 transition-colors"
+                      >
+                        <option value="ALL">✦ 全部客戶</option>
+                        {clients.map((c) => (
+                          <option key={c.client_id} value={c.client_id}>
+                            {c.display_name}（{c.client_id}）
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                   <button
                     onClick={() => handleExport(table)}
                     disabled={exportingTable === table}
                     className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
                       exportingTable === table
                         ? 'bg-white/[0.06] text-glacier-600 cursor-not-allowed'
-                        : `bg-aurora-500 text-titanium-950 hover:bg-aurora-400 glow-aurora-sm`
+                        : 'bg-aurora-500 text-titanium-950 hover:bg-aurora-400 glow-aurora-sm'
                     }`}
                   >
                     {exportingTable === table ? (
@@ -622,37 +655,6 @@ export default function AdminPage() {
               ))}
             </div>
 
-            {/* Per-client export for properties/buyers */}
-            {clients.length > 0 && (
-              <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-2xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-glacier-200/[0.06] bg-titanium-950/30">
-                  <p className="text-[13px] font-bold text-glacier-200">依客戶個別匯出</p>
-                  <p className="text-[11px] text-glacier-500 mt-0.5">僅匯出該客戶的物件與買方資料</p>
-                </div>
-                <div className="divide-y divide-glacier-200/[0.04]">
-                  {clients.map((c) => (
-                    <div key={c.client_id} className="flex items-center gap-4 px-6 py-4">
-                      <div className="flex-1">
-                        <p className="text-sm font-bold text-glacier-200">{c.display_name}</p>
-                        <p className="text-xs text-glacier-500 font-mono">{c.client_id}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => handleExport('properties', c.client_id)}
-                          disabled={exportingTable === `properties-${c.client_id}`}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-aurora-400 bg-aurora-500/10 border border-aurora-500/20 rounded-lg hover:bg-aurora-500/20 transition-all">
-                          <Building2 className="w-3 h-3" /> 物件
-                        </button>
-                        <button onClick={() => handleExport('buyers', c.client_id)}
-                          disabled={exportingTable === `buyers-${c.client_id}`}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded-lg hover:bg-blue-500/20 transition-all">
-                          <UserRound className="w-3 h-3" /> 買方
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </>
         )}
       </div>
