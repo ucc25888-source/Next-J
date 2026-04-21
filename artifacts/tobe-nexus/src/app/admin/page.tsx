@@ -185,11 +185,14 @@ export default function AdminPage() {
           {showAddForm && (
             <div className="px-6 py-5 border-b border-aurora-500/20 bg-aurora-500/[0.03]">
               <p className="text-[11px] font-bold text-aurora-400 uppercase tracking-[0.12em] mb-4">新增客戶帳號</p>
+              <p className="text-[10px] text-glacier-500 mb-3">
+                ⚠ A0001 為測試帳號，正式客戶請從 <span className="font-mono text-aurora-400">A1001</span> 開始編號
+              </p>
               <div className="grid grid-cols-3 gap-3 mb-3">
                 {[
-                  { label: '客戶代碼', key: 'client_id', placeholder: 'A0002', mono: true },
+                  { label: '客戶代碼', key: 'client_id', placeholder: 'A1001', mono: true },
                   { label: '顯示名稱', key: 'display_name', placeholder: '陳仲介' },
-                  { label: '存取碼', key: 'login_token', placeholder: 'A0002-2026' },
+                  { label: '存取碼', key: 'login_token', placeholder: 'A1001-2026' },
                 ].map(({ label, key, placeholder, mono }) => (
                   <div key={key}>
                     <label className="block text-[10px] font-bold text-glacier-500 uppercase tracking-[0.1em] mb-1">{label}</label>
