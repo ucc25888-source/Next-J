@@ -403,6 +403,9 @@ export default function CopywritingPage({ id }: { id: string }) {
                 <div className="flex flex-wrap gap-2">
                   {activeTags.map((tag) => {
                     const isSelected = selectedTagSet.has(tag);
+                    const prefix = tag.slice(0, 4);
+                    const isSimilarToSelected = !isSelected && [...selectedTagSet].some(s => stripEnglish(s).startsWith(prefix));
+                    if (isSimilarToSelected) return null;
                     return (
                       <button
                         key={tag}
