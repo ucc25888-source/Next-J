@@ -11,11 +11,11 @@ import type { Buyer } from "@/types";
 
 const SOURCES = ["平台", "介紹", "自來", "其他"];
 
-const STATUSES = ["潛在", "積極找房", "協商中", "已成交", "暫緩", "放棄"];
+const STATUSES = ["潛在", "積極找", "協商中", "已成交", "暫緩", "放棄"];
 
 const STATUS_STYLE: Record<string, string> = {
   潛在: "bg-slate-500/10 text-slate-400 border-slate-500/20",
-  積極找房: "bg-aurora-500/10 text-aurora-400 border-aurora-500/25",
+  積極找: "bg-aurora-500/10 text-aurora-400 border-aurora-500/25",
   協商中: "bg-amber-500/10 text-amber-400 border-amber-500/25",
   已成交: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
   暫緩: "bg-orange-500/10 text-orange-400 border-orange-500/20",
@@ -24,7 +24,7 @@ const STATUS_STYLE: Record<string, string> = {
 
 const STATUS_DOT: Record<string, string> = {
   潛在: "bg-slate-500",
-  積極找房: "bg-aurora-500",
+  積極找: "bg-aurora-500",
   協商中: "bg-amber-500",
   已成交: "bg-emerald-500",
   暫緩: "bg-orange-500",
