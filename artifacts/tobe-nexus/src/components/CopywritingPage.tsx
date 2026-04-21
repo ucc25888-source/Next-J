@@ -45,6 +45,7 @@ const TAG_MODE_LABELS: { value: TagMode; label: string }[] = [
 ];
 
 const LAND_POST_TYPES: PostType[] = ['土地潛力', '資產配置', '知識教學'];
+const SHOP_POST_TYPES: PostType[] = ['商辦店面', '物件開箱', '降價急售', '知識教學', '人設生活', '成交喜報'];
 
 const POST_TYPES: { value: PostType; label: string }[] = [
   { value: '物件開箱', label: '物件開箱' },
@@ -55,6 +56,7 @@ const POST_TYPES: { value: PostType; label: string }[] = [
   { value: '資產配置', label: '資產配置' },
   { value: '土地潛力', label: '土地潛力' },
   { value: '成家圓夢', label: '成家圓夢' },
+  { value: '商辦店面', label: '商辦店面' },
 ];
 
 const HOOK_TYPES: { value: HookType; label: string }[] = [
@@ -131,7 +133,7 @@ export default function CopywritingPage({ id }: { id: string }) {
     }
   };
 
-  const defaultPostType: PostType = isLandProperty ? '土地潛力' : '物件開箱';
+  const defaultPostType: PostType = isLandProperty ? '土地潛力' : isShopProperty ? '商辦店面' : '物件開箱';
   const defaultHookType: HookType = isLandProperty ? '專業焦慮鉤' : '情感溫度鉤';
 
   useEffect(() => {

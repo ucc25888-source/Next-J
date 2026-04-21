@@ -116,7 +116,8 @@ export type PostType =
   | '成交喜報'
   | '資產配置'
   | '土地潛力'
-  | '成家圓夢';
+  | '成家圓夢'
+  | '商辦店面';
 
 export type HookType =
   | '專業焦慮鉤'
