@@ -95,6 +95,7 @@ export default function PropertiesPage() {
               return (
                 <div
                   key={property.id}
+                  translate="no"
                   className="group bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden hover:border-aurora-500/20 transition-all duration-200 flex flex-col"
                 >
                   {/* Image */}

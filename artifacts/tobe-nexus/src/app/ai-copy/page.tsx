@@ -45,12 +45,13 @@ export default function AiCopyPage() {
                   <Link
                     key={property.id}
                     href={`/generate/${property.id}`}
+                    translate="no"
                     className="group flex bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden hover:border-aurora-500/25 transition-all duration-200"
                   >
                     <div className="w-24 h-24 shrink-0 bg-titanium-800 overflow-hidden">
                       <img
                         src={property.img1_url || "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=400"}
-                        alt={title}
+                        alt=""
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
