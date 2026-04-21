@@ -645,22 +645,28 @@ export default function PropertyForm({ id }: PropertyFormProps) {
               </div>
               <div className="p-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                 <Field label="主賣點">
-                  <select translate="no" className={selectCls} value={form.main_point} onChange={(e) => set('main_point', e.target.value)}>
-                    <option value="">請選擇</option>
-                    {activePoints.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
-                  </select>
+                  <NoTranslateSelect
+                    value={form.main_point}
+                    onChange={(v) => set('main_point', v)}
+                    options={activePoints.map((o) => ({ value: o.value, label: o.value.split(' | ')[0] }))}
+                    placeholder="請選擇"
+                  />
                 </Field>
                 <Field label="次賣點（可空）">
-                  <select translate="no" className={selectCls} value={form.second_point} onChange={(e) => set('second_point', e.target.value)}>
-                    <option value="">無</option>
-                    {activePoints.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
-                  </select>
+                  <NoTranslateSelect
+                    value={form.second_point}
+                    onChange={(v) => set('second_point', v)}
+                    options={[{ value: '', label: '無' }, ...activePoints.map((o) => ({ value: o.value, label: o.value.split(' | ')[0] }))]}
+                    placeholder="無"
+                  />
                 </Field>
                 <Field label="目標客群">
-                  <select translate="no" className={selectCls} value={form.target_buyer} onChange={(e) => set('target_buyer', e.target.value)}>
-                    <option value="">請選擇</option>
-                    {targetBuyers.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
-                  </select>
+                  <NoTranslateSelect
+                    value={form.target_buyer}
+                    onChange={(v) => set('target_buyer', v)}
+                    options={targetBuyers.map((o) => ({ value: o.value, label: o.value.split(' | ')[0] }))}
+                    placeholder="請選擇"
+                  />
                 </Field>
 
                 <div className="md:col-span-3">
