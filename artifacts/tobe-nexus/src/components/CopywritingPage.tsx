@@ -83,7 +83,7 @@ export default function CopywritingPage({ id }: { id: string }) {
   const [postType, setPostType] = useState<PostType>('物件開箱');
   const [hookType, setHookType] = useState<HookType>('情感溫度鉤');
   const [locationOverride, setLocationOverride] = useState(property?.subarea ?? '');
-  const [highlightsText, setHighlightsText] = useState(property?.must_say_3 ?? '');
+  const [highlightsText, setHighlightsText] = useState('');
   const [content, setContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -100,6 +100,21 @@ export default function CopywritingPage({ id }: { id: string }) {
   const isShopProperty = SHOP_PROPERTY_TYPES.includes(property?.property_type ?? '');
 
   const stripEnglish = (text: string) => text.split('|')[0].trim();
+
+  const normalizeHighlights = (raw: string): string => {
+    const lines = raw
+      .split(/[\n　]/)
+      .flatMap(l => l.split(/\s{2,}/))
+      .map(l => l.trim())
+      .filter(Boolean);
+    const seen = new Set<string>();
+    return lines.filter(l => {
+      const key = stripEnglish(l).slice(0, 4);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).join('\n');
+  };
 
   const defaultTagMode: TagMode = isLandProperty ? 'land' : isShopProperty ? 'shop' : 'residential';
   const [tagMode, setTagMode] = useState<TagMode>(defaultTagMode);
@@ -124,7 +139,7 @@ export default function CopywritingPage({ id }: { id: string }) {
       router.push('/properties');
     } else {
       setLocationOverride(property.subarea);
-      setHighlightsText(property.must_say_3 ?? '');
+      setHighlightsText(normalizeHighlights(property.must_say_3 ?? ''));
       setPostType(defaultPostType);
       setHookType(defaultHookType);
     }
