@@ -40,14 +40,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { postType, title, subtitle, hookSentence, location, price, ping, layout, propertyType, parking, highlights, property_id } = await req.json();
+  const { postType, title, subtitle, hookSentence, location, price, ping, landPing, isLandProperty, layout, propertyType, parking, highlights, property_id } = await req.json();
 
-  const infoLine2 = [
-    `💰 ${price}萬`,
-    `📏 ${ping}坪`,
-    parking ? parking : null,
-    layout,
-  ].filter(Boolean).join('｜');
+  const infoLine2 = isLandProperty
+    ? [
+        `💰 ${price}萬`,
+        landPing ? `地坪${landPing}坪` : null,
+      ].filter(Boolean).join('｜')
+    : [
+        `💰 ${price}萬`,
+        ping ? `📏 ${ping}坪` : null,
+        parking || null,
+        layout,
+      ].filter(Boolean).join('｜');
 
   const systemPrompt = `你是 TOBE Nexus 系統特助。代表「花蓮房產顧問福哥」與「杜美珍」產出精品級 FB 房產文案。
 

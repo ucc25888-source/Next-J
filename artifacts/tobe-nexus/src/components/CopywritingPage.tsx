@@ -132,6 +132,8 @@ export default function CopywritingPage({ id }: { id: string }) {
           location: locationOverride || property.subarea,
           price: property.price_wan,
           ping: property.build_ping,
+          landPing: property.land_ping,
+          isLandProperty,
           layout: defaultLayout,
           propertyType: property.property_type || '',
           parking: property.parking || '',
@@ -290,9 +292,11 @@ export default function CopywritingPage({ id }: { id: string }) {
                 <span translate="no" className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
                   📏 {getAreaDisplay(property.property_type, property.build_ping, property.land_ping)}
                 </span>
-                <span translate="no" className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
-                  🏠 {defaultLayout}
-                </span>
+                {!isLandProperty && (
+                  <span translate="no" className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
+                    🏠 {defaultLayout}
+                  </span>
+                )}
               </div>
               <div>
                 <label className={labelCls}>精華亮點（AI 會融入文案）</label>
