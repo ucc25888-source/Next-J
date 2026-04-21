@@ -59,7 +59,7 @@ export default function AiCopyPage() {
                       <div>
                         <p className="text-[12px] font-bold text-glacier-200 truncate">{title}</p>
                         <p className="text-xs text-glacier-500 mt-0.5">
-                          {property.rooms}房{property.halls}廳 · {property.build_ping}坪
+                          {property.rooms}房{property.halls}廳 · {property.build_ping > 0 ? `建坪 ${property.build_ping}` : property.land_ping > 0 ? `地坪 ${property.land_ping}` : '坪數未填'}坪
                         </p>
                       </div>
                       <div className="flex items-center justify-between mt-2">

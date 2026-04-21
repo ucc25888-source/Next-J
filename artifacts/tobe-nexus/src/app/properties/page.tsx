@@ -141,7 +141,13 @@ export default function PropertiesPage() {
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Ruler className="w-3 h-3 text-glacier-600 shrink-0" />
-                        <span translate="no">{property.build_ping} 坪</span>
+                        <span translate="no">
+                          {property.build_ping > 0
+                            ? `建坪 ${property.build_ping} 坪`
+                            : property.land_ping > 0
+                              ? `地坪 ${property.land_ping} 坪`
+                              : '坪數未填'}
+                        </span>
                       </div>
                     </div>
 
