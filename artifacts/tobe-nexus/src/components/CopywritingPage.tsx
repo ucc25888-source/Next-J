@@ -134,17 +134,12 @@ export default function CopywritingPage({ id }: { id: string }) {
     }
   };
 
-  const defaultPostType: PostType = isLandProperty ? '土地潛力' : isShopProperty ? '商辦店面' : '物件開箱';
-  const defaultHookType: HookType = isLandProperty ? '專業焦慮鉤' : '情感溫度鉤';
-
   useEffect(() => {
     if (!property) {
       router.push('/properties');
     } else {
       setLocationOverride(property.subarea);
       setHighlightsText(normalizeHighlights(property.must_say_3 ?? ''));
-      setPostType(defaultPostType);
-      setHookType(defaultHookType);
     }
   }, []);
 
