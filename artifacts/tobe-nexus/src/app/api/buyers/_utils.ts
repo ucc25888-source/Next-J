@@ -1,5 +1,17 @@
 import type { Buyer } from '@/types';
 
+function toDateStr(v: unknown): string | null {
+  if (!v) return null;
+  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  return String(v).slice(0, 10);
+}
+
+function toISOStr(v: unknown): string {
+  if (!v) return new Date().toISOString();
+  if (v instanceof Date) return v.toISOString();
+  return String(v);
+}
+
 export function dbRowToBuyer(row: Record<string, unknown>): Buyer {
   return {
     id: row.id as string,
@@ -18,9 +30,9 @@ export function dbRowToBuyer(row: Record<string, unknown>): Buyer {
     pref_min_ping: Number(row.pref_min_ping) ?? 0,
     status: (row.status as string) ?? '潛在',
     notes: (row.notes as string) ?? '',
-    last_contact_at: (row.last_contact_at as string) ?? null,
-    next_follow_up_date: (row.next_follow_up_date as string) ?? null,
-    created_at: (row.created_at as string) ?? new Date().toISOString(),
-    updated_at: (row.updated_at as string) ?? new Date().toISOString(),
+    last_contact_at: toDateStr(row.last_contact_at),
+    next_follow_up_date: toDateStr(row.next_follow_up_date),
+    created_at: toISOStr(row.created_at),
+    updated_at: toISOStr(row.updated_at),
   };
 }

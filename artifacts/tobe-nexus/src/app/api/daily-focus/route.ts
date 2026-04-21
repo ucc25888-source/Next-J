@@ -28,7 +28,8 @@ export async function GET() {
   );
 
   for (const r of buyerRows) {
-    const date = (r.next_follow_up_date as string).slice(0, 10);
+    const raw = r.next_follow_up_date as string | Date;
+    const date = (raw instanceof Date ? raw.toISOString() : String(raw)).slice(0, 10);
     items.push({
       id: `buyer-${r.id as string}`,
       type: 'buyer',
@@ -56,7 +57,8 @@ export async function GET() {
   );
 
   for (const r of showingRows) {
-    const date = (r.follow_up_date as string).slice(0, 10);
+    const rawDate = r.follow_up_date as string | Date;
+    const date = (rawDate instanceof Date ? rawDate.toISOString() : String(rawDate)).slice(0, 10);
     const propLabel = r.listing_id
       ? `[${r.listing_id as string}] ${r.subarea as string} ${r.property_type as string}`
       : r.subarea ? `${r.subarea as string} ${r.property_type as string}` : null;
@@ -91,7 +93,8 @@ export async function GET() {
   );
 
   for (const r of propRows) {
-    const date = (r.contract_end_date as string).slice(0, 10);
+    const rawCED = r.contract_end_date as string | Date;
+    const date = (rawCED instanceof Date ? rawCED.toISOString() : String(rawCED)).slice(0, 10);
     const daysLeft = Math.ceil((new Date(date).getTime() - Date.now()) / 86400000);
     items.push({
       id: `property-${r.id as string}`,
