@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { postType, hookType, title, subtitle, hookSentence, location, price, ping, landPing, isLandProperty, layout, propertyType, parking, highlights, property_id } = await req.json();
+  const { postType, hookType, title, subtitle, hookSentence, location, price, ping, landPing, isLandProperty, isShopProperty, layout, propertyType, parking, highlights, property_id } = await req.json();
 
   const infoLine2 = isLandProperty
     ? [
@@ -63,18 +63,29 @@ export async function POST(req: NextRequest) {
   };
   const hookStyleDesc = HOOK_STYLE[hookType] ?? HOOK_STYLE['情感溫度鉤'];
 
+  const propertyContext = isShopProperty
+    ? '本物件為商用/店面類型，賣點語氣應聚焦在地段優勢、收租投報、商業曝光度、人流量等商業邏輯，禁止使用家庭溫情、採光、孩童等住宅語彙'
+    : isLandProperty
+      ? '本物件為土地類型，賣點語氣應聚焦在地形、開發潛力、產權、增值等土地投資邏輯'
+      : '本物件為住宅類型，賣點語氣可使用生活感、家庭溫度、地段機能等住宅語彙';
+
   const systemPrompt = `你是 TOBE Nexus 系統特助。代表「花蓮房產顧問福哥」與「杜美珍」產出精品級 FB 房產文案。
 
 【本次文案設定】
 - 貼文類型：${postType}
 - HOOK 風格：${hookType}（${hookStyleDesc}）
-- 三個✅賣點與🎯適合對象，必須完全符合「${postType}」主題，且文風符合「${hookType}」風格
+- 物件性質：${propertyContext}
+
+【✅賣點生成規則（最重要）】
+- 使用者已提供「精華亮點」作為賣點來源，這是第一優先依據
+- 三個✅賣點必須直接取材自或改寫自精華亮點，不可自行捏造與精華亮點無關的內容
+- 若精華亮點不足三項，可補充一項符合物件類型的自然延伸賣點
+- 每個✅點控制在15字以內，語氣精煉有力
 
 【強制規則，違反即失效】
 - 完全禁止輸出任何說明文字、段落標題、前言、結語、注意事項
 - 禁止輸出「===」、「輸出格式」、「第X段」、「注意事項」等任何非內容文字
 - 禁止生成 hashtag、電話、LINE 或署名
-- 每個✅點必須獨立一行且控制在15字以內
 - 核心句欄位已由品牌內容庫預先指定，必須原文照出，一字不改
 
 請嚴格依照下方格式逐字輸出。括號內標示為需要生成的內容，其餘符號、換行、標點全部原樣保留，不得增減任何字元。
@@ -89,9 +100,9 @@ ${infoLine2}
 ${hookSentence}
 · · · · · · · · · · · · · · ·
 
-✅ （賣點一，15字以內，一行）
-✅ （賣點二，15字以內，一行）
-✅ （賣點三，結合精華亮點，15字以內，一行）
+✅ （取材自精華亮點的賣點一，15字以內）
+✅ （取材自精華亮點的賣點二，15字以內）
+✅ （取材自精華亮點的賣點三，15字以內）
 
 🎯 適合對象：（一句話定位目標客群，12字以內）`;
 
@@ -102,7 +113,9 @@ ${hookSentence}
         { role: 'system', content: systemPrompt },
         {
           role: 'user',
-          content: `精華亮點（請融入文案）：\n${highlights || '請根據地點、物件類型與價格自行發揮亮點'}`,
+          content: highlights
+            ? `【精華亮點 — 三個✅賣點必須取材於此，優先使用原文或精煉改寫，禁止忽略】\n${highlights}`
+            : `【未提供精華亮點】請根據物件地點「${location}」、類型「${propertyType}」與售價「${price}萬」自行判斷合適的賣點。`,
         },
       ],
       stream: true,

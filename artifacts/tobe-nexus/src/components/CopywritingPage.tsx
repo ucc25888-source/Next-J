@@ -143,7 +143,7 @@ export default function CopywritingPage({ id }: { id: string }) {
     const slogan = randomHumanSlogan();
     const cta = randomCTA();
     const theme = randomPostTheme(pType);
-    const hookSentence = randomHighEmotionSentence(pType);
+    const hookSentence = randomHighEmotionSentence(pType, isShopProperty);
 
     try {
       const resp = await fetch('/api/generate-fb', {
@@ -160,6 +160,7 @@ export default function CopywritingPage({ id }: { id: string }) {
           ping: property.build_ping,
           landPing: property.land_ping,
           isLandProperty,
+          isShopProperty,
           layout: defaultLayout,
           propertyType: property.property_type || '',
           parking: property.parking || '',

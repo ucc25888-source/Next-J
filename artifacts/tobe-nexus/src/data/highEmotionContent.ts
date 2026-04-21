@@ -1,6 +1,28 @@
 import { PostType } from '@/types';
 
 const HIGH_EMOTION_CONTENT: Record<string, string[]> = {
+  物件開箱_商辦: [
+    '看到這間角間店面，腦子裡已經想好了三種開店方案。',
+    '人流、面寬、黃金路段——這三件事，這間都有了。',
+    '做生意最怕的是選錯地址，這間的位置，讓你的每分廣告費都值回票價。',
+    '收租這件事，從你走進這間店面的那一刻就已經開始了。',
+    '地段就是生意的底氣，這條路的自然人流，比任何行銷費都值錢。',
+    '看到這個面寬，我第一個念頭是：這招牌掛上去，整條街都在幫你宣傳。',
+    '這種角間稀有到市場上找不到第二間，能見度就是你的競爭優勢。',
+    '收租和創業都想要？這間店住，兩種夢想一次打包給你。',
+    '做生意最怕換地址，這間的位置能讓老客戶永遠找得回來。',
+    '同樣是投資，這間店面的投報率，會讓你捨不得放手。',
+    '開業還是出租，選這間都對，因為地段不會騙人。',
+    '好的店面不需要太多廣告，因為街上的人潮就是最好的口碑。',
+    '進場就是贏在起跑線，這間商用物件的稀缺性你一看就懂。',
+    '租金收益穩定、屋況良好，這就是老練投資人最愛的標的。',
+    '幹了這麼多年，看過最多的遺憾是：那間好店面，當時沒出手。',
+    '這條商圈的地租行情你知道，這間開價代表什麼，你也心裡有數。',
+    '不是所有的店面都能稱為「黃金」，但這間，我打包票。',
+    '一樓黃金店位，每天的車流人流就是你的免費廣告板。',
+    '商用物件看的是現金流，這間的收租邏輯，福哥看了都點頭。',
+    '這個位置不租則已，一租就是長期客，你的被動收入從這裡出發。',
+  ],
   物件開箱: [
     '說實話，這間房的採光好到讓人想把沙發搬到窗邊，虛度一個下午也覺得奢侈。',
     '走進這客廳，我腦袋裡已經浮現你在這慶祝下一個升官時刻的畫面了。',
@@ -190,7 +212,11 @@ const POST_TYPE_TO_CATEGORY: Record<string, string> = {
   成家圓夢: '成家圓夢',
 };
 
-export function randomHighEmotionSentence(postType: PostType): string {
+export function randomHighEmotionSentence(postType: PostType, isShopProperty = false): string {
+  if (isShopProperty && postType === '物件開箱') {
+    const pool = HIGH_EMOTION_CONTENT['物件開箱_商辦'];
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
   const category = POST_TYPE_TO_CATEGORY[postType] ?? '物件開箱';
   const pool = HIGH_EMOTION_CONTENT[category];
   return pool[Math.floor(Math.random() * pool.length)];
