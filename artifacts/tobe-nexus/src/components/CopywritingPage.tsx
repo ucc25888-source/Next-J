@@ -165,6 +165,8 @@ export default function CopywritingPage({ id }: { id: string }) {
           propertyType: property.property_type || '',
           parking: property.parking || '',
           highlights: highlightsText || property.must_say_3 || '',
+          mainPoint: property.main_point || '',
+          secondPoint: property.second_point || '',
           property_id: property.id,
         }),
       });
@@ -310,7 +312,7 @@ export default function CopywritingPage({ id }: { id: string }) {
             <div className="px-5 py-3 border-b border-slate-100 bg-slate-50">
               <h2 className="text-[10px] font-bold text-glacier-400 uppercase tracking-[0.12em]">2. 精華亮點</h2>
             </div>
-            <div className="p-5 space-y-3">
+            <div className="p-5 space-y-4">
               {/* Property quick info */}
               <div translate="no" className="flex flex-wrap gap-2 text-[11px] text-glacier-500">
                 <span translate="no" className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
@@ -325,15 +327,60 @@ export default function CopywritingPage({ id }: { id: string }) {
                   </span>
                 )}
               </div>
+
+              {/* Main & Second selling point — AI 情緒主軸 */}
+              {(property.main_point || property.second_point) && (
+                <div>
+                  <p className={labelCls}>AI 情緒主軸（物件設定）</p>
+                  <div className="flex flex-wrap gap-2">
+                    {property.main_point && (
+                      <span translate="no" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium border bg-aurora-500/10 border-aurora-500/30 text-aurora-300">
+                        <span className="text-aurora-400">⭐ 主賣點</span>
+                        <span className="text-white/80">{property.main_point}</span>
+                      </span>
+                    )}
+                    {property.second_point && (
+                      <span translate="no" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium border bg-blue-500/10 border-blue-500/25 text-blue-300">
+                        <span className="text-blue-400">✦ 次賣點</span>
+                        <span className="text-white/80">{property.second_point}</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* must_say_3 — displayed as chips, not a textarea */}
               <div>
-                <label className={labelCls}>精華亮點（AI 會融入文案）</label>
-                <textarea
-                  className={`${inputCls} resize-none`}
-                  rows={4}
-                  value={highlightsText}
-                  onChange={(e) => setHighlightsText(e.target.value)}
-                  placeholder="例：近火車站步行3分鐘&#10;採光極佳視野無遮&#10;管理完善電梯大樓"
-                />
+                <div className="flex items-center justify-between mb-2">
+                  <p className={labelCls}>
+                    精華亮點（AI 融入文案）
+                    <span className="ml-1.5 normal-case tracking-normal font-normal text-glacier-600">
+                      — 已選 {selectedTagSet.size} 點，可從標籤池換選
+                    </span>
+                  </p>
+                </div>
+                {selectedTagSet.size > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {[...selectedTagSet].map((h) => (
+                      <span
+                        key={h}
+                        translate="no"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] border bg-aurora-500/15 border-aurora-500/35 text-aurora-300"
+                      >
+                        <span className="text-aurora-500">✓</span>
+                        {h}
+                        <button
+                          type="button"
+                          onClick={() => toggleTag(h)}
+                          className="ml-0.5 text-aurora-500/60 hover:text-aurora-400 transition-colors leading-none"
+                          title="移除"
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-glacier-600 italic">尚未選取精華亮點，點擊下方標籤加入</p>
+                )}
               </div>
 
               {/* Tag pool - manually switchable */}
@@ -341,7 +388,7 @@ export default function CopywritingPage({ id }: { id: string }) {
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em]">
                     賣點標籤池
-                    <span className="ml-1.5 normal-case tracking-normal font-normal text-glacier-600">— 點擊快速加入</span>
+                    <span className="ml-1.5 normal-case tracking-normal font-normal text-glacier-600">— 點擊替換或新增</span>
                   </p>
                   <div className="flex gap-1">
                     {TAG_MODE_LABELS.map((m) => (

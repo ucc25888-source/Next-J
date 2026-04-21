@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { postType, hookType, title, subtitle, hookSentence, location, price, ping, landPing, isLandProperty, isShopProperty, layout, propertyType, parking, highlights, property_id } = await req.json();
+  const { postType, hookType, title, subtitle, hookSentence, location, price, ping, landPing, isLandProperty, isShopProperty, layout, propertyType, parking, highlights, mainPoint, secondPoint, property_id } = await req.json();
 
   const infoLine2 = isLandProperty
     ? [
@@ -69,12 +69,16 @@ export async function POST(req: NextRequest) {
       ? '本物件為土地類型，賣點語氣應聚焦在地形、開發潛力、產權、增值等土地投資邏輯'
       : '本物件為住宅類型，賣點語氣可使用生活感、家庭溫度、地段機能等住宅語彙';
 
+  const emotionAxisLine = (mainPoint || secondPoint)
+    ? `\n【AI 情緒主軸 — HOOK 核心】\n${mainPoint ? `- 主賣點：${mainPoint}（文案的最強情緒錨點，HOOK 開場白與整篇語氣必須圍繞此核心展開）` : ''}${secondPoint ? `\n- 次賣點：${secondPoint}（文案中段的支撐點，強化主賣點的說服力）` : ''}`
+    : '';
+
   const systemPrompt = `你是 TOBE Nexus 系統特助。代表「花蓮房產顧問福哥」與「杜美珍」產出精品級 FB 房產文案。
 
 【本次文案設定】
 - 貼文類型：${postType}
 - HOOK 風格：${hookType}（${hookStyleDesc}）
-- 物件性質：${propertyContext}
+- 物件性質：${propertyContext}${emotionAxisLine}
 
 【✅賣點生成規則（最重要）】
 - 使用者已提供「精華亮點」作為賣點來源，這是第一優先依據
