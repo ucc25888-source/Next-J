@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { postType, location, price, ping, layout, propertyType, parking, hookType, highlights } = await req.json();
+  const { postType, title, subtitle, location, price, ping, layout, propertyType, parking, hookType, highlights } = await req.json();
 
   const infoLine2 = [
     `💰 總價 ${price}萬`,
@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
 
 === 輸出格式 ===
 
-【珍選好福邸｜${postType}】
+【珍選好福邸｜${title}】
+${subtitle}
 
 📍 ${location}｜${propertyType || '精選物件'}
 ${infoLine2}

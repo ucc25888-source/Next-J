@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { usePropertyStore } from '@/store/usePropertyStore';
 import { useSystemStore } from '@/store/useSystemStore';
 import { randomHumanSlogan } from '@/data/humanSlogans';
+import { randomPostTheme } from '@/data/postThemes';
+import { randomCTA } from '@/data/ctaSentences';
 import { PostType, HookType, Copy } from '@/types';
 import {
   ArrowLeft, Copy as CopyIcon, Sparkles, CheckCircle2,
@@ -28,9 +30,8 @@ const HOOK_TYPES: { value: HookType; label: string }[] = [
   { value: '無', label: '無（不使用開場白）' },
 ];
 
-const FIXED_FOOTER = `👇 好案不等人，點擊預約看屋：
-📞 專線：0925-997779
-💬 直通專線：https://bit.ly/4sJhSzs
+const CONTACT_BLOCK = `📞 專線：0925-997779
+🟢 LINE 直通專線：https://bit.ly/4sJhSzs
 👤 杜美珍 & 周福良 (福哥)`;
 
 export default function CopywritingPage({ id }: { id: string }) {
@@ -78,6 +79,8 @@ export default function CopywritingPage({ id }: { id: string }) {
     setContent('');
 
     const slogan = randomHumanSlogan();
+    const cta = randomCTA();
+    const theme = randomPostTheme(pType);
 
     try {
       const resp = await fetch('/api/generate-fb', {
@@ -85,6 +88,8 @@ export default function CopywritingPage({ id }: { id: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           postType: pType,
+          title: theme.title,
+          subtitle: theme.subtitle,
           location: locationOverride || property.subarea,
           price: property.price_wan,
           ping: property.build_ping,
@@ -112,8 +117,8 @@ export default function CopywritingPage({ id }: { id: string }) {
         setContent(fullText);
       }
 
-      const HASHTAGS = `#珍選好福邸\n#花蓮房產顧問福哥\n#TOBENexus`;
-      const finalContent = `${fullText}\n· · · · · · · · · · · · · · ·\n${slogan}\n\n${FIXED_FOOTER}\n\n${HASHTAGS}`;
+      const HASHTAGS = `#珍選好福邸 #花蓮房產顧問福哥 #TOBENexus`;
+      const finalContent = `${fullText}\n\n=== 珍選好福邸 ===\n${slogan}\n\n${cta}\n${CONTACT_BLOCK}\n\n${HASHTAGS}`;
       setContent(finalContent);
 
       const copyRecord: Copy = {
