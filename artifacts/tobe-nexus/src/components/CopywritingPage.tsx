@@ -80,7 +80,9 @@ export default function CopywritingPage({ id }: { id: string }) {
   const isOverQuota = used >= quota;
   const usagePct = Math.min((used / quota) * 100, 100);
 
-  const tagMode = LAND_POST_TYPES.includes(postType) ? 'land' : 'residential';
+  const LAND_PROPERTY_TYPES = ['土地 / 農地', '建地 / 工業地'];
+  const isLandProperty = LAND_PROPERTY_TYPES.includes(property?.property_type ?? '');
+  const tagMode = (isLandProperty || LAND_POST_TYPES.includes(postType)) ? 'land' : 'residential';
   const activeTags = TAG_LIBRARY[tagMode];
   const selectedTagSet = new Set(
     highlightsText.split('\n').map((l) => l.trim()).filter(Boolean)
@@ -280,14 +282,14 @@ export default function CopywritingPage({ id }: { id: string }) {
             </div>
             <div className="p-5 space-y-3">
               {/* Property quick info */}
-              <div className="flex flex-wrap gap-2 text-[11px] text-glacier-500">
-                <span className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
+              <div translate="no" className="flex flex-wrap gap-2 text-[11px] text-glacier-500">
+                <span translate="no" className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
                   💰 {property.price_wan?.toLocaleString()} 萬
                 </span>
-                <span className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
+                <span translate="no" className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
                   📏 {getAreaDisplay(property.property_type, property.build_ping, property.land_ping)}
                 </span>
-                <span className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
+                <span translate="no" className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
                   🏠 {defaultLayout}
                 </span>
               </div>
