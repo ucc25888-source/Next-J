@@ -470,6 +470,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                       <option translate="no" value="住宅區">住宅區</option>
                       <option translate="no" value="工業區">工業區</option>
                       <option translate="no" value="非都市土地">非都市土地</option>
+                      <option translate="no" value="原住民保留地">原住民保留地</option>
                     </select>
                   </Field>
                   <Field label="產權狀況" className="md:col-span-2">
