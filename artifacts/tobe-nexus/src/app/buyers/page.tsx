@@ -31,7 +31,7 @@ const STATUS_DOT: Record<string, string> = {
   放棄: "bg-red-500",
 };
 
-const PROPERTY_TYPES = ["", "住宅", "土地 / 農地", "建地 / 工業地", "透天", "店面 / 辦公室"];
+const PROPERTY_TYPES = ["", "電梯/華廈", "透天/別墅", "店面/辦公室", "土地/農地(特殊用地)", "建地/工業地"];
 const ROOMS_OPTIONS = ["", "1房", "2房", "3房", "4房", "5房以上"];
 
 const blankForm = {
