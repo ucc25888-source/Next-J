@@ -362,73 +362,79 @@ export default function BuyersPage() {
             </button>
           </div>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-col gap-5 max-w-2xl mx-auto lg:max-w-none lg:grid lg:grid-cols-2 xl:grid-cols-2">
             {filtered.map((b) => {
               const buyerShowings = showingsMap[b.id] ?? [];
               const isExpanded    = expandedBuyers.has(b.id);
               const visibleShowings = isExpanded ? buyerShowings : buyerShowings.slice(0, 2);
 
               return (
-                <div key={b.id} className={`bg-titanium-900 border border-glacier-200/[0.12] ${STATUS_LEFT_BORDER[b.status] ?? ""} rounded-xl overflow-hidden hover:shadow-md transition-all group flex flex-col`}>
+                <div key={b.id} className={`bg-white border-2 ${STATUS_LEFT_BORDER[b.status] ?? ""} rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col`}>
 
                   {/* Card header */}
-                  <div className="flex items-start justify-between px-4 pt-4 pb-3 border-b border-glacier-200/[0.06]">
-                    <div className="flex items-start gap-2.5">
-                      <div className={`w-9 h-9 rounded-full ${STATUS_AVATAR[b.status]?.bg ?? "bg-aurora-100 border-aurora-300"} border-2 flex items-center justify-center shrink-0`}>
-                        <span className={`text-sm font-black ${STATUS_AVATAR[b.status]?.text ?? "text-aurora-600"}`}>{b.name.charAt(0)}</span>
+                  <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-slate-100">
+                    <div className="flex items-start gap-3.5">
+                      <div className={`w-14 h-14 rounded-2xl ${STATUS_AVATAR[b.status]?.bg ?? "bg-aurora-100 border-aurora-300"} border-2 flex items-center justify-center shrink-0`}>
+                        <span className={`text-2xl font-black ${STATUS_AVATAR[b.status]?.text ?? "text-aurora-600"}`}>{b.name.charAt(0)}</span>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-bold text-glacier-200 leading-tight">{b.name}</p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-xl font-black text-slate-800 leading-tight">{b.name}</p>
                           {b.buyer_no && (
-                            <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-aurora-500/10 text-aurora-500 border border-aurora-500/20 tracking-wider">
+                            <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-lg bg-aurora-500/10 text-aurora-600 border border-aurora-500/25 tracking-wider">
                               {b.buyer_no}
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-glacier-500 mt-0.5">{b.source} · {new Date(b.created_at).toLocaleDateString("zh-TW")}</p>
+                        <p className="text-sm text-slate-500 mt-0.5 font-medium">{b.source} · {new Date(b.created_at).toLocaleDateString("zh-TW")}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <button onClick={() => openEdit(b)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-glacier-600 hover:text-aurora-400 hover:bg-aurora-500/[0.08] transition-all">
-                        <Pencil className="w-3.5 h-3.5" />
+                        className="p-2.5 rounded-xl text-slate-400 hover:text-aurora-500 hover:bg-aurora-500/10 transition-all">
+                        <Pencil className="w-4.5 h-4.5" style={{width:'18px',height:'18px'}} />
                       </button>
                       <button onClick={() => handleDelete(b.id)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-glacier-600 hover:text-red-400 hover:bg-red-500/[0.08] transition-all">
-                        <Trash2 className="w-3.5 h-3.5" />
+                        className="p-2.5 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all">
+                        <Trash2 className="w-4.5 h-4.5" style={{width:'18px',height:'18px'}} />
                       </button>
                     </div>
                   </div>
 
-                  <div className="p-4 space-y-3 flex-1">
+                  <div className="px-5 py-4 space-y-4 flex-1">
                     {/* Contact */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-2.5">
                       {b.phone && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="w-3 h-3 text-teal-500 shrink-0" />
-                          <a href={`tel:${b.phone}`} className="text-xs text-glacier-400 hover:text-teal-600 transition-colors">{b.phone}</a>
-                        </div>
+                        <a href={`tel:${b.phone}`} className="flex items-center gap-3 group/tel">
+                          <div className="w-8 h-8 rounded-xl bg-teal-100 flex items-center justify-center shrink-0">
+                            <Phone className="w-4 h-4 text-teal-600" />
+                          </div>
+                          <span className="text-base font-semibold text-slate-700 group-hover/tel:text-teal-600 transition-colors">{b.phone}</span>
+                        </a>
                       )}
                       {b.line_id && (
-                        <div className="flex items-center gap-2">
-                          <MessageCircle className="w-3 h-3 text-green-500 shrink-0" />
-                          <span className="text-xs text-glacier-400">{b.line_id}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+                            <MessageCircle className="w-4 h-4 text-green-600" />
+                          </div>
+                          <span className="text-base font-semibold text-slate-700">LINE: {b.line_id}</span>
                         </div>
                       )}
                       {b.email && (
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-3 h-3 text-blue-500 shrink-0" />
-                          <span className="text-xs text-glacier-400 truncate">{b.email}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                            <Mail className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <span className="text-base font-semibold text-slate-700 truncate">{b.email}</span>
                         </div>
                       )}
                     </div>
 
                     {/* Budget */}
                     {(b.budget_min > 0 || b.budget_max > 0) && (
-                      <div className="flex items-center gap-2">
-                        <Target className="w-3 h-3 text-aurora-500 shrink-0" />
-                        <span className="text-xs font-semibold text-aurora-400">
+                      <div className="flex items-center gap-3 px-4 py-3 bg-amber-50 rounded-xl border border-amber-200">
+                        <Target className="w-5 h-5 text-aurora-500 shrink-0" />
+                        <span className="text-lg font-black text-amber-700">
                           {b.budget_min > 0 && b.budget_max > 0
                             ? `${b.budget_min.toLocaleString()} – ${b.budget_max.toLocaleString()} 萬`
                             : b.budget_max > 0 ? `上限 ${b.budget_max.toLocaleString()} 萬`
@@ -438,24 +444,24 @@ export default function BuyersPage() {
                     )}
 
                     {/* Preferences */}
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-2">
                       {b.pref_property_type && (
-                        <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 font-medium">
-                          <Home className="w-2.5 h-2.5" />{b.pref_property_type}
+                        <span className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-semibold">
+                          <Home className="w-3.5 h-3.5" />{b.pref_property_type}
                         </span>
                       )}
                       {b.pref_area && (
-                        <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 font-medium">
-                          <MapPin className="w-2.5 h-2.5" />{b.pref_area}
+                        <span className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl bg-teal-50 text-teal-700 border border-teal-200 font-semibold">
+                          <MapPin className="w-3.5 h-3.5" />{b.pref_area}
                         </span>
                       )}
                       {b.pref_rooms && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 border border-violet-200 font-medium">
+                        <span className="text-sm px-3 py-1.5 rounded-xl bg-violet-50 text-violet-700 border border-violet-200 font-semibold">
                           {b.pref_rooms}
                         </span>
                       )}
                       {b.pref_min_ping > 0 && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 border border-violet-200 font-medium">
+                        <span className="text-sm px-3 py-1.5 rounded-xl bg-violet-50 text-violet-700 border border-violet-200 font-semibold">
                           {b.pref_min_ping}坪以上
                         </span>
                       )}
@@ -463,10 +469,10 @@ export default function BuyersPage() {
 
                     {/* Last contact */}
                     {b.last_contact_at && (
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-3 h-3 text-indigo-400 shrink-0" />
-                        <span className="text-[11px] text-indigo-500 font-medium">
-                          聯繫：{new Date(b.last_contact_at).toLocaleDateString("zh-TW")}
+                      <div className="flex items-center gap-2.5">
+                        <Clock className="w-4 h-4 text-indigo-500 shrink-0" />
+                        <span className="text-sm text-indigo-600 font-semibold">
+                          上次聯繫：{new Date(b.last_contact_at).toLocaleDateString("zh-TW")}
                         </span>
                       </div>
                     )}
@@ -477,13 +483,13 @@ export default function BuyersPage() {
                       const isOverdue = d < todayStr;
                       const isToday = d === todayStr;
                       return (
-                        <div className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border ${
-                          isOverdue ? "bg-red-50 border-red-200" : isToday ? "bg-amber-50 border-amber-300" : "bg-blue-50 border-blue-200"
+                        <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
+                          isOverdue ? "bg-red-50 border-red-300" : isToday ? "bg-amber-50 border-amber-300" : "bg-blue-50 border-blue-200"
                         }`}>
-                          <Bell className={`w-3 h-3 shrink-0 ${isOverdue ? "text-red-500" : isToday ? "text-amber-600" : "text-blue-500"}`} />
-                          <span className={`text-[11px] font-bold ${isOverdue ? "text-red-600" : isToday ? "text-amber-700" : "text-blue-600"}`}>
-                            {isOverdue ? "⚠ 逾期追蹤：" : isToday ? "今日追蹤：" : "下次追蹤："}
-                            {new Date(d).toLocaleDateString("zh-TW", { month: "numeric", day: "numeric" })}
+                          <Bell className={`w-5 h-5 shrink-0 ${isOverdue ? "text-red-500" : isToday ? "text-amber-600" : "text-blue-500"}`} />
+                          <span className={`text-base font-bold ${isOverdue ? "text-red-700" : isToday ? "text-amber-800" : "text-blue-700"}`}>
+                            {isOverdue ? "⚠ 逾期追蹤：" : isToday ? "今日需追蹤：" : "下次追蹤："}
+                            {new Date(d).toLocaleDateString("zh-TW", { month: "long", day: "numeric" })}
                           </span>
                         </div>
                       );
@@ -491,78 +497,75 @@ export default function BuyersPage() {
 
                     {/* Notes */}
                     {b.notes && (
-                      <p className="text-[11px] text-glacier-500 leading-relaxed line-clamp-2 border-t border-glacier-200/[0.06] pt-2">{b.notes}</p>
+                      <p className="text-sm text-slate-600 leading-relaxed line-clamp-3 border-t border-slate-100 pt-3">{b.notes}</p>
                     )}
 
                     {/* ── Showings section ── */}
-                    <div className="border-t border-glacier-200/[0.08] pt-2.5 space-y-2">
+                    <div className="border-t border-slate-100 pt-4 space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <CalendarCheck className="w-3 h-3 text-glacier-500" />
-                          <span className="text-[10px] font-bold text-glacier-400 uppercase tracking-wide">帶看紀錄</span>
+                        <div className="flex items-center gap-2">
+                          <CalendarCheck className="w-4 h-4 text-slate-500" />
+                          <span className="text-sm font-bold text-slate-600 uppercase tracking-wide">帶看紀錄</span>
                           {buyerShowings.length > 0 && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-aurora-500/10 text-aurora-400 border border-aurora-500/20">
+                            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-aurora-500/10 text-aurora-600 border border-aurora-500/20">
                               {buyerShowings.length}筆
                             </span>
                           )}
                         </div>
                         <button
                           onClick={() => openShowingModal(b)}
-                          className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-aurora-500/10 text-aurora-400 border border-aurora-500/20 hover:bg-aurora-500/20 transition-all">
-                          <Plus className="w-2.5 h-2.5" />帶看
+                          className="flex items-center gap-1.5 text-sm font-bold px-3 py-1.5 rounded-xl bg-aurora-500/10 text-aurora-600 border border-aurora-500/25 hover:bg-aurora-500/20 transition-all">
+                          <Plus className="w-3.5 h-3.5" />帶看
                         </button>
                       </div>
 
                       {buyerShowings.length === 0 ? (
-                        <p className="text-[10px] text-glacier-600 italic">尚未有帶看紀錄</p>
+                        <p className="text-sm text-slate-400 italic">尚未有帶看紀錄</p>
                       ) : (
-                        <div className="space-y-1.5">
+                        <div className="space-y-2.5">
                           {visibleShowings.map((s) => {
                             const cfg = REACTION_MINI[s.reaction] ?? REACTION_MINI["普通"];
                             const RIcon = cfg.icon;
                             const propTitle = getPropertyTitle(s.property_id);
                             return (
-                              <div key={s.id} className="flex items-start gap-2 group/row">
-                                <div className="flex flex-col items-center shrink-0 pt-0.5">
-                                  <div className={`w-1.5 h-1.5 rounded-full ${cfg.dot} shrink-0`} />
-                                </div>
+                              <div key={s.id} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                <div className={`w-2.5 h-2.5 rounded-full ${cfg.dot} shrink-0 mt-1.5`} />
                                 <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-1.5 flex-wrap">
-                                    <span className="text-[10px] font-semibold text-glacier-400 shrink-0">
+                                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                                    <span className="text-sm font-bold text-slate-700 shrink-0">
                                       {new Date(s.showing_date).toLocaleDateString("zh-TW", { month: "numeric", day: "numeric" })}
                                     </span>
-                                    <span className={`flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${cfg.badge}`}>
-                                      <RIcon className="w-2.5 h-2.5" />{s.reaction}
+                                    <span className={`flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full border ${cfg.badge}`}>
+                                      <RIcon className="w-3 h-3" />{s.reaction}
                                     </span>
                                     {s.offer_wan > 0 && (
-                                      <span className="flex items-center gap-0.5 text-[9px] font-bold text-white bg-aurora-500 px-1.5 py-0.5 rounded-full">
-                                        <TrendingUp className="w-2 h-2" />{s.offer_wan.toLocaleString()}萬
+                                      <span className="flex items-center gap-1 text-xs font-bold text-white bg-aurora-500 px-2 py-0.5 rounded-full">
+                                        <TrendingUp className="w-3 h-3" />{s.offer_wan.toLocaleString()}萬
                                       </span>
                                     )}
-                                    {propTitle && (
-                                      <span className="text-[9px] text-glacier-500 truncate max-w-[100px]">{propTitle}</span>
-                                    )}
                                   </div>
+                                  {propTitle && (
+                                    <p className="text-sm font-semibold text-slate-700 leading-snug">{propTitle}</p>
+                                  )}
                                   {s.follow_up && (
-                                    <p className="text-[9px] text-amber-600 mt-0.5 flex items-start gap-1">
-                                      <MessageSquare className="w-2.5 h-2.5 shrink-0 mt-0.5" />
-                                      <span className="line-clamp-1">{s.follow_up}</span>
+                                    <p className="text-sm text-amber-700 mt-1 flex items-start gap-1.5 font-medium">
+                                      <MessageSquare className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                      <span>{s.follow_up}</span>
                                     </p>
                                   )}
                                 </div>
-                                {/* edit + delete buttons */}
-                                <div className="flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100 transition-all shrink-0">
+                                <div className="flex items-center gap-1 shrink-0">
                                   <button
                                     onClick={() => openEditShowing(b, s)}
-                                    className="p-0.5 rounded text-glacier-600 hover:text-blue-500 transition-all"
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-blue-50 transition-all"
                                     title="編輯">
-                                    <Pencil className="w-2.5 h-2.5" />
+                                    <Pencil className="w-3.5 h-3.5" />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteShowing(s.id)}
-                                    className="p-0.5 rounded text-glacier-600 hover:text-red-400 transition-all"
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
                                     title="刪除">
-                                    <X className="w-2.5 h-2.5" />
+                                    <X className="w-3.5 h-3.5" />
                                   </button>
                                 </div>
                               </div>
@@ -570,10 +573,10 @@ export default function BuyersPage() {
                           })}
                           {buyerShowings.length > 2 && (
                             <button onClick={() => toggleExpand(b.id)}
-                              className="flex items-center gap-1 text-[10px] text-glacier-500 hover:text-aurora-400 transition-colors font-medium">
+                              className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-aurora-500 transition-colors font-semibold">
                               {isExpanded
-                                ? <><ChevronUp className="w-2.5 h-2.5" />收起</>
-                                : <><ChevronDown className="w-2.5 h-2.5" />還有 {buyerShowings.length - 2} 筆</>}
+                                ? <><ChevronUp className="w-4 h-4" />收起</>
+                                : <><ChevronDown className="w-4 h-4" />還有 {buyerShowings.length - 2} 筆紀錄</>}
                             </button>
                           )}
                         </div>
@@ -582,17 +585,17 @@ export default function BuyersPage() {
                   </div>
 
                   {/* Status footer */}
-                  <div className="px-4 pb-3">
+                  <div className="px-5 pb-5 pt-1">
                     <div className="flex items-center gap-2">
                       <div className="relative flex-1">
                         <select
-                          className={`w-full appearance-none text-[11px] font-bold px-3 py-1.5 pr-7 rounded-lg border cursor-pointer focus:outline-none transition-all ${STATUS_STYLE[b.status] ?? STATUS_STYLE["潛在"]}`}
+                          className={`w-full appearance-none text-base font-bold px-4 py-3 pr-9 rounded-xl border-2 cursor-pointer focus:outline-none transition-all ${STATUS_STYLE[b.status] ?? STATUS_STYLE["潛在"]}`}
                           value={b.status} onChange={(e) => handleStatusChange(b, e.target.value)}>
-                          {STATUSES.map((s) => <option key={s} value={s} className="bg-titanium-900 text-glacier-200">{s}</option>)}
+                          {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
-                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none opacity-60" />
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none opacity-60" />
                       </div>
-                      {b.status === "已成交" && <BadgeCheck className="w-4 h-4 text-emerald-400 shrink-0" />}
+                      {b.status === "已成交" && <BadgeCheck className="w-6 h-6 text-emerald-500 shrink-0" />}
                     </div>
                   </div>
                 </div>
