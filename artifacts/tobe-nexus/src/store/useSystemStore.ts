@@ -8,6 +8,7 @@ interface SystemState {
   copies: Copy[];
   counters: Counter[];
   mainPoints: OptionItem[];
+  landPoints: OptionItem[];
   targetBuyers: OptionItem[];
   propertyTypes: OptionItem[];
   parkingOptions: OptionItem[];
@@ -79,6 +80,24 @@ export const useSystemStore = create<SystemState>()((set, get) => ({
   subareas: mockSubareas,
   copies: [],
   counters: [{ key: 'LISTING_HC', value: 1, updated_at: '2026-01-01T00:00:00.000Z' }],
+  landPoints: [
+    { value: '地形方正漂亮' },
+    { value: '大面寬好規劃' },
+    { value: '臨大馬路好進出' },
+    { value: '特定農業區' },
+    { value: '建商開發首選' },
+    { value: '可蓋夢想家' },
+    { value: '投資重劃核心' },
+    { value: '合法資材室' },
+    { value: '產權單純乾淨' },
+    { value: '變更潛力大' },
+    { value: '稀有大坪數' },
+    { value: '可當農場民宿' },
+    { value: '適合資產配置' },
+    { value: '節稅規劃首選' },
+    { value: '水源路徑清晰' },
+    { value: '地形平坦好用' },
+  ],
   mainPoints: [
     { value: '低於實價登錄 | Below market' },
     { value: '低總價好入手 | Affordable' },

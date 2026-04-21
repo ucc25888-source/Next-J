@@ -41,10 +41,12 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const router = useRouter();
   const { addProperty, updateProperty, getPropertyById } = usePropertyStore();
   const {
-    areas, subareas, mainPoints, targetBuyers, propertyTypes,
+    areas, subareas, mainPoints, landPoints, targetBuyers, propertyTypes,
     parkingOptions, statusNowOptions, statusPushOptions,
     getNextListingId, currentClient,
   } = useSystemStore();
+
+  const LAND_PROPERTY_TYPES = ['土地 / 農地', '建地 / 工業地'];
 
   const isEditMode = Boolean(id);
 
@@ -78,6 +80,9 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   };
 
   const [form, setForm] = useState(blank);
+
+  const isLandType = LAND_PROPERTY_TYPES.includes(form.property_type);
+  const activePoints = isLandType ? landPoints : mainPoints;
 
   useEffect(() => {
     if (isEditMode && id) {
@@ -338,13 +343,13 @@ export default function PropertyForm({ id }: PropertyFormProps) {
           <Field label="主賣點">
             <select translate="no" className={selectCls} value={form.main_point} onChange={(e) => set('main_point', e.target.value)}>
               <option value="">請選擇</option>
-              {mainPoints.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
+              {activePoints.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
             </select>
           </Field>
           <Field label="次賣點（可空）">
             <select translate="no" className={selectCls} value={form.second_point} onChange={(e) => set('second_point', e.target.value)}>
               <option value="">無</option>
-              {mainPoints.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
+              {activePoints.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
             </select>
           </Field>
           <Field label="目標客群">
@@ -360,7 +365,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
               必講 3 點 <span className="text-glacier-600 normal-case tracking-normal font-normal">（最多選 3 項，已選 {form.must_say_3.length}/3）</span>
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-52 overflow-y-auto pr-1">
-              {mainPoints.map((o) => {
+              {activePoints.map((o) => {
                 const selected = form.must_say_3.includes(o.value);
                 return (
                   <button
