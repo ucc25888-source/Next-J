@@ -12,6 +12,7 @@ import {
   Activity,
   LogOut,
   Users,
+  Bell,
 } from "lucide-react";
 
 const navItems = [
@@ -19,7 +20,7 @@ const navItems = [
   { label: "案件管理", href: "/properties", icon: Building2 },
   { label: "買方 CRM", href: "/buyers", icon: Users },
   { label: "AI 文案生成", href: "/ai-copy", icon: Sparkles },
-  { label: "系統設定", href: "/settings", icon: Settings },
+  { label: "每日重點", href: "/daily-focus", icon: Bell },
 ];
 
 function useActiveItem() {
@@ -104,6 +105,13 @@ export default function Sidebar() {
             </div>
             <div className="w-1.5 h-1.5 rounded-full bg-aurora-500 animate-pulse shrink-0" />
           </div>
+          <Link
+            href="/settings"
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/[0.05] border border-transparent hover:border-white/[0.07] transition-all text-[12px] font-medium"
+          >
+            <Settings className="w-3.5 h-3.5 shrink-0" />
+            <span>帳號∕設定</span>
+          </Link>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/[0.07] border border-transparent hover:border-red-500/20 transition-all text-[12px] font-medium"
@@ -125,12 +133,20 @@ export default function Sidebar() {
             <p className="text-[9px] text-aurora-500 leading-none mt-0.5">AI 成交戰略系統</p>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/[0.08] transition-all"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1">
+          <Link
+            href="/settings"
+            className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/[0.06] transition-all"
+          >
+            <Settings className="w-4 h-4" />
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/[0.08] transition-all"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </header>
 
       {/* Mobile Bottom Tab Bar — shown only on mobile/tablet */}
