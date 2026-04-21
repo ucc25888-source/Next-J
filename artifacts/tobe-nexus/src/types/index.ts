@@ -114,3 +114,18 @@ export type HookType =
   | '利益誘惑鉤'
   | '情感溫度鉤'
   | '無';
+
+export interface Showing {
+  id: string;
+  client_id: string;
+  property_id: string | null;
+  showing_date: string;
+  buyer_name: string;
+  buyer_phone: string;
+  buyer_source: string;
+  reaction: string;
+  offer_wan: number;
+  follow_up: string;
+  notes: string;
+  created_at: string;
+}

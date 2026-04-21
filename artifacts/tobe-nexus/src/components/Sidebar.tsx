@@ -11,11 +11,13 @@ import {
   Network,
   Activity,
   LogOut,
+  CalendarCheck,
 } from "lucide-react";
 
 const navItems = [
   { label: "總覽儀表板", href: "/", icon: LayoutDashboard },
   { label: "案件管理", href: "/properties", icon: Building2 },
+  { label: "帶看紀錄", href: "/showings", icon: CalendarCheck },
   { label: "AI 文案生成", href: "/ai-copy", icon: Sparkles },
   { label: "系統設定", href: "/settings", icon: Settings },
 ];
@@ -147,7 +149,7 @@ export default function Sidebar() {
               }`}
             >
               <Icon className={`w-5 h-5 ${active ? "text-aurora-500" : ""}`} />
-              <span className="text-[9px] font-semibold tracking-tight">{item.label.replace('總覽儀表板', '儀表板').replace('AI 文案生成', 'AI 文案').replace('系統設定', '設定').replace('案件管理', '案件')}</span>
+              <span className="text-[9px] font-semibold tracking-tight">{item.label.replace('總覽儀表板', '儀表板').replace('AI 文案生成', 'AI 文案').replace('系統設定', '設定').replace('案件管理', '案件').replace('帶看紀錄', '帶看')}</span>
               {active && <span className="absolute bottom-0 h-0.5 w-8 bg-aurora-500 rounded-full" />}
             </Link>
           );
