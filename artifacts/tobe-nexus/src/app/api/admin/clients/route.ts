@@ -23,7 +23,7 @@ export async function GET() {
     FROM clients c
     LEFT JOIN properties p ON p.client_id = c.client_id
     LEFT JOIN copies cp ON cp.client_id = c.client_id
-    WHERE c.client_id != 'ADMIN'
+    WHERE c.role = 'user'
     GROUP BY c.client_id
     ORDER BY c.created_at ASC
   `, [currentMonthKey]);

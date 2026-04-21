@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   if (actualUsed >= clientRow.monthly_quota) {
     return NextResponse.json(
-      { error: '本月 AI 文案配額已用盡，案件管理功能仍可正常使用' },
+      { error: '本月生成額度已達上限，請聯繫 TOBE Nexus AI Hub 的客服開放權限。' },
       { status: 429 }
     );
   }
@@ -123,6 +123,19 @@ ${hookSentence}
         [property_id, session.clientId]
       );
     }
+
+    /* ── AI usage log ── */
+    await query(
+      `INSERT INTO ai_logs (client_id, display_name, action, property_id, tokens_used)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [
+        session.clientId,
+        session.displayName ?? session.clientId,
+        `FB文案 · ${postType ?? ''}${hookType ? ` · ${hookType}` : ''}`,
+        property_id ?? null,
+        1500,
+      ]
+    );
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({

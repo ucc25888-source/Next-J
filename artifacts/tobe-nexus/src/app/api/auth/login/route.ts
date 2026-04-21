@@ -13,6 +13,7 @@ interface DbClient {
   month_key: string;
   status: string;
   created_at: string;
+  role: string;
 }
 
 function resetMonthIfNeeded(row: DbClient): DbClient {
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '客戶代碼或存取碼不正確' }, { status: 401 });
   }
 
-  if (row.status !== 'active' && row.client_id !== 'ADMIN') {
+  if (row.status !== 'active' && row.role !== 'admin') {
     return NextResponse.json({ error: '帳號已停用，請聯繫業務窗口' }, { status: 403 });
   }
 
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
   session.clientId = client.client_id;
   session.displayName = client.display_name;
-  session.isAdmin = client.client_id === 'ADMIN';
+  session.isAdmin = client.role === 'admin';
   await session.save();
 
   const payload: Client = {

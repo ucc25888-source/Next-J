@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
   if (actualUsed >= clientRow.monthly_quota) {
     return NextResponse.json(
-      { error: "本月 AI 文案配額已用盡，案件管理功能仍可正常使用" },
+      { error: "本月生成額度已達上限，請聯繫 TOBE Nexus AI Hub 的客服開放權限。" },
       { status: 429 }
     );
   }
@@ -109,6 +109,19 @@ ${features ? `物件特色：${features}` : ""}
            month_key = $1
        WHERE client_id = $2`,
       [currentMonthKey, session.clientId]
+    );
+
+    /* ── AI usage log ── */
+    const tokensUsed = response.usage?.total_tokens ?? 1000;
+    await query(
+      `INSERT INTO ai_logs (client_id, display_name, action, tokens_used)
+       VALUES ($1, $2, $3, $4)`,
+      [
+        session.clientId,
+        session.displayName ?? session.clientId,
+        `文案生成 · ${propertyType ?? ''} · ${tone ?? ''}`,
+        tokensUsed,
+      ]
     );
 
     const updated = await queryOne<{ used_this_month: number; monthly_quota: number }>(
