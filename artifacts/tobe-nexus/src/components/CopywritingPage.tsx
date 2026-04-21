@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePropertyStore } from '@/store/usePropertyStore';
 import { useSystemStore } from '@/store/useSystemStore';
-import { randomHumanSlogan } from '@/data/humanSlogans';
 import { randomCTA } from '@/data/ctaSentences';
 import { getAreaDisplay } from '@/utils/areaDisplay';
 import { PostType, HookType, Copy } from '@/types';
@@ -140,7 +139,6 @@ export default function CopywritingPage({ id }: { id: string }) {
     setSaved(false);
     setContent('');
 
-    const slogan = randomHumanSlogan();
     const cta = randomCTA();
 
     try {
@@ -183,7 +181,7 @@ export default function CopywritingPage({ id }: { id: string }) {
       }
 
       const HASHTAGS = `#珍選好福邸 #花蓮房產顧問福哥 #TOBENexus`;
-      const finalContent = `${fullText}\n\n=== 珍選好福邸 ===\n${slogan}\n\n${cta}\n${CONTACT_BLOCK}\n\n${HASHTAGS}`;
+      const finalContent = `${fullText}\n\n${cta}\n${CONTACT_BLOCK}\n\n${HASHTAGS}`;
       setContent(finalContent);
 
       const copyRecord: Copy = {
