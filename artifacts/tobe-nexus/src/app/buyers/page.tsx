@@ -31,6 +31,33 @@ const STATUS_DOT: Record<string, string> = {
   放棄: "bg-red-500",
 };
 
+const STATUS_STAT_IDLE: Record<string, string> = {
+  潛在:  "border-slate-300  bg-slate-50   text-slate-600",
+  積極找: "border-amber-300  bg-amber-50   text-amber-700",
+  協商中: "border-yellow-400 bg-yellow-50  text-yellow-700",
+  已成交: "border-emerald-400 bg-emerald-50 text-emerald-700",
+  暫緩:  "border-orange-300 bg-orange-50  text-orange-700",
+  放棄:  "border-red-300    bg-red-50     text-red-600",
+};
+
+const STATUS_LEFT_BORDER: Record<string, string> = {
+  潛在:  "border-l-4 border-l-slate-300",
+  積極找: "border-l-4 border-l-amber-400",
+  協商中: "border-l-4 border-l-yellow-400",
+  已成交: "border-l-4 border-l-emerald-400",
+  暫緩:  "border-l-4 border-l-orange-400",
+  放棄:  "border-l-4 border-l-red-400",
+};
+
+const STATUS_AVATAR: Record<string, { bg: string; text: string }> = {
+  潛在:  { bg: "bg-slate-100 border-slate-300",   text: "text-slate-600" },
+  積極找: { bg: "bg-amber-100 border-amber-300",   text: "text-amber-700" },
+  協商中: { bg: "bg-yellow-100 border-yellow-300", text: "text-yellow-700" },
+  已成交: { bg: "bg-emerald-100 border-emerald-300",text: "text-emerald-700" },
+  暫緩:  { bg: "bg-orange-100 border-orange-300",  text: "text-orange-700" },
+  放棄:  { bg: "bg-red-100 border-red-300",        text: "text-red-600" },
+};
+
 const PROPERTY_TYPES = ["", "電梯/華廈", "透天/別墅", "店面/辦公室", "土地/農地(特殊用地)", "建地/工業地"];
 const ROOMS_OPTIONS = ["", "1房", "2房", "3房", "4房", "5房以上"];
 
@@ -208,16 +235,16 @@ export default function BuyersPage() {
             <button
               key={s}
               onClick={() => setFilterStatus(filterStatus === s ? "" : s)}
-              className={`flex flex-col items-center gap-1 p-2.5 rounded-xl border transition-all ${
+              className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${
                 filterStatus === s
-                  ? STATUS_STYLE[s] + " scale-105"
-                  : "bg-titanium-900 border-glacier-200/[0.07] text-glacier-500 hover:border-glacier-200/20"
+                  ? STATUS_STYLE[s] + " scale-105 shadow-md"
+                  : `${STATUS_STAT_IDLE[s]} hover:scale-[1.03] hover:shadow-sm`
               }`}
             >
-              <span className={`text-lg font-black ${filterStatus === s ? "" : "text-glacier-300"}`}>
+              <span className="text-xl font-black leading-none">
                 {statusCounts[s] ?? 0}
               </span>
-              <span className="text-[10px] font-semibold">{s}</span>
+              <span className="text-[10px] font-bold tracking-wide">{s}</span>
             </button>
           ))}
         </div>
@@ -268,12 +295,12 @@ export default function BuyersPage() {
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((b) => (
-              <div key={b.id} className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden hover:border-aurora-500/20 transition-all group flex flex-col">
+              <div key={b.id} className={`bg-titanium-900 border border-glacier-200/[0.12] ${STATUS_LEFT_BORDER[b.status] ?? ""} rounded-xl overflow-hidden hover:shadow-md transition-all group flex flex-col`}>
                 {/* Card header */}
                 <div className="flex items-start justify-between px-4 pt-4 pb-3 border-b border-glacier-200/[0.06]">
                   <div className="flex items-start gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-aurora-500/10 border border-aurora-500/20 flex items-center justify-center shrink-0">
-                      <span className="text-xs font-bold text-aurora-400">{b.name.charAt(0)}</span>
+                    <div className={`w-9 h-9 rounded-full ${STATUS_AVATAR[b.status]?.bg ?? "bg-aurora-100 border-aurora-300"} border-2 flex items-center justify-center shrink-0`}>
+                      <span className={`text-sm font-black ${STATUS_AVATAR[b.status]?.text ?? "text-aurora-600"}`}>{b.name.charAt(0)}</span>
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
@@ -308,19 +335,19 @@ export default function BuyersPage() {
                   <div className="space-y-1.5">
                     {b.phone && (
                       <div className="flex items-center gap-2">
-                        <Phone className="w-3 h-3 text-glacier-500 shrink-0" />
-                        <a href={`tel:${b.phone}`} className="text-xs text-glacier-400 hover:text-aurora-400 transition-colors">{b.phone}</a>
+                        <Phone className="w-3 h-3 text-teal-500 shrink-0" />
+                        <a href={`tel:${b.phone}`} className="text-xs text-glacier-400 hover:text-teal-600 transition-colors">{b.phone}</a>
                       </div>
                     )}
                     {b.line_id && (
                       <div className="flex items-center gap-2">
-                        <MessageCircle className="w-3 h-3 text-glacier-500 shrink-0" />
+                        <MessageCircle className="w-3 h-3 text-green-500 shrink-0" />
                         <span className="text-xs text-glacier-400">{b.line_id}</span>
                       </div>
                     )}
                     {b.email && (
                       <div className="flex items-center gap-2">
-                        <Mail className="w-3 h-3 text-glacier-500 shrink-0" />
+                        <Mail className="w-3 h-3 text-blue-500 shrink-0" />
                         <span className="text-xs text-glacier-400 truncate">{b.email}</span>
                       </div>
                     )}
@@ -329,7 +356,7 @@ export default function BuyersPage() {
                   {/* Budget */}
                   {(b.budget_min > 0 || b.budget_max > 0) && (
                     <div className="flex items-center gap-2">
-                      <Target className="w-3 h-3 text-glacier-500 shrink-0" />
+                      <Target className="w-3 h-3 text-aurora-500 shrink-0" />
                       <span className="text-xs font-semibold text-aurora-400">
                         {b.budget_min > 0 && b.budget_max > 0
                           ? `${b.budget_min.toLocaleString()} – ${b.budget_max.toLocaleString()} 萬`
@@ -343,22 +370,22 @@ export default function BuyersPage() {
                   {/* Preferences */}
                   <div className="flex flex-wrap gap-1.5">
                     {b.pref_property_type && (
-                      <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-titanium-800 text-glacier-400 border border-glacier-200/[0.07]">
+                      <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 font-medium">
                         <Home className="w-2.5 h-2.5" />{b.pref_property_type}
                       </span>
                     )}
                     {b.pref_area && (
-                      <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-titanium-800 text-glacier-400 border border-glacier-200/[0.07]">
+                      <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 font-medium">
                         <MapPin className="w-2.5 h-2.5" />{b.pref_area}
                       </span>
                     )}
                     {b.pref_rooms && (
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-titanium-800 text-glacier-400 border border-glacier-200/[0.07]">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 border border-violet-200 font-medium">
                         {b.pref_rooms}
                       </span>
                     )}
                     {b.pref_min_ping > 0 && (
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-titanium-800 text-glacier-400 border border-glacier-200/[0.07]">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 border border-violet-200 font-medium">
                         {b.pref_min_ping}坪以上
                       </span>
                     )}
@@ -367,9 +394,9 @@ export default function BuyersPage() {
                   {/* Last contact */}
                   {b.last_contact_at && (
                     <div className="flex items-center gap-2">
-                      <Clock className="w-3 h-3 text-glacier-500 shrink-0" />
-                      <span className="text-[11px] text-glacier-500">
-                        最後聯繫：{new Date(b.last_contact_at).toLocaleDateString("zh-TW")}
+                      <Clock className="w-3 h-3 text-indigo-400 shrink-0" />
+                      <span className="text-[11px] text-indigo-500 font-medium">
+                        聯繫：{new Date(b.last_contact_at).toLocaleDateString("zh-TW")}
                       </span>
                     </div>
                   )}
