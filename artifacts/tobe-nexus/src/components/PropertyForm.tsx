@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { usePropertyStore } from '@/store/usePropertyStore';
 import { useSystemStore } from '@/store/useSystemStore';
 import { compressImage } from '@/utils/image';
-import { ArrowLeft, Save, ImagePlus, X, MapPin, FileText, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Save, ImagePlus, X, MapPin, FileText, TrendingUp, Phone } from 'lucide-react';
+import { NoTranslateSelect } from '@/components/NoTranslateSelect';
 
 const GEOGRAPHIC_DATA: Record<string, string[]> = {
   '花蓮市 | HC': ['市中心商圈', '美崙行政區', '慈濟生活圈', '火車站前後站', '花商/生活圈', '花蓮港/海濱'],
@@ -96,6 +97,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     img2_url: '',
     img3_url: '',
     img4_url: '',
+    owner_follow_up_date: '',
+    owner_follow_up_notes: '',
   };
 
   const [form, setForm] = useState(blank);
@@ -160,6 +163,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
           img2_url: property.img2_url,
           img3_url: property.img3_url,
           img4_url: property.img4_url,
+          owner_follow_up_date: property.owner_follow_up_date ?? '',
+          owner_follow_up_notes: property.owner_follow_up_notes ?? '',
         });
       } else {
         router.push('/properties');
@@ -244,6 +249,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       img2_url: form.img2_url,
       img3_url: form.img3_url,
       img4_url: form.img4_url,
+      owner_follow_up_date: form.owner_follow_up_date || '',
+      owner_follow_up_notes: form.owner_follow_up_notes,
     };
     if (isEditMode && id) {
       updateProperty(id, payload);
@@ -326,41 +333,31 @@ export default function PropertyForm({ id }: PropertyFormProps) {
               </div>
               <div className="p-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                 <Field label="物件類型" required>
-                  <select translate="no" className={selectCls} value={form.property_type} onChange={(e) => set('property_type', e.target.value)} required>
-                    <option translate="no" value="">請選擇</option>
-                    {propertyTypes.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value}</option>)}
-                  </select>
+                  <NoTranslateSelect
+                    value={form.property_type}
+                    onChange={(v) => set('property_type', v)}
+                    placeholder="請選擇"
+                    options={propertyTypes.map((o) => ({ value: o.value, label: o.value }))}
+                  />
                 </Field>
 
                 <Field label="區域" required>
-                  <select
-                    translate="no"
-                    className={selectCls}
+                  <NoTranslateSelect
                     value={form.region_key}
-                    onChange={(e) => set('region_key', e.target.value)}
-                    required
-                  >
-                    <option translate="no" value="">請選擇區域</option>
-                    {Object.keys(GEOGRAPHIC_DATA).map((key) => (
-                      <option translate="no" key={key} value={key}>{key.split(' | ')[0]}</option>
-                    ))}
-                  </select>
+                    onChange={(v) => set('region_key', v)}
+                    placeholder="請選擇區域"
+                    options={Object.keys(GEOGRAPHIC_DATA).map((key) => ({ value: key, label: key.split(' | ')[0] }))}
+                  />
                 </Field>
 
                 <Field label="小區域" required>
-                  <select
-                    translate="no"
-                    className={selectCls}
+                  <NoTranslateSelect
                     value={form.subarea}
-                    onChange={(e) => set('subarea', e.target.value)}
+                    onChange={(v) => set('subarea', v)}
+                    placeholder={form.region_key ? '請選擇小區域' : '請先選區域'}
                     disabled={!form.region_key}
-                    required
-                  >
-                    <option translate="no" value="">{form.region_key ? '請選擇小區域' : '請先選區域'}</option>
-                    {availableSubareas.map((s) => (
-                      <option translate="no" key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
+                    options={availableSubareas.map((s) => ({ value: s, label: s }))}
+                  />
                 </Field>
 
                 <Field label="地址備註（不含門牌）" className="md:col-span-3">
@@ -434,10 +431,12 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                   </div>
 
                   <Field label="車位">
-                    <select translate="no" className={selectCls} value={form.parking} onChange={(e) => set('parking', e.target.value)}>
-                      <option translate="no" value="">請選擇</option>
-                      {parkingOptions.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value}</option>)}
-                    </select>
+                    <NoTranslateSelect
+                      value={form.parking}
+                      onChange={(v) => set('parking', v)}
+                      placeholder="請選擇"
+                      options={parkingOptions.map((o) => ({ value: o.value, label: o.value }))}
+                    />
                   </Field>
                 </div>
               </div>
@@ -682,6 +681,47 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                     </div>
                   </Field>
                 )}
+              </div>
+            </div>
+
+            {/* Owner Follow-up */}
+            <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
+              <div className="px-6 py-3.5 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5 text-glacier-400" />
+                <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">屋主跟進紀錄</h2>
+              </div>
+              <div className="p-6 grid gap-4 sm:grid-cols-2">
+                <Field label="下次跟進日期">
+                  <input
+                    className={inputCls}
+                    type="date"
+                    value={form.owner_follow_up_date}
+                    onChange={(e) => set('owner_follow_up_date', e.target.value)}
+                  />
+                  {form.owner_follow_up_date && (() => {
+                    const today = new Date().toISOString().slice(0, 10);
+                    const isOverdue = form.owner_follow_up_date < today;
+                    const isToday = form.owner_follow_up_date === today;
+                    if (isOverdue) return (
+                      <p className="mt-1.5 text-[10px] font-semibold text-red-500">⚠ 已逾期，請盡快聯繫屋主</p>
+                    );
+                    if (isToday) return (
+                      <p className="mt-1.5 text-[10px] font-semibold text-amber-500">📞 今天需要跟進</p>
+                    );
+                    return (
+                      <p className="mt-1.5 text-[10px] text-glacier-500">已排程跟進</p>
+                    );
+                  })()}
+                </Field>
+                <Field label="跟進備註">
+                  <textarea
+                    rows={3}
+                    className={inputCls + ' resize-none'}
+                    value={form.owner_follow_up_notes}
+                    onChange={(e) => set('owner_follow_up_notes', e.target.value)}
+                    placeholder="例：屋主說下個月考慮降價，先約下週電話確認..."
+                  />
+                </Field>
               </div>
             </div>
 

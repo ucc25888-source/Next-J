@@ -6,7 +6,7 @@ import { usePropertyStore } from "@/store/usePropertyStore";
 import PageHeader from "@/components/PageHeader";
 import {
   Plus, Search, Building2, MapPin, Ruler,
-  PenTool, Trash2, Upload, CalendarClock,
+  PenTool, Trash2, Upload, CalendarClock, Phone,
 } from "lucide-react";
 import { getAreaDisplay } from "@/utils/areaDisplay";
 
@@ -111,6 +111,10 @@ export default function PropertiesPage() {
               const daysLeft = getContractDaysLeft(property.contract_end_date);
               const expiringSoon = daysLeft !== null && daysLeft <= 30 && daysLeft >= 0;
               const expired = daysLeft !== null && daysLeft < 0;
+              const todayStr = new Date().toISOString().slice(0, 10);
+              const ownerFollowUp = property.owner_follow_up_date ?? null;
+              const ownerOverdue = ownerFollowUp && ownerFollowUp < todayStr;
+              const ownerToday = ownerFollowUp && ownerFollowUp === todayStr;
 
               return (
                 <div
@@ -192,6 +196,13 @@ export default function PropertiesPage() {
                               ? `委託已過期 ${Math.abs(daysLeft!)} 天`
                               : `委託剩 ${daysLeft} 天`}
                           </span>
+                        </div>
+                      )}
+                      {/* Owner follow-up badge */}
+                      {(ownerOverdue || ownerToday) && (
+                        <div className={`flex items-center gap-1.5 text-[10px] font-semibold ${ownerOverdue ? 'text-red-400' : 'text-amber-400'}`}>
+                          <Phone className="w-3 h-3 shrink-0" />
+                          <span>{ownerOverdue ? '屋主跟進已逾期' : '今天需跟進屋主'}</span>
                         </div>
                       )}
                       {/* FB post count */}
