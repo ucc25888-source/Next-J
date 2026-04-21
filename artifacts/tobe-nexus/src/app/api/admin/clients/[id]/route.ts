@@ -13,6 +13,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     display_name?: string;
     plan_name?: string;
     reset_usage?: boolean;
+    has_line_service?: boolean;
+    line_notify_token?: string | null;
   };
 
   const updates: string[] = [];
@@ -37,6 +39,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
   if (body.reset_usage) {
     updates.push(`used_this_month = 0`);
+  }
+  if (body.has_line_service !== undefined) {
+    updates.push(`has_line_service = $${idx++}`);
+    values.push(body.has_line_service);
+  }
+  if (body.line_notify_token !== undefined) {
+    updates.push(`line_notify_token = $${idx++}`);
+    values.push(body.line_notify_token);
   }
 
   if (updates.length === 0) {

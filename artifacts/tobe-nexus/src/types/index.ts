@@ -77,6 +77,8 @@ export interface Client {
   used_this_month: number;
   status: string;
   created_at: string;
+  has_line_service: boolean;
+  line_notify_token?: string;
 }
 
 export interface Copy {

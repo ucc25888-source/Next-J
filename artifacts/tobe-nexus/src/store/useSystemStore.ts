@@ -72,6 +72,7 @@ const mockClient: Client = {
   used_this_month: 0,
   status: 'active',
   created_at: '2026-01-01T00:00:00.000Z',
+  has_line_service: false,
 };
 
 export const useSystemStore = create<SystemState>()((set, get) => ({

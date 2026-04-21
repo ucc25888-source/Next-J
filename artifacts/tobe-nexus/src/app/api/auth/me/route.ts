@@ -11,6 +11,8 @@ interface DbClient {
   month_key: string;
   status: string;
   created_at: string;
+  has_line_service: boolean;
+  line_notify_token: string | null;
 }
 
 export async function GET() {
@@ -22,7 +24,7 @@ export async function GET() {
   const currentMonthKey = new Date().toISOString().slice(0, 7).replace('-', '');
 
   const row = await queryOne<DbClient>(
-    'SELECT client_id, display_name, plan_name, monthly_quota, used_this_month, month_key, status, created_at FROM clients WHERE client_id = $1',
+    'SELECT client_id, display_name, plan_name, monthly_quota, used_this_month, month_key, status, created_at, has_line_service, line_notify_token FROM clients WHERE client_id = $1',
     [session.clientId]
   );
 
@@ -43,6 +45,8 @@ export async function GET() {
       month_key: row.month_key,
       status: row.status,
       created_at: row.created_at,
+      has_line_service: row.has_line_service ?? false,
+      line_notify_token: row.line_notify_token ?? undefined,
     },
     isAdmin: session.isAdmin ?? false,
   });

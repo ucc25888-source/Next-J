@@ -18,6 +18,8 @@ export async function GET() {
       c.month_key,
       c.status,
       c.created_at,
+      c.has_line_service,
+      c.line_notify_token,
       COUNT(DISTINCT p.id)::int AS property_count,
       COUNT(DISTINCT cp.copy_id)::int AS total_copies
     FROM clients c

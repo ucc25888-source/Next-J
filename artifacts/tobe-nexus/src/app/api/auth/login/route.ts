@@ -14,6 +14,8 @@ interface DbClient {
   status: string;
   created_at: string;
   role: string;
+  has_line_service: boolean;
+  line_notify_token: string | null;
 }
 
 function resetMonthIfNeeded(row: DbClient): DbClient {
@@ -65,6 +67,8 @@ export async function POST(req: NextRequest) {
     month_key: client.month_key,
     status: client.status,
     created_at: client.created_at,
+    has_line_service: client.has_line_service ?? false,
+    line_notify_token: client.line_notify_token ?? undefined,
   };
 
   return NextResponse.json({ client: payload, isAdmin: session.isAdmin });

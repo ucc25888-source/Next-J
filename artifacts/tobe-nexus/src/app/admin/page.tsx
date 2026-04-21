@@ -19,6 +19,8 @@ interface AdminClient {
   created_at: string;
   property_count: number;
   total_copies: number;
+  has_line_service: boolean;
+  line_notify_token: string | null;
 }
 
 interface NewClientForm {
@@ -218,6 +220,15 @@ export default function AdminPage() {
     setClients(clients.map(c => c.client_id === clientId ? { ...c, used_this_month: 0 } : c));
   };
 
+  const handleToggleLine = async (client: AdminClient) => {
+    const newVal = !client.has_line_service;
+    await fetch(`/api/admin/clients/${client.client_id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ has_line_service: newVal }),
+    });
+    setClients(clients.map(c => c.client_id === client.client_id ? { ...c, has_line_service: newVal } : c));
+  };
+
   const handleAddClient = async () => {
     if (!newClient.client_id || !newClient.display_name || !newClient.login_token) return;
     setAddLoading(true);
@@ -400,7 +411,7 @@ export default function AdminPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-glacier-200/[0.05]">
-                        {['客戶代碼', '名稱', '方案', '本月用量', '案件數', '狀態', '操作'].map((h) => (
+                        {['客戶代碼', '名稱', '方案', '本月用量', '案件數', '狀態', 'LINE', '操作'].map((h) => (
                           <th key={h} className="px-6 py-3 text-left text-[10px] font-bold text-glacier-500 uppercase tracking-[0.1em]">{h}</th>
                         ))}
                       </tr>
@@ -453,6 +464,21 @@ export default function AdminPage() {
                               }`}>
                                 {c.status === 'active' ? '正常' : '已停用'}
                               </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <button
+                                onClick={() => handleToggleLine(c)}
+                                title={c.has_line_service ? '點擊關閉 LINE 加值服務' : '點擊開啟 LINE 加值服務'}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                  c.has_line_service ? 'bg-emerald-500' : 'bg-titanium-600'
+                                }`}>
+                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                                  c.has_line_service ? 'translate-x-4' : 'translate-x-1'
+                                }`} />
+                              </button>
+                              {c.line_notify_token && (
+                                <span className="block text-[9px] text-emerald-400 mt-0.5 font-mono">token 已設定</span>
+                              )}
                             </td>
                             <td className="px-6 py-4">
                               <button onClick={() => handleToggleStatus(c)}
