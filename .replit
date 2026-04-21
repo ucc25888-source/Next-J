@@ -3,6 +3,8 @@ modules = ["nodejs-24", "postgresql-16"]
 [deployment]
 router = "application"
 deploymentTarget = "autoscale"
+build = ["sh", "-c", "NEXT_TELEMETRY_DISABLED=1 pnpm --filter @workspace/tobe-nexus run build"]
+run = ["sh", "-c", "pnpm --filter @workspace/tobe-nexus run start"]
 
 [deployment.postBuild]
 args = ["pnpm", "store", "prune"]
