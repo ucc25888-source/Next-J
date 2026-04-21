@@ -20,7 +20,6 @@ const POST_TYPES: { value: PostType; label: string }[] = [
   { value: '知識教學', label: '知識教學' },
   { value: '人設生活', label: '人設生活' },
   { value: '成交喜報', label: '成交喜報' },
-  { value: '開發徵件', label: '開發徵件' },
   { value: '資產配置', label: '資產配置' },
   { value: '土地潛力', label: '土地潛力' },
   { value: '成家圓夢', label: '成家圓夢' },

@@ -51,8 +51,6 @@ ${parking ? `附有${extractText(parking)}` : '目前無車位'}。
       const randomHook = (hooks: string[]) =>
         hooks[Math.floor(Math.random() * hooks.length)];
       switch (postType) {
-        case '開發徵件':
-          return randomHook(fallbackHooks['開發徵件']).replace('{subarea}', subarea);
         case '降價急售':
           return randomHook(fallbackHooks['降價急售']).replace('{subarea}', subarea);
         case '成交喜報':
@@ -150,21 +148,6 @@ ${mustSayStr}
 
 好的物件總是不等人！如果您也正在尋找類似的房子，
 或是您的愛屋正準備出售，請放心交給福哥！
-
-${footer}`;
-
-    case '開發徵件':
-      return `${hookPrefix}【🎯 買方急尋！指定 ${subarea} 周邊物件】
-福哥手上目前有誠意買方，資金已到位，正在尋找合適的房子！
-
-🔍 【買方需求條件】
-➤ 鎖定區域：${subarea}
-➤ 需求類型：${property_type}
-➤ 預算區間：${price_wan} 萬上下
-➤ 需求格局：${layoutStr}
-
-如果您在附近剛好有房子想出售，或是知道鄰居有意願割愛，
-歡迎隨時聯繫，精準配對，快速成交！
 
 ${footer}`;
 

@@ -43,8 +43,8 @@ export async function POST(req: NextRequest) {
   const { postType, title, subtitle, hookSentence, location, price, ping, layout, propertyType, parking, highlights } = await req.json();
 
   const infoLine2 = [
-    `💰 總價 ${price}萬`,
-    `${ping}坪`,
+    `💰 ${price}萬`,
+    `📏 ${ping}坪`,
     parking ? parking : null,
     layout,
   ].filter(Boolean).join('｜');
