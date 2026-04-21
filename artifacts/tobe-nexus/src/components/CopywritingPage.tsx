@@ -30,7 +30,7 @@ const HOOK_TYPES: { value: HookType; label: string }[] = [
 
 const FIXED_FOOTER = `👇 好案不等人，點擊預約看屋：
 📞 專線：0925-997779
-💬 LINE：https://bit.ly/4sJhSzs
+💬 直通專線：https://bit.ly/4sJhSzs
 👤 杜美珍 & 周福良 (福哥)`;
 
 export default function CopywritingPage({ id }: { id: string }) {
