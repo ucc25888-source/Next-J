@@ -15,12 +15,15 @@ import {
   Download, RefreshCw, ThumbsUp, MessageCircle, Share2, Globe,
 } from 'lucide-react';
 
-const TAG_LIBRARY = {
+type TagMode = 'residential' | 'land' | 'shop';
+
+const TAG_LIBRARY: Record<TagMode, string[]> = {
   residential: [
     '低於實價登錄', '近市區機能', '景觀採光佳', '格局方正漂亮',
     '近車站通勤', '有車位好停車', '屋況佳免整理', '低總價好入手',
     '低公設比', '新屋/新裝潢', '學區首選', '邊間三面採光',
     '一層一戶', '電梯大樓管理', '近公園/生活圈', '稀有釋出',
+    '可隔套好出租', '高投報收租', '稀有急售', '重劃開發潛力',
   ],
   land: [
     '地形方正漂亮', '大面寬好規劃', '臨大馬路好進出', '特定農業區',
@@ -28,7 +31,21 @@ const TAG_LIBRARY = {
     '產權單純乾淨', '變更潛力大', '稀有大坪數', '可當農場民宿',
     '適合資產配置', '節稅規劃首選', '水源路徑清晰', '地形平坦好用',
   ],
+  shop: [
+    '黃金路段人流旺', '一樓黃金店面', '大面寬好招牌', '角間三面曝光',
+    '主幹道臨路', '近觀光商圈', '近市場批發區', '附設停車位',
+    '現租金收益中', '高投報穩收租', '租客可承接', '適合餐飲手搖',
+    '適合零售服務業', '純商業分區', '店住合一自營', '附裝潢設備轉讓',
+    '格局方正好規劃', '屋況佳即可開業', '低總價好入手', '低於實價登錄',
+    '高坪效好利用', '整棟釋出稀有', '稀有釋出', '急售可談',
+  ],
 };
+
+const TAG_MODE_LABELS: { value: TagMode; label: string }[] = [
+  { value: 'residential', label: '住宅' },
+  { value: 'shop', label: '店面/商辦' },
+  { value: 'land', label: '土地' },
+];
 
 const LAND_POST_TYPES: PostType[] = ['土地潛力', '資產配置', '知識教學'];
 
@@ -81,8 +98,12 @@ export default function CopywritingPage({ id }: { id: string }) {
   const usagePct = Math.min((used / quota) * 100, 100);
 
   const LAND_PROPERTY_TYPES = ['土地 / 農地', '建地 / 工業地'];
+  const SHOP_PROPERTY_TYPES = ['透天厝 (店住)', '純店面 / 商用辦公'];
   const isLandProperty = LAND_PROPERTY_TYPES.includes(property?.property_type ?? '');
-  const tagMode = (isLandProperty || LAND_POST_TYPES.includes(postType)) ? 'land' : 'residential';
+  const isShopProperty = SHOP_PROPERTY_TYPES.includes(property?.property_type ?? '');
+
+  const defaultTagMode: TagMode = isLandProperty ? 'land' : isShopProperty ? 'shop' : 'residential';
+  const [tagMode, setTagMode] = useState<TagMode>(defaultTagMode);
   const activeTags = TAG_LIBRARY[tagMode];
   const selectedTagSet = new Set(
     highlightsText.split('\n').map((l) => l.trim()).filter(Boolean)
@@ -314,14 +335,30 @@ export default function CopywritingPage({ id }: { id: string }) {
                 />
               </div>
 
-              {/* Tag pool - switches based on postType */}
+              {/* Tag pool - manually switchable */}
               <div>
-                <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-2">
-                  賣點標籤池
-                  <span className="ml-1.5 normal-case tracking-normal font-normal text-glacier-600">
-                    {tagMode === 'land' ? '土地模式' : '住宅模式'} — 點擊快速加入
-                  </span>
-                </p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em]">
+                    賣點標籤池
+                    <span className="ml-1.5 normal-case tracking-normal font-normal text-glacier-600">— 點擊快速加入</span>
+                  </p>
+                  <div className="flex gap-1">
+                    {TAG_MODE_LABELS.map((m) => (
+                      <button
+                        key={m.value}
+                        type="button"
+                        onClick={() => setTagMode(m.value)}
+                        className={`px-2.5 py-0.5 rounded text-[10px] font-medium border transition-all ${
+                          tagMode === m.value
+                            ? 'bg-aurora-500/20 border-aurora-500/40 text-aurora-300'
+                            : 'bg-titanium-800 border-glacier-200/[0.07] text-glacier-500 hover:border-glacier-200/20 hover:text-glacier-300'
+                        }`}
+                      >
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="flex flex-wrap gap-1.5">
                   {activeTags.map((tag) => {
                     const isSelected = selectedTagSet.has(tag);
