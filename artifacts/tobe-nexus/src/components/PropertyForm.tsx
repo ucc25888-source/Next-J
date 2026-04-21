@@ -336,21 +336,21 @@ export default function PropertyForm({ id }: PropertyFormProps) {
         {/* Selling Points */}
         <Section title="賣點與客群分析">
           <Field label="主賣點">
-            <select className={selectCls} value={form.main_point} onChange={(e) => set('main_point', e.target.value)}>
+            <select translate="no" className={selectCls} value={form.main_point} onChange={(e) => set('main_point', e.target.value)}>
               <option value="">請選擇</option>
-              {mainPoints.map((o) => <option key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
+              {mainPoints.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
             </select>
           </Field>
           <Field label="次賣點（可空）">
-            <select className={selectCls} value={form.second_point} onChange={(e) => set('second_point', e.target.value)}>
+            <select translate="no" className={selectCls} value={form.second_point} onChange={(e) => set('second_point', e.target.value)}>
               <option value="">無</option>
-              {mainPoints.map((o) => <option key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
+              {mainPoints.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
             </select>
           </Field>
           <Field label="目標客群">
-            <select className={selectCls} value={form.target_buyer} onChange={(e) => set('target_buyer', e.target.value)}>
+            <select translate="no" className={selectCls} value={form.target_buyer} onChange={(e) => set('target_buyer', e.target.value)}>
               <option value="">請選擇</option>
-              {targetBuyers.map((o) => <option key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
+              {targetBuyers.map((o) => <option translate="no" key={o.value} value={o.value}>{o.value.split(' | ')[0]}</option>)}
             </select>
           </Field>
 
