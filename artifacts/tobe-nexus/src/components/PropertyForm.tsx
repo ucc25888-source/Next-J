@@ -904,15 +904,29 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                   </select>
                 </Field>
 
-                <Field label="議價進度" className="md:col-span-3">
+                <div className="md:col-span-3">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-medium text-glacier-400">議價／溝通備註</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const now = new Date();
+                        const stamp = `【${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}】`;
+                        set('negotiation_progress', stamp + '\n' + (form.negotiation_progress ? form.negotiation_progress + '\n' : ''));
+                      }}
+                      className="text-xs px-2.5 py-1 rounded-md bg-aurora-600/20 text-aurora-400 hover:bg-aurora-600/30 border border-aurora-500/30 transition-all"
+                    >
+                      📅 插入跟進時間
+                    </button>
+                  </div>
                   <textarea
-                    rows={3}
+                    rows={4}
                     className={inputCls + ' resize-none'}
                     value={form.negotiation_progress}
                     onChange={(e) => set('negotiation_progress', e.target.value)}
                     placeholder="目前議到哪個價位？買方出多少？屋主反應？..."
                   />
-                </Field>
+                </div>
               </div>
             </div>
           </div>
