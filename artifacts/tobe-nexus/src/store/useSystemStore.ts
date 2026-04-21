@@ -121,7 +121,7 @@ export const useSystemStore = create<SystemState>()((set, get) => ({
     { value: '屋況佳/即可開業 | Move-in ready' },
     { value: '低總價好入手 | Affordable entry' },
     { value: '低於實價登錄 | Below market' },
-    { value: '高坪效好利用 | High usability' },
+    { value: '空間利用率高' },
     { value: '整棟釋出/稀有 | Rare whole-building' },
     { value: '稀有釋出 | Rare listing' },
     { value: '急售可談 | Motivated seller' },
