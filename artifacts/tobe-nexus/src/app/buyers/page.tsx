@@ -276,7 +276,14 @@ export default function BuyersPage() {
                       <span className="text-xs font-bold text-aurora-400">{b.name.charAt(0)}</span>
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-glacier-200 leading-tight">{b.name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-bold text-glacier-200 leading-tight">{b.name}</p>
+                        {b.buyer_no && (
+                          <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-aurora-500/10 text-aurora-500 border border-aurora-500/20 tracking-wider">
+                            {b.buyer_no}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[10px] text-glacier-500 mt-0.5">{b.source} · {new Date(b.created_at).toLocaleDateString("zh-TW")}</p>
                     </div>
                   </div>

@@ -118,6 +118,7 @@ export type HookType =
 export interface Buyer {
   id: string;
   client_id: string;
+  buyer_no: string;
   name: string;
   phone: string;
   email: string;

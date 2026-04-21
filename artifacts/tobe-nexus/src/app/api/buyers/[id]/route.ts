@@ -7,6 +7,7 @@ function dbRowToBuyer(row: Record<string, unknown>): Buyer {
   return {
     id: row.id as string,
     client_id: row.client_id as string,
+    buyer_no: (row.buyer_no as string) ?? '',
     name: (row.name as string) ?? '',
     phone: (row.phone as string) ?? '',
     email: (row.email as string) ?? '',
