@@ -139,7 +139,7 @@ export default function CopywritingPage({ id }: { id: string }) {
     setSaved(false);
     setContent('');
 
-    const cta = randomCTA();
+    const cta = randomCTA(isShopProperty, isLandProperty);
 
     try {
       const resp = await fetch('/api/generate-fb', {
