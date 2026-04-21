@@ -15,6 +15,23 @@ import {
   Download, RefreshCw, ThumbsUp, MessageCircle, Share2, Globe,
 } from 'lucide-react';
 
+const TAG_LIBRARY = {
+  residential: [
+    '低於實價登錄', '近市區機能', '景觀採光佳', '格局方正漂亮',
+    '近車站通勤', '有車位好停車', '屋況佳免整理', '低總價好入手',
+    '低公設比', '新屋/新裝潢', '學區首選', '邊間三面採光',
+    '一層一戶', '電梯大樓管理', '近公園/生活圈', '稀有釋出',
+  ],
+  land: [
+    '地形方正漂亮', '大面寬好規劃', '臨大馬路好進出', '特定農業區',
+    '建商開發首選', '可蓋夢想家', '投資重劃核心', '合法資材室',
+    '產權單純乾淨', '變更潛力大', '稀有大坪數', '可當農場民宿',
+    '適合資產配置', '節稅規劃首選', '水源路徑清晰', '地形平坦好用',
+  ],
+};
+
+const LAND_POST_TYPES: PostType[] = ['土地潛力', '資產配置', '知識教學'];
+
 const POST_TYPES: { value: PostType; label: string }[] = [
   { value: '物件開箱', label: '物件開箱' },
   { value: '降價急售', label: '降價急售' },
@@ -62,6 +79,20 @@ export default function CopywritingPage({ id }: { id: string }) {
   const quota = currentClient?.monthly_quota ?? 30;
   const isOverQuota = used >= quota;
   const usagePct = Math.min((used / quota) * 100, 100);
+
+  const tagMode = LAND_POST_TYPES.includes(postType) ? 'land' : 'residential';
+  const activeTags = TAG_LIBRARY[tagMode];
+  const selectedTagSet = new Set(
+    highlightsText.split('\n').map((l) => l.trim()).filter(Boolean)
+  );
+  const toggleTag = (tag: string) => {
+    const lines = highlightsText.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.includes(tag)) {
+      setHighlightsText(lines.filter((l) => l !== tag).join('\n'));
+    } else {
+      setHighlightsText([...lines, tag].join('\n'));
+    }
+  };
 
   useEffect(() => {
     if (!property) {
@@ -269,6 +300,37 @@ export default function CopywritingPage({ id }: { id: string }) {
                   onChange={(e) => setHighlightsText(e.target.value)}
                   placeholder="例：近火車站步行3分鐘&#10;採光極佳視野無遮&#10;管理完善電梯大樓"
                 />
+              </div>
+
+              {/* Tag pool - switches based on postType */}
+              <div>
+                <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-2">
+                  賣點標籤池
+                  <span className="ml-1.5 normal-case tracking-normal font-normal text-glacier-600">
+                    {tagMode === 'land' ? '土地模式' : '住宅模式'} — 點擊快速加入
+                  </span>
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {activeTags.map((tag) => {
+                    const isSelected = selectedTagSet.has(tag);
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        translate="no"
+                        onClick={() => toggleTag(tag)}
+                        className={`px-2.5 py-1 rounded-full text-[11px] border transition-all ${
+                          isSelected
+                            ? 'bg-aurora-500/15 border-aurora-500/30 text-aurora-400'
+                            : 'bg-titanium-800 border-glacier-200/[0.07] text-glacier-500 hover:border-glacier-200/15 hover:text-glacier-300'
+                        }`}
+                      >
+                        {isSelected && <span className="mr-0.5">✓</span>}
+                        {tag}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
