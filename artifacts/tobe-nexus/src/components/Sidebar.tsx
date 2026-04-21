@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Building2,
@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Network,
   Activity,
+  LogOut,
 } from "lucide-react";
 
 const navItems = [
@@ -21,6 +22,12 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+  };
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -83,7 +90,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="px-4 py-4 border-t border-white/[0.07]">
+      <div className="px-4 py-4 border-t border-white/[0.07] space-y-2">
         <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-white/[0.05] border border-white/[0.07]">
           <Activity className="w-3.5 h-3.5 text-aurora-500" />
           <div className="flex-1 min-w-0">
@@ -92,6 +99,13 @@ export default function Sidebar() {
           </div>
           <div className="w-1.5 h-1.5 rounded-full bg-aurora-500 animate-pulse shrink-0" />
         </div>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/[0.07] border border-transparent hover:border-red-500/20 transition-all text-[12px] font-medium"
+        >
+          <LogOut className="w-3.5 h-3.5 shrink-0" />
+          <span>登出</span>
+        </button>
       </div>
     </aside>
   );
