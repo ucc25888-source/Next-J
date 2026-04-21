@@ -103,8 +103,8 @@ export async function POST(req: NextRequest) {
   const postTypeDisplay = postType === '無' ? '不指定（由AI根據物件與賣點自行判斷）' : postType;
   const titleGuide = postType === '無' ? '緊扣物件類型' : `緊扣物件類型與${postType}主題`;
   const hookBlock = hookType === '無'
-    ? `\n\n· · · · · · · · · · · · · · ·\n（HOOK 開場段，一段不換行，約35字最多40字，不限風格，綜合主賣點、次賣點與物件整體特性，由AI自行判斷最強表達方式）\n· · · · · · · · · · · · · · ·`
-    : `\n\n· · · · · · · · · · · · · · ·\n（HOOK 開場段，一段不換行，約35字最多40字，依 ${hookType} 風格，綜合主賣點、次賣點與精華亮點，帶出最強張力與情緒價值）\n· · · · · · · · · · · · · · ·`;
+    ? `· · · · · · · · · · · · · · ·\n（HOOK 開場段，一段不換行，約35字最多40字，不限風格，綜合主賣點、次賣點與物件整體特性，由AI自行判斷最強表達方式）\n· · · · · · · · · · · · · · ·`
+    : `· · · · · · · · · · · · · · ·\n（HOOK 開場段，一段不換行，約35字最多40字，依 ${hookType} 風格，綜合主賣點、次賣點與精華亮點，帶出最強張力與情緒價值）\n· · · · · · · · · · · · · · ·`;
 
   const systemPrompt = `你是 TOBE Nexus 系統特助。代表「花蓮房產顧問福哥」與「杜美珍」產出精品級 FB 房產文案。
 
@@ -178,7 +178,9 @@ export async function POST(req: NextRequest) {
 （副標前段5–7漢字），（副標後段5–7漢字）
 
 📍 ${location}｜${propertyType || '精選物件'}
-${infoLine2}${hookBlock}
+${infoLine2}
+
+${hookBlock}
 
 ✅ （取材自精華亮點的賣點一，15字以內）
 ✅ （取材自精華亮點的賣點二，15字以內）
