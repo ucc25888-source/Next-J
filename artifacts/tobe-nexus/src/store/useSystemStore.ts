@@ -9,6 +9,7 @@ interface SystemState {
   counters: Counter[];
   mainPoints: OptionItem[];
   landPoints: OptionItem[];
+  shopPoints: OptionItem[];
   targetBuyers: OptionItem[];
   propertyTypes: OptionItem[];
   parkingOptions: OptionItem[];
@@ -98,6 +99,32 @@ export const useSystemStore = create<SystemState>()((set, get) => ({
     { value: '節稅規劃首選' },
     { value: '水源路徑清晰' },
     { value: '地形平坦好用' },
+  ],
+  shopPoints: [
+    { value: '黃金路段/人流旺 | Prime location' },
+    { value: '一樓黃金店面 | Ground floor shop' },
+    { value: '大面寬好招牌 | Wide frontage' },
+    { value: '角間三面曝光 | Corner visibility' },
+    { value: '主幹道臨路 | Main road frontage' },
+    { value: '近觀光商圈 | Near tourist district' },
+    { value: '近市場/批發區 | Near market' },
+    { value: '附設停車位 | Parking included' },
+    { value: '現租金收益中 | Leased & income-producing' },
+    { value: '高投報穩收租 | High rental yield' },
+    { value: '租客可承接 | Tenant transferable' },
+    { value: '適合餐飲/手搖 | F&B suitable' },
+    { value: '適合零售/服務業 | Retail suitable' },
+    { value: '純商業分區 | Commercial zoning' },
+    { value: '店住合一/自住自營 | Live & work' },
+    { value: '附裝潢/設備轉讓 | Fit-out included' },
+    { value: '格局方正好規劃 | Practical layout' },
+    { value: '屋況佳/即可開業 | Move-in ready' },
+    { value: '低總價好入手 | Affordable entry' },
+    { value: '低於實價登錄 | Below market' },
+    { value: '高坪效好利用 | High usability' },
+    { value: '整棟釋出/稀有 | Rare whole-building' },
+    { value: '稀有釋出 | Rare listing' },
+    { value: '急售可談 | Motivated seller' },
   ],
   mainPoints: [
     { value: '低於實價登錄 | Below market' },
