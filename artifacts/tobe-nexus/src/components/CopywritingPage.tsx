@@ -181,7 +181,12 @@ export default function CopywritingPage({ id }: { id: string }) {
       }
 
       const HASHTAGS = `#珍選好福邸 #花蓮房產顧問福哥 #TOBENexus`;
-      const finalContent = `${fullText}\n\n${cta}\n${CONTACT_BLOCK}\n\n${HASHTAGS}`;
+      const SLOGAN_MARKER = '=== 珍選好福邸 ===';
+      const firstIdx = fullText.indexOf(SLOGAN_MARKER);
+      const cleanText = firstIdx !== -1
+        ? fullText.slice(0, firstIdx + SLOGAN_MARKER.length) + fullText.slice(firstIdx + SLOGAN_MARKER.length).replace(new RegExp(`\\n*${SLOGAN_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*$`), '')
+        : fullText;
+      const finalContent = `${cleanText}\n\n${cta}\n${CONTACT_BLOCK}\n\n${HASHTAGS}`;
       setContent(finalContent);
 
       const copyRecord: Copy = {
