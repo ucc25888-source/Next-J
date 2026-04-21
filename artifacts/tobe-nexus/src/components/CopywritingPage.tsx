@@ -107,7 +107,6 @@ export default function CopywritingPage({ id }: { id: string }) {
       setHighlightsText(property.must_say_3 ?? '');
       setPostType(defaultPostType);
       setHookType(defaultHookType);
-      handleGenerate(defaultPostType, defaultHookType);
     }
   }, []);
 
