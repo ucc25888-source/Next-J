@@ -14,10 +14,10 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { label: "總覽儀表板", labelEn: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "案件管理", labelEn: "Properties", href: "/properties", icon: Building2 },
-  { label: "AI 文案生成", labelEn: "Copywriting", href: "/ai-copy", icon: Sparkles },
-  { label: "系統設定", labelEn: "Settings", href: "/settings", icon: Settings },
+  { label: "總覽儀表板", href: "/", icon: LayoutDashboard },
+  { label: "案件管理", href: "/properties", icon: Building2 },
+  { label: "AI 文案生成", href: "/ai-copy", icon: Sparkles },
+  { label: "系統設定", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -36,7 +36,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-[220px] flex flex-col bg-titanium-950 border-r border-white/[0.07] min-h-screen shrink-0">
+    <aside translate="no" className="w-[220px] flex flex-col bg-titanium-950 border-r border-white/[0.07] min-h-screen shrink-0">
       {/* Brand */}
       <div className="px-5 pt-6 pb-5 border-b border-white/[0.07]">
         <div className="flex items-center gap-3">
@@ -55,7 +55,7 @@ export default function Sidebar() {
       </div>
 
       <div className="px-5 pt-5 pb-2">
-        <span className="text-[9px] font-bold text-white/30 tracking-[0.18em] uppercase">Navigation</span>
+        <span className="text-[9px] font-bold text-white/30 tracking-[0.18em] uppercase">選單</span>
       </div>
 
       <nav className="flex-1 px-3 space-y-0.5 pb-4">
@@ -78,12 +78,7 @@ export default function Sidebar() {
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-aurora-500 rounded-r-full" />
               )}
               <Icon className={`w-[15px] h-[15px] shrink-0 ${active ? "text-aurora-500" : "text-slate-500 group-hover:text-slate-300"}`} />
-              <span className="flex-1 min-w-0">
-                <span className="block text-[13px]">{item.label}</span>
-                <span className={`block text-[9px] tracking-wide mt-0.5 ${active ? "text-aurora-500/60" : "text-slate-600 group-hover:text-slate-500"}`}>
-                  {item.labelEn}
-                </span>
-              </span>
+              <span className="flex-1 min-w-0 text-[13px]">{item.label}</span>
               {active && <ChevronRight className="w-3 h-3 text-aurora-500/60 shrink-0" />}
             </Link>
           );
@@ -95,7 +90,7 @@ export default function Sidebar() {
           <Activity className="w-3.5 h-3.5 text-aurora-500" />
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-semibold text-slate-200 truncate">系統運行中</p>
-            <p className="text-[9px] text-slate-500">AI Ready</p>
+            <p className="text-[9px] text-slate-500">AI 就緒</p>
           </div>
           <div className="w-1.5 h-1.5 rounded-full bg-aurora-500 animate-pulse shrink-0" />
         </div>

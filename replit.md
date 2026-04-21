@@ -72,8 +72,22 @@ artifacts/tobe-nexus/src/
 - **Primary:** `/api/generate-fb` — gpt-5.2 + streaming, uses `AI_INTEGRATIONS_OPENAI_BASE_URL` / `AI_INTEGRATIONS_OPENAI_API_KEY` (Replit AI Integrations, no own key required)
 - **Legacy:** `/api/generate-copy` — gpt-4o-mini, uses `OPENAI_API_KEY` secret
 
+## Client Accounts
+
+| client_id | login_token | plan | quota | description |
+|-----------|-------------|------|-------|-------------|
+| A0001 | A0001-2026 | basic | 50 | test account |
+| A1001 | A1001-2026 | professional | 200 | 福哥/杜美珍 花蓮房產顧問（21筆真實案件已匯入） |
+| ADMIN | TOBE-ADMIN-2026 | admin | 99999 | 管理員 |
+
+## Chrome Auto-translate Fix
+
+`<html>` has `translate="no"` + `className="notranslate"` + `suppressHydrationWarning`.
+`<body>` has `suppressHydrationWarning`. Sidebar uses `translate="no"` on `<aside>`.
+All English text removed from Sidebar (was causing Chrome to trigger translation on zh-TW page).
+
 ## State Persistence
 
-Both Zustand stores use `persist` middleware with localStorage:
-- `tobe-nexus-properties-v1` — property data
-- `tobe-nexus-system-v1` — areas, subareas, copies, options
+Zustand stores use localStorage only (no persist middleware):
+- `StoreHydrator.tsx` — loads counters from localStorage key `tobe-nexus-counters-v1`
+- `DataProvider.tsx` — fetches properties and client info from API on mount
