@@ -1,0 +1,32 @@
+kind = "web"
+previewPath = "/"
+title = "TOBE-Nexus"
+version = "1.0.0"
+id = "ToBeNexusWebApp2026Main"
+
+[[services]]
+localPort = 3000
+name = "TOBE-Nexus"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/tobe-nexus run dev"
+
+[services.production]
+
+[services.production.build]
+args = ["sh", "-c", "NEXT_TELEMETRY_DISABLED=1 pnpm --filter @workspace/tobe-nexus run build"]
+
+[services.production.build.env]
+NODE_ENV = "production"
+NEXT_TELEMETRY_DISABLED = "1"
+
+[services.production.run]
+args = ["pnpm", "--filter", "@workspace/tobe-nexus", "run", "start"]
+
+[services.production.run.env]
+PORT = "3000"
+NODE_ENV = "production"
+
+[services.production.health.startup]
+path = "/"
