@@ -327,15 +327,15 @@ export default function CopywritingPage({ id }: { id: string }) {
                   <p className={labelCls}>AI 情緒主軸（物件設定）</p>
                   <div className="flex flex-wrap gap-2">
                     {property.main_point && (
-                      <span translate="no" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium border bg-aurora-500/10 border-aurora-500/30 text-aurora-300">
-                        <span className="text-aurora-400">⭐ 主賣點</span>
-                        <span className="text-white/80">{property.main_point}</span>
+                      <span translate="no" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border bg-amber-50 border-amber-400 text-amber-800">
+                        <span className="text-amber-500">⭐ 主賣點</span>
+                        <span className="text-amber-900">{property.main_point}</span>
                       </span>
                     )}
                     {property.second_point && (
-                      <span translate="no" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium border bg-blue-500/10 border-blue-500/25 text-blue-300">
-                        <span className="text-blue-400">✦ 次賣點</span>
-                        <span className="text-white/80">{property.second_point}</span>
+                      <span translate="no" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border bg-blue-50 border-blue-400 text-blue-800">
+                        <span className="text-blue-500">✦ 次賣點</span>
+                        <span className="text-blue-900">{property.second_point}</span>
                       </span>
                     )}
                   </div>
@@ -358,14 +358,14 @@ export default function CopywritingPage({ id }: { id: string }) {
                       <span
                         key={h}
                         translate="no"
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] border bg-aurora-500/15 border-aurora-500/35 text-aurora-300"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium border bg-amber-100 border-amber-500 text-amber-800"
                       >
-                        <span className="text-aurora-500">✓</span>
+                        <span className="text-amber-600">✓</span>
                         {h}
                         <button
                           type="button"
                           onClick={() => toggleTag(h)}
-                          className="ml-0.5 text-aurora-500/60 hover:text-aurora-400 transition-colors leading-none"
+                          className="ml-0.5 text-amber-500 hover:text-amber-700 transition-colors leading-none font-bold"
                           title="移除"
                         >×</button>
                       </span>
@@ -391,8 +391,8 @@ export default function CopywritingPage({ id }: { id: string }) {
                         onClick={() => setTagMode(m.value)}
                         className={`px-2.5 py-0.5 rounded text-[10px] font-medium border transition-all ${
                           tagMode === m.value
-                            ? 'bg-aurora-500/20 border-aurora-500/40 text-aurora-300'
-                            : 'bg-titanium-800 border-glacier-200/[0.07] text-glacier-500 hover:border-glacier-200/20 hover:text-glacier-300'
+                            ? 'bg-amber-100 border-amber-500 text-amber-800'
+                            : 'bg-slate-100 border-slate-300 text-slate-500 hover:border-slate-400 hover:text-slate-700'
                         }`}
                       >
                         {m.label}
@@ -411,8 +411,8 @@ export default function CopywritingPage({ id }: { id: string }) {
                         onClick={() => toggleTag(tag)}
                         className={`px-2.5 py-1 rounded-full text-[11px] border transition-all ${
                           isSelected
-                            ? 'bg-aurora-500/15 border-aurora-500/30 text-aurora-400'
-                            : 'bg-titanium-800 border-glacier-200/[0.07] text-glacier-500 hover:border-glacier-200/15 hover:text-glacier-300'
+                            ? 'bg-amber-100 border-amber-500 text-amber-800 font-medium'
+                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-400 hover:text-slate-800'
                         }`}
                       >
                         {isSelected && <span className="mr-0.5">✓</span>}
