@@ -75,7 +75,7 @@ const mockClient: Client = {
 };
 
 export const useSystemStore = create<SystemState>()((set, get) => ({
-  currentClient: mockClient,
+  currentClient: null,
   areas: mockAreas,
   subareas: mockSubareas,
   copies: [],

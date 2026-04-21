@@ -4,13 +4,18 @@ import { useSystemStore } from "@/store/useSystemStore";
 import PageHeader from "@/components/PageHeader";
 import { User, Sparkles, BarChart3, Phone, ShieldCheck } from "lucide-react";
 
+function SkeletonBlock({ className }: { className?: string }) {
+  return <div className={`animate-pulse bg-titanium-700/40 rounded-md ${className}`} />;
+}
+
 export default function SettingsPage() {
   const { currentClient } = useSystemStore();
 
+  const loading = currentClient === null;
   const used = currentClient?.used_this_month ?? 0;
-  const quota = currentClient?.monthly_quota ?? 30;
-  const usagePct = Math.min((used / quota) * 100, 100);
-  const isOverQuota = used >= quota;
+  const quota = currentClient?.monthly_quota ?? 0;
+  const usagePct = quota > 0 ? Math.min((used / quota) * 100, 100) : 0;
+  const isOverQuota = quota > 0 && used >= quota;
   const remaining = Math.max(quota - used, 0);
 
   const planLabel: Record<string, string> = {
@@ -42,21 +47,32 @@ export default function SettingsPage() {
             </div>
 
             <div className="p-6">
-              <div className="grid grid-cols-2 gap-x-8 gap-y-5">
-                {[
-                  { label: '客戶代碼', value: currentClient?.client_id ?? '—' },
-                  { label: '顯示名稱', value: currentClient?.display_name ?? '—' },
-                  { label: '方案', value: planLabel[currentClient?.plan_name ?? ''] ?? currentClient?.plan_name ?? '—' },
-                  { label: '帳號狀態', value: currentClient?.status === 'active' ? '✓ 正常使用中' : '已停用' },
-                ].map(({ label, value }) => (
-                  <div key={label}>
-                    <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-1">
-                      {label}
-                    </p>
-                    <p className="text-sm font-medium text-glacier-200">{value}</p>
-                  </div>
-                ))}
-              </div>
+              {loading ? (
+                <div className="grid grid-cols-2 gap-x-8 gap-y-5">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i}>
+                      <SkeletonBlock className="h-2.5 w-16 mb-2" />
+                      <SkeletonBlock className="h-4 w-28" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-x-8 gap-y-5">
+                  {[
+                    { label: '客戶代碼', value: currentClient?.client_id ?? '—' },
+                    { label: '顯示名稱', value: currentClient?.display_name ?? '—' },
+                    { label: '方案', value: planLabel[currentClient?.plan_name ?? ''] ?? currentClient?.plan_name ?? '—' },
+                    { label: '帳號狀態', value: currentClient?.status === 'active' ? '✓ 正常使用中' : '已停用' },
+                  ].map(({ label, value }) => (
+                    <div key={label}>
+                      <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-1">
+                        {label}
+                      </p>
+                      <p className="text-sm font-medium text-glacier-200">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -73,48 +89,67 @@ export default function SettingsPage() {
             </div>
 
             <div className="p-6 space-y-5">
-              {/* Big numbers */}
-              <div className="flex items-end gap-2">
-                <span className={`text-4xl font-black tabular-nums ${isOverQuota ? 'text-red-500' : 'text-aurora-500'}`}>
-                  {used}
-                </span>
-                <span className="text-lg font-bold text-glacier-500 mb-1">/ {quota} 次</span>
-              </div>
+              {loading ? (
+                <>
+                  <div className="flex items-end gap-2">
+                    <SkeletonBlock className="h-10 w-16" />
+                    <SkeletonBlock className="h-5 w-20 mb-1" />
+                  </div>
+                  <div className="space-y-2">
+                    <SkeletonBlock className="h-3 w-full rounded-full" />
+                    <div className="flex justify-between">
+                      <SkeletonBlock className="h-2.5 w-8" />
+                      <SkeletonBlock className="h-2.5 w-14" />
+                    </div>
+                  </div>
+                  <SkeletonBlock className="h-12 w-full rounded-xl" />
+                </>
+              ) : (
+                <>
+                  {/* Big numbers */}
+                  <div className="flex items-end gap-2">
+                    <span className={`text-4xl font-black tabular-nums ${isOverQuota ? 'text-red-500' : 'text-aurora-500'}`}>
+                      {used}
+                    </span>
+                    <span className="text-lg font-bold text-glacier-500 mb-1">/ {quota} 次</span>
+                  </div>
 
-              {/* Progress bar */}
-              <div className="space-y-2">
-                <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      isOverQuota ? 'bg-red-500' : usagePct >= 80 ? 'bg-amber-400' : 'bg-aurora-500'
-                    }`}
-                    style={{ width: `${usagePct}%` }}
-                  />
-                </div>
-                <div className="flex justify-between text-[10px] text-glacier-500">
-                  <span>0 次</span>
-                  <span>{quota} 次上限</span>
-                </div>
-              </div>
+                  {/* Progress bar */}
+                  <div className="space-y-2">
+                    <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          isOverQuota ? 'bg-red-500' : usagePct >= 80 ? 'bg-amber-400' : 'bg-aurora-500'
+                        }`}
+                        style={{ width: `${usagePct}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-glacier-500">
+                      <span>0 次</span>
+                      <span>{quota} 次上限</span>
+                    </div>
+                  </div>
 
-              {/* Status badge */}
-              <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium ${
-                isOverQuota
-                  ? 'bg-red-50 text-red-600 border border-red-200'
-                  : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-              }`}>
-                {isOverQuota ? (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    本月文案配額已用盡，案件管理功能仍可正常使用
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    AI 文案服務正常 — 本月剩餘 <strong>{remaining}</strong> 次
-                  </>
-                )}
-              </div>
+                  {/* Status badge */}
+                  <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium ${
+                    isOverQuota
+                      ? 'bg-red-50 text-red-600 border border-red-200'
+                      : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  }`}>
+                    {isOverQuota ? (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        本月文案配額已用盡，案件管理功能仍可正常使用
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        AI 文案服務正常 — 本月剩餘 <strong>{remaining}</strong> 次
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
