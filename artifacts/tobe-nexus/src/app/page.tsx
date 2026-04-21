@@ -17,23 +17,32 @@ import type { DailyFocusItem } from "@/types";
 function FocusItemRow({
   item,
   onDone,
+  variant = "blue",
 }: {
   item: DailyFocusItem;
   onDone: (item: DailyFocusItem) => void;
+  variant?: "red" | "blue" | "green";
 }) {
   const typeIcon = item.type === "buyer"
-    ? <Users className="w-3 h-3 shrink-0" />
+    ? <Users className="w-3.5 h-3.5 shrink-0" />
     : item.type === "showing"
-    ? <CalendarCheck className="w-3 h-3 shrink-0" />
+    ? <CalendarCheck className="w-3.5 h-3.5 shrink-0" />
     : item.type === "colisting"
-    ? <Handshake className="w-3 h-3 shrink-0" />
-    : <Building2 className="w-3 h-3 shrink-0" />;
+    ? <Handshake className="w-3.5 h-3.5 shrink-0" />
+    : <Building2 className="w-3.5 h-3.5 shrink-0" />;
 
   const canComplete = item.type !== "property";
+  const iconColor = variant === "red" ? "text-red-400" : variant === "green" ? "text-emerald-400" : "text-blue-400";
 
   return (
-    <div className={`flex items-start gap-3 py-2.5 px-3 rounded-lg transition-all ${
-      item.done ? "opacity-50" : "hover:bg-black/[0.02]"
+    <div className={`flex items-start gap-3 p-3 bg-white rounded-xl shadow-sm border transition-all ${
+      item.done
+        ? "opacity-50 border-slate-100"
+        : variant === "red"
+        ? "border-red-100 hover:shadow-md hover:border-red-200"
+        : variant === "green"
+        ? "border-emerald-100 hover:shadow-md hover:border-emerald-200"
+        : "border-blue-100 hover:shadow-md hover:border-blue-200"
     }`}>
       <button
         onClick={() => canComplete && onDone(item)}
@@ -41,23 +50,25 @@ function FocusItemRow({
         disabled={!canComplete || item.done}
       >
         {item.done
-          ? <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-          : <Circle className={`w-4 h-4 ${item.is_overdue ? "text-red-400" : "text-blue-400"}`} />
+          ? <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+          : <Circle className={`w-5 h-5 ${iconColor}`} />
         }
       </button>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
-          <span className={`${item.is_overdue ? "text-red-500" : "text-blue-500"}`}>{typeIcon}</span>
-          <p className={`text-sm font-semibold leading-tight ${item.done ? "line-through text-glacier-500" : "text-glacier-200"}`}>
+          <span className={iconColor}>{typeIcon}</span>
+          <p className={`text-sm font-bold leading-snug ${item.done ? "line-through text-slate-400" : "text-slate-800"}`}>
             {item.title}
           </p>
         </div>
-        <p className="text-[11px] text-glacier-500 mt-0.5 leading-relaxed">{item.subtitle}</p>
+        <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{item.subtitle}</p>
       </div>
-      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-        item.is_overdue
-          ? "bg-red-100 text-red-600 border border-red-200"
-          : "bg-blue-50 text-blue-600 border border-blue-200"
+      <span className={`text-xs font-bold px-2.5 py-1 rounded-full shrink-0 ${
+        variant === "red"
+          ? "bg-red-100 text-red-700 border border-red-200"
+          : variant === "green"
+          ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+          : "bg-blue-100 text-blue-700 border border-blue-200"
       }`}>
         {item.is_overdue
           ? `逾期 ${Math.ceil((Date.now() - new Date(item.date).getTime()) / 86400000)} 天`
@@ -69,14 +80,16 @@ function FocusItemRow({
 
 function PropertyAlertRow({ item }: { item: DailyFocusItem }) {
   return (
-    <div className="flex items-start gap-3 py-2.5 px-3 rounded-lg hover:bg-amber-50/50 transition-all">
-      <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+    <div className="flex items-start gap-3 p-3 bg-white rounded-xl shadow-sm border border-amber-100 hover:shadow-md hover:border-amber-200 transition-all">
+      <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+        <AlertTriangle className="w-4 h-4 text-amber-600" />
+      </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-glacier-200 leading-tight">{item.title}</p>
-        <p className="text-[11px] text-amber-600 mt-0.5">{item.subtitle}</p>
+        <p className="text-sm font-bold text-slate-800 leading-snug">{item.title}</p>
+        <p className="text-xs text-amber-600 mt-0.5 font-medium">{item.subtitle}</p>
       </div>
       <Link href="/properties"
-        className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200 transition-colors shrink-0">
+        className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200 transition-colors shrink-0">
         查看
       </Link>
     </div>
@@ -264,57 +277,65 @@ export default function DashboardPage() {
               <p className="text-xs text-glacier-500 mt-1">沒有待追蹤的任務</p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100">
+            <div className="p-4 space-y-4">
 
               {/* Overdue section */}
               {overdueItems.length > 0 && (
-                <div className="p-4 space-y-1 bg-red-50/40">
-                  <div className="flex items-center gap-2 px-3 mb-2">
-                    <div className="w-2 h-2 rounded-full bg-red-500" />
-                    <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">逾期未處理 ({overdueItems.length})</span>
+                <div className="rounded-2xl bg-red-50 border border-red-100 shadow-sm overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-2.5 bg-red-100/60 border-b border-red-100">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" />
+                    <span className="text-xs font-black text-red-700 tracking-wide">逾期未處理 ({overdueItems.length})</span>
                   </div>
-                  {overdueItems.map((item) => (
-                    <FocusItemRow key={item.id} item={item} onDone={handleDone} />
-                  ))}
+                  <div className="p-3 space-y-2">
+                    {overdueItems.map((item) => (
+                      <FocusItemRow key={item.id} item={item} onDone={handleDone} variant="red" />
+                    ))}
+                  </div>
                 </div>
               )}
 
               {/* Today section */}
               {todayItems.length > 0 && (
-                <div className="p-4 space-y-1 bg-blue-50/30">
-                  <div className="flex items-center gap-2 px-3 mb-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-500" />
-                    <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">今日任務 ({todayItems.length})</span>
+                <div className="rounded-2xl bg-blue-50 border border-blue-100 shadow-sm overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-100/60 border-b border-blue-100">
+                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm" />
+                    <span className="text-xs font-black text-blue-700 tracking-wide">今日任務 ({todayItems.length})</span>
                   </div>
-                  {todayItems.map((item) => (
-                    <FocusItemRow key={item.id} item={item} onDone={handleDone} />
-                  ))}
+                  <div className="p-3 space-y-2">
+                    {todayItems.map((item) => (
+                      <FocusItemRow key={item.id} item={item} onDone={handleDone} variant="blue" />
+                    ))}
+                  </div>
                 </div>
               )}
 
               {/* Property alerts */}
               {propertyAlerts.length > 0 && (
-                <div className="p-4 space-y-1 bg-amber-50/40">
-                  <div className="flex items-center gap-2 px-3 mb-2">
-                    <div className="w-2 h-2 rounded-full bg-amber-500" />
-                    <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">委託到期提醒 ({propertyAlerts.length})</span>
+                <div className="rounded-2xl bg-amber-50 border border-amber-100 shadow-sm overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-100/70 border-b border-amber-100">
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" />
+                    <span className="text-xs font-black text-amber-700 tracking-wide">委託到期提醒 ({propertyAlerts.length})</span>
                   </div>
-                  {propertyAlerts.map((item) => (
-                    <PropertyAlertRow key={item.id} item={item} />
-                  ))}
+                  <div className="p-3 space-y-2">
+                    {propertyAlerts.map((item) => (
+                      <PropertyAlertRow key={item.id} item={item} />
+                    ))}
+                  </div>
                 </div>
               )}
 
-              {/* Done items (collapsible) */}
+              {/* Done items */}
               {doneItems.length > 0 && (
-                <div className="p-4 space-y-1 bg-slate-50/50">
-                  <div className="flex items-center gap-2 px-3 mb-2">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">已完成 ({doneItems.length})</span>
+                <div className="rounded-2xl bg-emerald-50 border border-emerald-100 shadow-sm overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-2.5 bg-emerald-100/60 border-b border-emerald-100">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-xs font-black text-emerald-700 tracking-wide">已完成 ({doneItems.length})</span>
                   </div>
-                  {doneItems.map((item) => (
-                    <FocusItemRow key={item.id} item={item} onDone={handleDone} />
-                  ))}
+                  <div className="p-3 space-y-2">
+                    {doneItems.map((item) => (
+                      <FocusItemRow key={item.id} item={item} onDone={handleDone} variant="green" />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
