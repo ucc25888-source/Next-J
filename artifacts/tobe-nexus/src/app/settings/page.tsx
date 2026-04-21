@@ -75,7 +75,7 @@ export default function SettingsPage() {
             <div className="p-6 space-y-5">
               {/* Big numbers */}
               <div className="flex items-end gap-2">
-                <span className={`text-4xl font-black tabular-nums ${isOverQuota ? 'text-red-500' : 'text-glacier-100'}`}>
+                <span className={`text-4xl font-black tabular-nums ${isOverQuota ? 'text-red-500' : 'text-aurora-500'}`}>
                   {used}
                 </span>
                 <span className="text-lg font-bold text-glacier-500 mb-1">/ {quota} 次</span>

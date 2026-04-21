@@ -339,7 +339,7 @@ export default function CopywritingPage({ id }: { id: string }) {
           <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl p-5 space-y-3">
             <div className="flex items-center justify-between text-[10px] text-glacier-500">
               <span>本月文案用量</span>
-              <span className={isOverQuota ? 'text-red-500 font-bold' : 'text-glacier-400'}>
+              <span className={isOverQuota ? 'text-red-500 font-bold' : 'text-aurora-400 font-medium'}>
                 {used} / {quota} 次
               </span>
             </div>

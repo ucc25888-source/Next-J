@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Users, BarChart3, Sparkles, ShieldOff, ShieldCheck,
-  Plus, LogOut, RefreshCw, Network, PencilLine, X, Check,
+  Plus, LogOut, RefreshCw, Network, PencilLine, X, Check, RotateCcw,
 } from "lucide-react";
 
 interface AdminClient {
@@ -81,6 +81,17 @@ export default function AdminPage() {
       c.client_id === clientId ? { ...c, monthly_quota: editQuota } : c
     ));
     setEditingId(null);
+  };
+
+  const handleResetUsage = async (clientId: string) => {
+    await fetch(`/api/admin/clients/${clientId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reset_usage: true }),
+    });
+    setClients(clients.map(c =>
+      c.client_id === clientId ? { ...c, used_this_month: 0 } : c
+    ));
   };
 
   const handleAddClient = async () => {
@@ -280,15 +291,25 @@ export default function AdminPage() {
                           ) : (
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className={`text-xs font-medium tabular-nums ${isOver ? 'text-red-400' : 'text-glacier-300'}`}>
+                                <span className={`text-xs font-medium tabular-nums ${isOver ? 'text-red-400' : 'text-aurora-400'}`}>
                                   {c.used_this_month} / {c.monthly_quota}
                                 </span>
                                 <button
                                   onClick={() => { setEditingId(c.client_id); setEditQuota(c.monthly_quota); }}
                                   className="text-glacier-600 hover:text-aurora-400 transition-colors"
+                                  title="修改配額上限"
                                 >
                                   <PencilLine className="w-3 h-3" />
                                 </button>
+                                {isOver && (
+                                  <button
+                                    onClick={() => handleResetUsage(c.client_id)}
+                                    className="text-amber-500 hover:text-amber-400 transition-colors"
+                                    title="重置本月用量"
+                                  >
+                                    <RotateCcw className="w-3 h-3" />
+                                  </button>
+                                )}
                               </div>
                               <div className="w-24 h-1 bg-titanium-700 rounded-full overflow-hidden">
                                 <div

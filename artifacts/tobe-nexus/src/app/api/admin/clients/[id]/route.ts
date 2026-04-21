@@ -12,6 +12,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     status?: string;
     display_name?: string;
     plan_name?: string;
+    reset_usage?: boolean;
   };
 
   const updates: string[] = [];
@@ -33,6 +34,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (body.plan_name !== undefined) {
     updates.push(`plan_name = $${idx++}`);
     values.push(body.plan_name);
+  }
+  if (body.reset_usage) {
+    updates.push(`used_this_month = 0`);
   }
 
   if (updates.length === 0) {
