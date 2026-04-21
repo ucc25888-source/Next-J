@@ -23,7 +23,7 @@ export default function DashboardPage() {
     { label: "總管理案件", value: String(properties.length), sub: "件", icon: Building2, accent: true },
     { label: "銷售中案件", value: String(activeListings), sub: "件", icon: TrendingUp, accent: true },
     { label: "本月新增案件", value: String(thisMonthNew), sub: "件", icon: Building2, accent: false },
-    { label: "AI 文案生成", value: String(copies.length), sub: "次", icon: Sparkles, accent: false },
+    { label: "AI 文案生成", value: String(currentClient?.used_this_month ?? 0), sub: "次", icon: Sparkles, accent: false },
   ];
 
   const getTitle = (p: ReturnType<typeof usePropertyStore.getState>['properties'][0]) =>
