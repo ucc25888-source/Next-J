@@ -139,11 +139,41 @@ export default function DashboardPage() {
   const doneItems      = focusItems.filter((i) => i.done && i.type !== "property");
   const totalPending   = overdueItems.length + todayItems.length;
 
-  const stats = [
-    { label: "總管理案件", value: String(properties.length), sub: "件", icon: Building2, accent: true },
-    { label: "銷售中案件", value: String(activeListings), sub: "件", icon: TrendingUp, accent: true },
-    { label: "本月新增案件", value: String(thisMonthNew), sub: "件", icon: Building2, accent: false },
-    { label: "AI 文案生成", value: String(currentClient?.used_this_month ?? 0), sub: "次", icon: Sparkles, accent: false },
+  const negotiatingCount = properties.filter((p) => p.status_now === "議價中" || p.status_now === "洽談中").length;
+
+  const statCards = [
+    {
+      label: "委託案件", value: properties.length, sub: "件", emoji: "🏘️",
+      badge: "總管理", badgeStyle: "bg-amber-100 text-amber-600",
+      gradient: "from-amber-50 to-orange-100", border: "border-amber-200/80",
+      numColor: "text-amber-600", labelColor: "text-amber-800", ringColor: "bg-amber-400/20",
+      hint: properties.length > 0 ? `銷售中 ${activeListings} 件` : "開始登錄案件",
+      hintColor: "text-amber-500",
+    },
+    {
+      label: "熱銷中案件", value: activeListings, sub: "件", emoji: "🔥",
+      badge: "LIVE", badgeStyle: "bg-emerald-100 text-emerald-600",
+      gradient: "from-emerald-50 to-green-100", border: "border-emerald-200/80",
+      numColor: "text-emerald-600", labelColor: "text-emerald-800", ringColor: "bg-emerald-400/20",
+      hint: activeListings > 0 ? "買方都在找！" : "把案件狀態設為銷售中",
+      hintColor: "text-emerald-500",
+    },
+    {
+      label: "議價∕洽談中", value: negotiatingCount, sub: "件", emoji: "💬",
+      badge: "成交在即", badgeStyle: "bg-sky-100 text-sky-600",
+      gradient: "from-sky-50 to-blue-100", border: "border-sky-200/80",
+      numColor: "text-sky-600", labelColor: "text-sky-800", ringColor: "bg-sky-400/20",
+      hint: negotiatingCount > 0 ? "把握機會，加把勁！" : "持續跟進，等待時機",
+      hintColor: "text-sky-500",
+    },
+    {
+      label: "AI 文案生成", value: currentClient?.used_this_month ?? 0, sub: "次", emoji: "⚡",
+      badge: "本月", badgeStyle: "bg-violet-100 text-violet-600",
+      gradient: "from-violet-50 to-purple-100", border: "border-violet-200/80",
+      numColor: "text-violet-600", labelColor: "text-violet-800", ringColor: "bg-violet-400/20",
+      hint: `配額 ${currentClient?.monthly_quota ?? 0} 次`,
+      hintColor: "text-violet-500",
+    },
   ];
 
   const getTitle = (p: ReturnType<typeof usePropertyStore.getState>["properties"][0]) =>
@@ -168,27 +198,31 @@ export default function DashboardPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <div key={stat.label}
-                className={`relative bg-titanium-900 rounded-xl p-5 border transition-all duration-200 hover:translate-y-[-1px] ${
-                  stat.accent ? "border-aurora-500/15 hover:border-aurora-500/30" : "border-glacier-200/[0.06] hover:border-glacier-200/[0.12]"
-                }`}>
-                {stat.accent && <div className="absolute inset-0 rounded-xl bg-aurora-500/[0.03] pointer-events-none" />}
+          {statCards.map((card) => (
+            <div key={card.label}
+              className={`relative bg-gradient-to-br ${card.gradient} rounded-2xl p-5 border ${card.border} overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md group cursor-default`}>
+              {/* Decorative ring */}
+              <div className={`absolute -top-5 -right-5 w-24 h-24 rounded-full ${card.ringColor} transition-transform duration-500 group-hover:scale-110`} />
+              <div className="relative">
+                {/* Top row */}
                 <div className="flex items-start justify-between mb-3">
-                  <div className={`p-2 rounded-lg ${stat.accent ? "bg-aurora-500/10" : "bg-titanium-700/60"}`}>
-                    <Icon className={`w-4 h-4 ${stat.accent ? "text-aurora-500" : "text-glacier-500"}`} />
-                  </div>
+                  <span className="text-2xl leading-none">{card.emoji}</span>
+                  <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${card.badgeStyle} tracking-wider uppercase whitespace-nowrap`}>
+                    {card.badge}
+                  </span>
                 </div>
-                <div className="flex items-baseline gap-1">
-                  <p className="text-2xl font-bold text-glacier-200 leading-none">{stat.value}</p>
-                  <span className="text-xs text-glacier-500">{stat.sub}</span>
+                {/* Number */}
+                <div className="flex items-baseline gap-1 mt-1">
+                  <span className={`text-[2.6rem] font-black leading-none ${card.numColor} tabular-nums`}>{card.value}</span>
+                  <span className={`text-base font-bold ${card.numColor} opacity-70`}>{card.sub}</span>
                 </div>
-                <p className="mt-1.5 text-xs font-semibold text-glacier-400">{stat.label}</p>
+                {/* Label */}
+                <p className={`mt-1 text-[13px] font-bold ${card.labelColor}`}>{card.label}</p>
+                {/* Hint line */}
+                <p className={`mt-1.5 text-[10px] font-semibold ${card.hintColor} opacity-80`}>{card.hint}</p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
         {/* ── Daily Focus Section ── */}
