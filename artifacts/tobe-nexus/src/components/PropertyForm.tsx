@@ -23,6 +23,8 @@ const GEOGRAPHIC_DATA: Record<string, string[]> = {
 };
 
 const LAND_PROPERTY_TYPES = ['土地 / 農地', '建地 / 工業地'];
+const TRANSPARENT_TYPES = ['透天厝 (住宅)', '透天厝 (店住)', '別墅 / 莊園'];
+const VILLA_TYPE = '別墅 / 莊園';
 
 interface PropertyFormProps {
   id?: string;
@@ -70,6 +72,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     floor_num: '',
     total_floors: '',
     common_area_ratio: '',
+    garden_area: '',
     face_width: '',
     road_width: '',
     depth_m: '',
@@ -106,6 +109,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const [form, setForm] = useState(blank);
 
   const isLandType = LAND_PROPERTY_TYPES.includes(form.property_type);
+  const isTransparentType = TRANSPARENT_TYPES.includes(form.property_type);
+  const isVilla = form.property_type === VILLA_TYPE;
   const activePoints = isLandType ? landPoints : mainPoints;
 
   const availableSubareas = useMemo(
@@ -134,6 +139,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
           floor_num: property.floor_num ?? '',
           total_floors: property.total_floors ?? '',
           common_area_ratio: property.common_area_ratio ? property.common_area_ratio.toString() : '',
+          garden_area: property.garden_area ?? '',
           face_width: property.face_width ?? '',
           road_width: property.road_width ?? '',
           depth_m: property.depth_m ?? '',
@@ -223,9 +229,10 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       reserve_price_wan: parseFloat(form.reserve_price_wan) || 0,
       build_ping: parseFloat(Number(form.build_ping).toFixed(1)) || 0,
       land_ping: parseFloat(Number(form.land_ping).toFixed(1)) || 0,
-      floor_num: form.floor_num,
+      floor_num: isTransparentType ? '' : form.floor_num,
       total_floors: form.total_floors,
-      common_area_ratio: parseFloat(form.common_area_ratio) || 0,
+      common_area_ratio: isTransparentType ? 0 : (parseFloat(form.common_area_ratio) || 0),
+      garden_area: isVilla ? form.garden_area : '',
       face_width: form.face_width,
       road_width: form.road_width,
       depth_m: form.depth_m,
@@ -400,15 +407,33 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                   <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">住宅專屬欄位</h2>
                 </div>
                 <div className="p-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                  <Field label="樓層">
-                    <input className={inputCls} value={form.floor_num} onChange={(e) => set('floor_num', e.target.value)} placeholder="例：3F" />
-                  </Field>
+                  {!isTransparentType && (
+                    <Field label="所在樓層">
+                      <input className={inputCls} value={form.floor_num} onChange={(e) => set('floor_num', e.target.value)} placeholder="例：3F" />
+                    </Field>
+                  )}
                   <Field label="總樓高">
                     <input className={inputCls} value={form.total_floors} onChange={(e) => set('total_floors', e.target.value)} placeholder="例：5樓" />
                   </Field>
-                  <Field label="公設比（%）">
-                    <input className={inputCls} type="number" min="0" max="100" value={form.common_area_ratio} onChange={(e) => set('common_area_ratio', e.target.value)} placeholder="例：28" />
-                  </Field>
+                  {!isTransparentType && (
+                    <Field label="公設比（%）">
+                      <input className={inputCls} type="number" min="0" max="100" value={form.common_area_ratio} onChange={(e) => set('common_area_ratio', e.target.value)} placeholder="例：28" />
+                    </Field>
+                  )}
+                  {isVilla && (
+                    <Field label="花園∕空地">
+                      <select
+                        translate="no"
+                        className={selectCls}
+                        value={form.garden_area}
+                        onChange={(e) => set('garden_area', e.target.value)}
+                      >
+                        <option translate="no" value="">未填寫</option>
+                        <option translate="no" value="有">有</option>
+                        <option translate="no" value="無">無</option>
+                      </select>
+                    </Field>
+                  )}
 
                   <div className="md:col-span-3">
                     <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-3">格局</p>

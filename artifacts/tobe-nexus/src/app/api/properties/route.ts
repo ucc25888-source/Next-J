@@ -47,6 +47,7 @@ function dbRowToProperty(row: Record<string, unknown>): Property {
     img2_url: (row.img2_url as string) ?? '',
     img3_url: (row.img3_url as string) ?? '',
     img4_url: (row.img4_url as string) ?? '',
+    garden_area: (row.garden_area as string) ?? '',
     owner_follow_up_date: (() => {
       const v = row.owner_follow_up_date;
       if (!v) return null;
@@ -100,13 +101,14 @@ export async function POST(req: NextRequest) {
       status_now, status_push, alert_level, negotiation_progress,
       main_point, second_point, target_buyer, must_say_3, notes_private,
       fb_post_count, img1_url, img2_url, img3_url, img4_url,
+      garden_area,
       owner_follow_up_date, owner_follow_up_notes,
       colisting_company, colisting_contact, colisting_last_check,
       created_at, updated_at
     ) VALUES (
       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,
       $18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,
-      $33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49
+      $33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50
     ) RETURNING *`,
     [
       id, session.clientId, body.listing_type ?? 'C', body.listing_id ?? '',
@@ -127,6 +129,7 @@ export async function POST(req: NextRequest) {
       body.target_buyer ?? '', body.must_say_3 ?? '', body.notes_private ?? '',
       0,
       body.img1_url ?? '', body.img2_url ?? '', body.img3_url ?? '', body.img4_url ?? '',
+      body.garden_area ?? '',
       body.owner_follow_up_date || null,
       body.owner_follow_up_notes ?? '',
       body.colisting_company ?? '',

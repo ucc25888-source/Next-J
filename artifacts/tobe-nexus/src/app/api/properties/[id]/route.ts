@@ -47,6 +47,7 @@ function dbRowToProperty(row: Record<string, unknown>): Property {
     img2_url: (row.img2_url as string) ?? '',
     img3_url: (row.img3_url as string) ?? '',
     img4_url: (row.img4_url as string) ?? '',
+    garden_area: (row.garden_area as string) ?? '',
     owner_follow_up_date: (() => {
       const v = row.owner_follow_up_date;
       if (!v) return null;
@@ -105,6 +106,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     'status_now', 'status_push', 'alert_level', 'negotiation_progress',
     'main_point', 'second_point', 'target_buyer', 'must_say_3', 'notes_private',
     'img1_url', 'img2_url', 'img3_url', 'img4_url',
+    'garden_area',
     'last_generated_at', 'last_fingerprint',
     'owner_follow_up_date', 'owner_follow_up_notes',
     'colisting_company', 'colisting_contact', 'colisting_last_check',
