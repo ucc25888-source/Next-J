@@ -100,6 +100,8 @@ export default function CopywritingPage({ id }: { id: string }) {
   const isLandProperty = LAND_PROPERTY_TYPES.includes(property?.property_type ?? '');
   const isShopProperty = SHOP_PROPERTY_TYPES.includes(property?.property_type ?? '');
 
+  const stripEnglish = (text: string) => text.split('|')[0].trim();
+
   const defaultTagMode: TagMode = isLandProperty ? 'land' : isShopProperty ? 'shop' : 'residential';
   const [tagMode, setTagMode] = useState<TagMode>(defaultTagMode);
   const activeTags = TAG_LIBRARY[tagMode];
@@ -229,9 +231,9 @@ export default function CopywritingPage({ id }: { id: string }) {
 
   if (!property) return null;
 
-  const selectCls = 'w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-glacier-200 focus:outline-none focus:border-aurora-500/60 focus:ring-1 focus:ring-aurora-500/20 transition-colors cursor-pointer';
-  const inputCls = 'w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-glacier-200 placeholder-glacier-500 focus:outline-none focus:border-aurora-500/60 focus:ring-1 focus:ring-aurora-500/20 transition-colors';
-  const labelCls = 'block text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-1.5';
+  const selectCls = 'w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-base text-slate-800 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition-colors cursor-pointer';
+  const inputCls = 'w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition-colors';
+  const labelCls = 'block text-[13px] font-semibold text-slate-600 mb-2';
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -256,12 +258,12 @@ export default function CopywritingPage({ id }: { id: string }) {
         <div className="space-y-5">
 
           {/* Strategy panel */}
-          <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
-            <div className="px-5 py-3 border-b border-slate-100 bg-slate-50">
-              <h2 className="text-[10px] font-bold text-glacier-400 uppercase tracking-[0.12em]">1. 發文策略</h2>
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <div className="px-4 py-2.5 border-b border-slate-100 bg-slate-50">
+              <h2 className="text-sm font-bold text-slate-500">1. 發文策略</h2>
             </div>
-            <div className="p-5 space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+            <div className="p-4 space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <label className={labelCls}>貼文類型</label>
                   <select
@@ -301,21 +303,21 @@ export default function CopywritingPage({ id }: { id: string }) {
           </div>
 
           {/* Highlights panel */}
-          <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
-            <div className="px-5 py-3 border-b border-slate-100 bg-slate-50">
-              <h2 className="text-[10px] font-bold text-glacier-400 uppercase tracking-[0.12em]">2. 精華亮點</h2>
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <div className="px-4 py-2.5 border-b border-slate-100 bg-slate-50">
+              <h2 className="text-sm font-bold text-slate-500">2. 精華亮點</h2>
             </div>
-            <div className="p-5 space-y-4">
+            <div className="p-4 space-y-5">
               {/* Property quick info */}
-              <div translate="no" className="flex flex-wrap gap-2 text-[11px] text-glacier-500">
-                <span translate="no" className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
+              <div translate="no" className="flex flex-wrap gap-2">
+                <span translate="no" className="px-3 py-1.5 bg-slate-100 rounded-lg border border-slate-200 text-sm font-medium text-slate-700">
                   💰 {property.price_wan?.toLocaleString()} 萬
                 </span>
-                <span translate="no" className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
+                <span translate="no" className="px-3 py-1.5 bg-slate-100 rounded-lg border border-slate-200 text-sm font-medium text-slate-700">
                   📏 {getAreaDisplay(property.property_type, property.build_ping, property.land_ping)}
                 </span>
                 {!isLandProperty && (
-                  <span translate="no" className="px-2 py-1 bg-titanium-800 rounded-md border border-glacier-200/[0.07]">
+                  <span translate="no" className="px-3 py-1.5 bg-slate-100 rounded-lg border border-slate-200 text-sm font-medium text-slate-700">
                     🏠 {defaultLayout}
                   </span>
                 )}
@@ -325,17 +327,17 @@ export default function CopywritingPage({ id }: { id: string }) {
               {(property.main_point || property.second_point) && (
                 <div>
                   <p className={labelCls}>AI 情緒主軸（物件設定）</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-col gap-2">
                     {property.main_point && (
-                      <span translate="no" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border bg-amber-50 border-amber-400 text-amber-800">
-                        <span className="text-amber-500">⭐ 主賣點</span>
-                        <span className="text-amber-900">{property.main_point}</span>
+                      <span translate="no" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold border bg-amber-50 border-amber-400 text-amber-800">
+                        <span className="text-amber-500 shrink-0">⭐ 主賣點</span>
+                        <span className="text-amber-900">{stripEnglish(property.main_point)}</span>
                       </span>
                     )}
                     {property.second_point && (
-                      <span translate="no" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border bg-blue-50 border-blue-400 text-blue-800">
-                        <span className="text-blue-500">✦ 次賣點</span>
-                        <span className="text-blue-900">{property.second_point}</span>
+                      <span translate="no" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold border bg-blue-50 border-blue-400 text-blue-800">
+                        <span className="text-blue-500 shrink-0">✦ 次賣點</span>
+                        <span className="text-blue-900">{stripEnglish(property.second_point)}</span>
                       </span>
                     )}
                   </div>
@@ -344,52 +346,50 @@ export default function CopywritingPage({ id }: { id: string }) {
 
               {/* must_say_3 — displayed as chips, not a textarea */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className={labelCls}>
-                    精華亮點（AI 融入文案）
-                    <span className="ml-1.5 normal-case tracking-normal font-normal text-glacier-600">
-                      — 已選 {selectedTagSet.size} 點，可從標籤池換選
-                    </span>
-                  </p>
-                </div>
+                <p className={labelCls}>
+                  精華亮點（AI 融入文案）
+                  <span className="ml-1.5 font-normal text-slate-400">
+                    — 已選 {selectedTagSet.size} 點，可從標籤池換選
+                  </span>
+                </p>
                 {selectedTagSet.size > 0 ? (
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {[...selectedTagSet].map((h) => (
                       <span
                         key={h}
                         translate="no"
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium border bg-amber-100 border-amber-500 text-amber-800"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border bg-amber-100 border-amber-500 text-amber-800"
                       >
                         <span className="text-amber-600">✓</span>
-                        {h}
+                        {stripEnglish(h)}
                         <button
                           type="button"
                           onClick={() => toggleTag(h)}
-                          className="ml-0.5 text-amber-500 hover:text-amber-700 transition-colors leading-none font-bold"
+                          className="ml-1 text-amber-500 hover:text-amber-700 transition-colors font-bold text-base leading-none"
                           title="移除"
                         >×</button>
                       </span>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[11px] text-glacier-600 italic">尚未選取精華亮點，點擊下方標籤加入</p>
+                  <p className="text-sm text-slate-400 italic py-2">尚未選取精華亮點，點擊下方標籤加入</p>
                 )}
               </div>
 
               {/* Tag pool - manually switchable */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em]">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[13px] font-semibold text-slate-600">
                     賣點標籤池
-                    <span className="ml-1.5 normal-case tracking-normal font-normal text-glacier-600">— 點擊替換或新增</span>
+                    <span className="ml-1.5 font-normal text-slate-400 text-xs">— 點擊替換或新增</span>
                   </p>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1.5">
                     {TAG_MODE_LABELS.map((m) => (
                       <button
                         key={m.value}
                         type="button"
                         onClick={() => setTagMode(m.value)}
-                        className={`px-2.5 py-0.5 rounded text-[10px] font-medium border transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all ${
                           tagMode === m.value
                             ? 'bg-amber-100 border-amber-500 text-amber-800'
                             : 'bg-slate-100 border-slate-300 text-slate-500 hover:border-slate-400 hover:text-slate-700'
@@ -400,7 +400,7 @@ export default function CopywritingPage({ id }: { id: string }) {
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {activeTags.map((tag) => {
                     const isSelected = selectedTagSet.has(tag);
                     return (
@@ -409,13 +409,13 @@ export default function CopywritingPage({ id }: { id: string }) {
                         type="button"
                         translate="no"
                         onClick={() => toggleTag(tag)}
-                        className={`px-2.5 py-1 rounded-full text-[11px] border transition-all ${
+                        className={`px-3 py-2 rounded-lg text-sm border transition-all ${
                           isSelected
-                            ? 'bg-amber-100 border-amber-500 text-amber-800 font-medium'
+                            ? 'bg-amber-100 border-amber-500 text-amber-800 font-semibold'
                             : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-400 hover:text-slate-800'
                         }`}
                       >
-                        {isSelected && <span className="mr-0.5">✓</span>}
+                        {isSelected && <span className="mr-1">✓</span>}
                         {tag}
                       </button>
                     );
