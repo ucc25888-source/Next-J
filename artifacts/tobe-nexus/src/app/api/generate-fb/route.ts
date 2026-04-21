@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { postType, title, subtitle, hookSentence, location, price, ping, landPing, isLandProperty, layout, propertyType, parking, highlights, property_id } = await req.json();
+  const { postType, hookType, title, subtitle, hookSentence, location, price, ping, landPing, isLandProperty, layout, propertyType, parking, highlights, property_id } = await req.json();
 
   const infoLine2 = isLandProperty
     ? [
@@ -54,7 +54,21 @@ export async function POST(req: NextRequest) {
         layout,
       ].filter(Boolean).join('｜');
 
+  const HOOK_STYLE: Record<string, string> = {
+    '情感溫度鉤': '以生活畫面與情感溫度吸引讀者，喚起家的溫暖與幸福感，語氣柔和真誠',
+    '專業焦慮鉤': '以地產專業知識點出讀者盲點或錯失風險，製造輕微焦慮後提供解方，語氣權威但不強硬',
+    '知識佈道鉤': '以分享教育的口吻傳遞房地產知識與觀念，語氣像老師或前輩，平易近人',
+    '利益誘惑鉤': '強調財務獲利、稀缺性與限時行動誘因，讓讀者感受到不行動就會損失，語氣積極有感染力',
+    '無': '直接切入物件本身，不使用特定開場風格，平實自然呈現',
+  };
+  const hookStyleDesc = HOOK_STYLE[hookType] ?? HOOK_STYLE['情感溫度鉤'];
+
   const systemPrompt = `你是 TOBE Nexus 系統特助。代表「花蓮房產顧問福哥」與「杜美珍」產出精品級 FB 房產文案。
+
+【本次文案設定】
+- 貼文類型：${postType}
+- HOOK 風格：${hookType}（${hookStyleDesc}）
+- 三個✅賣點與🎯適合對象，必須完全符合「${postType}」主題，且文風符合「${hookType}」風格
 
 【強制規則，違反即失效】
 - 完全禁止輸出任何說明文字、段落標題、前言、結語、注意事項
