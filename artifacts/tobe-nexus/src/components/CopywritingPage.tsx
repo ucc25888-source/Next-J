@@ -136,6 +136,7 @@ export default function CopywritingPage({ id }: { id: string }) {
           propertyType: property.property_type || '',
           parking: property.parking || '',
           highlights: highlightsText || property.must_say_3 || '',
+          property_id: property.id,
         }),
       });
 

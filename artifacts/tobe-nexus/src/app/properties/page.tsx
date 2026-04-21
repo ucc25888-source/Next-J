@@ -6,9 +6,15 @@ import { usePropertyStore } from "@/store/usePropertyStore";
 import PageHeader from "@/components/PageHeader";
 import {
   Plus, Search, Building2, MapPin, Ruler,
-  PenTool, Trash2, Sparkles, Upload,
+  PenTool, Trash2, Upload, CalendarClock,
 } from "lucide-react";
 import { getAreaDisplay } from "@/utils/areaDisplay";
+
+const ALERT_BADGE: Record<string, string> = {
+  green: '🟢',
+  yellow: '🟡',
+  red: '🔴',
+};
 
 export default function PropertiesPage() {
   const { properties, deleteProperty } = usePropertyStore();
@@ -33,6 +39,14 @@ export default function PropertiesPage() {
     已成交:   "bg-titanium-700/50 text-glacier-300 border-titanium-600/40",
     暫停:     "bg-titanium-700/30 text-glacier-500 border-titanium-600/30",
     評估排除: "bg-red-500/10 text-red-400 border-red-500/20",
+  };
+
+  const getContractDaysLeft = (endDate: string) => {
+    if (!endDate) return null;
+    const end = new Date(endDate);
+    const now = new Date();
+    const diff = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return diff;
   };
 
   return (
@@ -93,11 +107,22 @@ export default function PropertiesPage() {
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((property) => {
               const sc = statusCls[property.status_now] ?? statusCls["新進案"];
+              const alertEmoji = ALERT_BADGE[property.alert_level ?? 'green'] ?? '🟢';
+              const daysLeft = getContractDaysLeft(property.contract_end_date);
+              const expiringSoon = daysLeft !== null && daysLeft <= 30 && daysLeft >= 0;
+              const expired = daysLeft !== null && daysLeft < 0;
+
               return (
                 <div
                   key={property.id}
                   translate="no"
-                  className="group bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden hover:border-aurora-500/20 transition-all duration-200 flex flex-col"
+                  className={`group bg-titanium-900 border rounded-xl overflow-hidden transition-all duration-200 flex flex-col ${
+                    property.alert_level === 'red'
+                      ? 'border-red-500/25 hover:border-red-500/40'
+                      : property.alert_level === 'yellow'
+                      ? 'border-yellow-500/20 hover:border-yellow-500/35'
+                      : 'border-glacier-200/[0.07] hover:border-aurora-500/20'
+                  }`}
                 >
                   {/* Image */}
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-titanium-800">
@@ -106,24 +131,35 @@ export default function PropertiesPage() {
                       alt={getTitle(property)}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
+                    {/* Status badge */}
                     {property.status_now && (
                       <div className={`absolute top-2 right-2 px-2 py-1 rounded-md text-[10px] font-semibold border ${sc}`}>
                         {property.status_now}
                       </div>
                     )}
-                    {property.status_push === "全網熱銷中" && (
-                      <div className="absolute top-2 left-2 px-2 py-1 rounded-md text-[10px] font-bold bg-aurora-500 text-titanium-950">
-                        強銷中
-                      </div>
-                    )}
+                    {/* Alert level + Commission type */}
+                    <div className="absolute top-2 left-2 flex gap-1 flex-col">
+                      <span className="text-sm leading-none">{alertEmoji}</span>
+                      {property.commission_type && (
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                          property.commission_type === '專任'
+                            ? 'bg-aurora-500 text-titanium-950'
+                            : 'bg-titanium-800/80 text-glacier-400'
+                        }`}>
+                          {property.commission_type}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Info */}
                   <div className="flex flex-1 flex-col p-4">
                     <div className="mb-2">
-                      <span className="inline-flex items-center text-[9px] px-1.5 py-0.5 rounded bg-titanium-700 text-glacier-500 border border-glacier-200/[0.06] font-medium">
-                        {property.rooms}房{property.halls}廳{property.baths}衛
-                      </span>
+                      {!['土地 / 農地', '建地 / 工業地'].includes(property.property_type) && (
+                        <span className="inline-flex items-center text-[9px] px-1.5 py-0.5 rounded bg-titanium-700 text-glacier-500 border border-glacier-200/[0.06] font-medium">
+                          {property.rooms}房{property.halls}廳{property.baths}衛
+                        </span>
+                      )}
                       <h3
                         className="mt-1.5 text-[13px] font-bold text-glacier-200 truncate"
                         title={getTitle(property)}
@@ -138,7 +174,7 @@ export default function PropertiesPage() {
                     <div className="space-y-1.5 text-xs text-glacier-500 mb-4 flex-1">
                       <div className="flex items-center gap-1.5">
                         <MapPin className="w-3 h-3 text-glacier-600 shrink-0" />
-                        <span className="truncate">{property.address_note || "無地址備註"}</span>
+                        <span className="truncate">{property.address_note || property.subarea || "無地址備註"}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Ruler className="w-3 h-3 text-glacier-600 shrink-0" />
@@ -146,31 +182,42 @@ export default function PropertiesPage() {
                           {getAreaDisplay(property.property_type, property.build_ping, property.land_ping)}
                         </span>
                       </div>
+                      {/* Contract expiry warning */}
+                      {(expiringSoon || expired) && (
+                        <div className={`flex items-center gap-1.5 text-[10px] font-semibold ${expired ? 'text-red-400' : 'text-yellow-400'}`}>
+                          <CalendarClock className="w-3 h-3 shrink-0" />
+                          <span>
+                            {expired
+                              ? `委託已過期 ${Math.abs(daysLeft!)} 天`
+                              : `委託剩 ${daysLeft} 天`}
+                          </span>
+                        </div>
+                      )}
+                      {/* FB post count */}
+                      {(property.fb_post_count ?? 0) > 0 && (
+                        <div className="text-[10px] text-glacier-600">
+                          📢 已發文 {property.fb_post_count} 次
+                        </div>
+                      )}
                     </div>
 
                     {/* Actions */}
-                    <div className="mt-auto grid grid-cols-2 gap-2 pt-3 border-t border-glacier-200/[0.06]">
+                    <div className="mt-auto pt-3 border-t border-glacier-200/[0.06] space-y-2">
                       <Link
                         href={`/properties/${property.id}`}
-                        className="flex items-center justify-center gap-1 py-1.5 text-xs font-medium text-glacier-400 bg-titanium-800 border border-glacier-200/[0.08] rounded-lg hover:border-glacier-200/15 hover:text-glacier-200 transition-all"
+                        className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-glacier-300 bg-titanium-800 border border-glacier-200/[0.08] rounded-lg hover:border-glacier-200/20 hover:text-glacier-100 transition-all"
                       >
-                        <PenTool className="w-3 h-3" /> 編輯
-                      </Link>
-                      <Link
-                        href={`/generate/${property.id}`}
-                        className="flex items-center justify-center gap-1 py-1.5 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all"
-                      >
-                        <Sparkles className="w-3 h-3" /> FB 文案
+                        <PenTool className="w-3.5 h-3.5" /> 編輯案件
                       </Link>
                       <button
                         onClick={() => {
-                          if (window.confirm("確定要刪除這個物件嗎？")) {
+                          if (window.confirm("確定要刪除這個案件嗎？")) {
                             deleteProperty(property.id);
                           }
                         }}
-                        className="col-span-2 flex items-center justify-center gap-1 py-1.5 text-xs font-medium text-danger/70 bg-titanium-800 rounded-lg hover:bg-danger/10 hover:text-danger transition-all border border-transparent hover:border-danger/20"
+                        className="w-full flex items-center justify-center gap-1 py-1.5 text-[11px] font-medium text-danger/60 hover:text-danger transition-all"
                       >
-                        <Trash2 className="w-3 h-3" /> 刪除物件
+                        <Trash2 className="w-3 h-3" /> 刪除案件
                       </button>
                     </div>
                   </div>

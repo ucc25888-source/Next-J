@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { postType, title, subtitle, hookSentence, location, price, ping, layout, propertyType, parking, highlights } = await req.json();
+  const { postType, title, subtitle, hookSentence, location, price, ping, layout, propertyType, parking, highlights, property_id } = await req.json();
 
   const infoLine2 = [
     `💰 ${price}萬`,
@@ -97,6 +97,13 @@ ${hookSentence}
        WHERE client_id = $2`,
       [currentMonthKey, session.clientId]
     );
+
+    if (property_id) {
+      await query(
+        `UPDATE properties SET fb_post_count = fb_post_count + 1 WHERE id = $1 AND client_id = $2`,
+        [property_id, session.clientId]
+      );
+    }
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({

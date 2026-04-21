@@ -14,6 +14,7 @@ function dbRowToProperty(row: Record<string, unknown>): Property {
     address_note: (row.address_note as string) ?? '',
     property_type: (row.property_type as string) ?? '',
     price_wan: Number(row.price_wan) ?? 0,
+    reserve_price_wan: Number(row.reserve_price_wan) ?? 0,
     build_ping: Number(row.build_ping) ?? 0,
     land_ping: Number(row.land_ping) ?? 0,
     rooms: (row.rooms as string) ?? '0',
@@ -21,13 +22,27 @@ function dbRowToProperty(row: Record<string, unknown>): Property {
     baths: (row.baths as string) ?? '0',
     balconies: (row.balconies as string) ?? '0',
     parking: (row.parking as string) ?? '無車位',
+    floor_num: (row.floor_num as string) ?? '',
+    total_floors: (row.total_floors as string) ?? '',
+    common_area_ratio: Number(row.common_area_ratio) ?? 0,
+    face_width: (row.face_width as string) ?? '',
+    road_width: (row.road_width as string) ?? '',
+    depth_m: (row.depth_m as string) ?? '',
+    agri_zone_type: (row.agri_zone_type as string) ?? '',
+    ownership_status: (row.ownership_status as string) ?? '',
+    commission_type: (row.commission_type as string) ?? '一般',
+    contract_start_date: (row.contract_start_date as string) ?? '',
+    contract_end_date: (row.contract_end_date as string) ?? '',
     status_now: (row.status_now as string) ?? '新進案',
     status_push: (row.status_push as string) ?? '待場勘拍照',
+    alert_level: (row.alert_level as string) ?? 'green',
+    negotiation_progress: (row.negotiation_progress as string) ?? '',
     main_point: (row.main_point as string) ?? '',
     second_point: (row.second_point as string) ?? '',
     target_buyer: (row.target_buyer as string) ?? '',
     must_say_3: (row.must_say_3 as string) ?? '',
     notes_private: (row.notes_private as string) ?? '',
+    fb_post_count: Number(row.fb_post_count) ?? 0,
     img1_url: (row.img1_url as string) ?? '',
     img2_url: (row.img2_url as string) ?? '',
     img3_url: (row.img3_url as string) ?? '',
@@ -67,17 +82,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const allowed: (keyof Property)[] = [
     'listing_type', 'listing_id', 'area_code', 'subarea', 'address_note',
-    'property_type', 'price_wan', 'build_ping', 'land_ping', 'rooms', 'halls',
-    'baths', 'balconies', 'parking', 'status_now', 'status_push', 'main_point',
-    'second_point', 'target_buyer', 'must_say_3', 'notes_private',
+    'property_type', 'price_wan', 'reserve_price_wan', 'build_ping', 'land_ping',
+    'rooms', 'halls', 'baths', 'balconies', 'parking',
+    'floor_num', 'total_floors', 'common_area_ratio',
+    'face_width', 'road_width', 'depth_m', 'agri_zone_type', 'ownership_status',
+    'commission_type', 'contract_start_date', 'contract_end_date',
+    'status_now', 'status_push', 'alert_level', 'negotiation_progress',
+    'main_point', 'second_point', 'target_buyer', 'must_say_3', 'notes_private',
     'img1_url', 'img2_url', 'img3_url', 'img4_url',
     'last_generated_at', 'last_fingerprint',
   ];
 
   for (const key of allowed) {
     if (key in body) {
-      fields.push(`${key} = $${idx++}`);
-      values.push(body[key]);
+      const val = body[key];
+      if ((key === 'contract_start_date' || key === 'contract_end_date') && val === '') {
+        fields.push(`${key} = $${idx++}`);
+        values.push(null);
+      } else {
+        fields.push(`${key} = $${idx++}`);
+        values.push(val);
+      }
     }
   }
 
