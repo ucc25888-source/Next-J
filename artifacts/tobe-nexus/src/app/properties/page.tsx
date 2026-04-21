@@ -149,9 +149,11 @@ export default function PropertiesPage() {
                         <span translate="no" className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
                           property.commission_type === '專任'
                             ? 'bg-aurora-500 text-titanium-950'
+                            : property.commission_type === '同業聯賣'
+                            ? 'bg-blue-500 text-white'
                             : 'bg-titanium-800/80 text-glacier-400'
                         }`}>
-                          {property.commission_type}
+                          {property.commission_type === '同業聯賣' ? '🤝聯賣' : property.commission_type}
                         </span>
                       )}
                     </div>

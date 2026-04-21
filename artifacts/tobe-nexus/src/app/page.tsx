@@ -9,7 +9,7 @@ import {
   Building2, Sparkles, TrendingUp, ChevronRight,
   ArrowUpRight, Plus, PenTool,
   AlertCircle, CalendarCheck, CheckCircle2, Circle,
-  Users, AlertTriangle, Bell, RefreshCw,
+  Users, AlertTriangle, Bell, RefreshCw, Handshake,
 } from "lucide-react";
 import type { DailyFocusItem } from "@/types";
 
@@ -25,6 +25,8 @@ function FocusItemRow({
     ? <Users className="w-3 h-3 shrink-0" />
     : item.type === "showing"
     ? <CalendarCheck className="w-3 h-3 shrink-0" />
+    : item.type === "colisting"
+    ? <Handshake className="w-3 h-3 shrink-0" />
     : <Building2 className="w-3 h-3 shrink-0" />;
 
   const canComplete = item.type !== "property";
@@ -117,6 +119,13 @@ export default function DashboardPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ follow_up_done: true }),
+      });
+    } else if (item.type === "colisting") {
+      const today = new Date().toISOString().slice(0, 10);
+      await fetch(`/api/properties/${item.source_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ colisting_last_check: today }),
       });
     }
   };

@@ -99,6 +99,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     img4_url: '',
     owner_follow_up_date: '',
     owner_follow_up_notes: '',
+    colisting_company: '',
+    colisting_contact: '',
   };
 
   const [form, setForm] = useState(blank);
@@ -165,6 +167,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
           img4_url: property.img4_url,
           owner_follow_up_date: property.owner_follow_up_date ?? '',
           owner_follow_up_notes: property.owner_follow_up_notes ?? '',
+          colisting_company: property.colisting_company ?? '',
+          colisting_contact: property.colisting_contact ?? '',
         });
       } else {
         router.push('/properties');
@@ -251,6 +255,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       img4_url: form.img4_url,
       owner_follow_up_date: form.owner_follow_up_date || '',
       owner_follow_up_notes: form.owner_follow_up_notes,
+      colisting_company: form.colisting_company,
+      colisting_contact: form.colisting_contact,
     };
     if (isEditMode && id) {
       updateProperty(id, payload);
@@ -532,24 +538,60 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                 <h2 className="text-[11px] font-bold text-glacier-400 uppercase tracking-[0.12em]">合約資訊</h2>
               </div>
               <div className="p-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                <Field label="委託類型">
-                  <div className="flex gap-2">
-                    {['一般', '專任'].map((type) => (
+                <Field label="委託類型" className="sm:col-span-2 md:col-span-3">
+                  <div className="flex gap-2 flex-wrap">
+                    {[
+                      { key: '一般', label: '一般委託', hint: '自己簽的物件' },
+                      { key: '專任', label: '專任委託', hint: '自己簽的物件' },
+                      { key: '同業聯賣', label: '同業聯賣', hint: '別家公司的案件' },
+                    ].map(({ key, label, hint }) => (
                       <button
-                        key={type}
+                        key={key}
                         type="button"
-                        onClick={() => set('commission_type', type)}
-                        className={`flex-1 py-2.5 rounded-lg text-sm font-semibold border transition-all ${
-                          form.commission_type === type
-                            ? 'bg-aurora-500 text-titanium-950 border-aurora-500'
+                        onClick={() => set('commission_type', key)}
+                        title={hint}
+                        className={`flex-1 min-w-[100px] py-2.5 rounded-lg text-sm font-semibold border transition-all ${
+                          form.commission_type === key
+                            ? key === '同業聯賣'
+                              ? 'bg-blue-500 text-white border-blue-500'
+                              : 'bg-aurora-500 text-titanium-950 border-aurora-500'
                             : 'bg-white text-glacier-400 border-slate-200 hover:border-aurora-500/40'
                         }`}
                       >
-                        {type}委託
+                        {label}
                       </button>
                     ))}
                   </div>
                 </Field>
+
+                {form.commission_type === '同業聯賣' && (
+                  <>
+                    <Field label="哪家公司">
+                      <input
+                        className={inputCls}
+                        value={form.colisting_company}
+                        onChange={(e) => set('colisting_company', e.target.value)}
+                        placeholder="例：信義房屋、永慶房屋..."
+                      />
+                    </Field>
+                    <Field label="窗口接洽（姓名＋電話）">
+                      <input
+                        className={inputCls}
+                        value={form.colisting_contact}
+                        onChange={(e) => set('colisting_contact', e.target.value)}
+                        placeholder="例：王小明 0912-345-678"
+                      />
+                    </Field>
+                    <div className="sm:col-span-2 md:col-span-3">
+                      <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                        <span className="text-blue-500 text-base shrink-0">🤝</span>
+                        <p className="text-[11px] text-blue-700 leading-relaxed">
+                          同業聯賣物件將每 <strong>21 天</strong>在每日提醒出現，提示你詢問窗口是否有異動，點「已詢問」即記錄今天日期，計時重新開始。
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <Field label="簽約日期">
                   <input

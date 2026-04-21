@@ -54,6 +54,14 @@ function dbRowToProperty(row: Record<string, unknown>): Property {
       return String(v).slice(0, 10);
     })(),
     owner_follow_up_notes: (row.owner_follow_up_notes as string) ?? '',
+    colisting_company: (row.colisting_company as string) ?? '',
+    colisting_contact: (row.colisting_contact as string) ?? '',
+    colisting_last_check: (() => {
+      const v = row.colisting_last_check;
+      if (!v) return null;
+      if (v instanceof Date) return v.toISOString().slice(0, 10);
+      return String(v).slice(0, 10);
+    })(),
     last_generated_at: row.last_generated_at as string | undefined,
     last_fingerprint: row.last_fingerprint as string | undefined,
     createdAt: (row.created_at as string) ?? new Date().toISOString(),
@@ -99,12 +107,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     'img1_url', 'img2_url', 'img3_url', 'img4_url',
     'last_generated_at', 'last_fingerprint',
     'owner_follow_up_date', 'owner_follow_up_notes',
+    'colisting_company', 'colisting_contact', 'colisting_last_check',
   ];
 
   for (const key of allowed) {
     if (key in body) {
       const val = body[key];
-      if ((key === 'contract_start_date' || key === 'contract_end_date' || key === 'owner_follow_up_date') && val === '') {
+      if ((key === 'contract_start_date' || key === 'contract_end_date' || key === 'owner_follow_up_date' || key === 'colisting_last_check') && val === '') {
         fields.push(`${key} = $${idx++}`);
         values.push(null);
       } else {

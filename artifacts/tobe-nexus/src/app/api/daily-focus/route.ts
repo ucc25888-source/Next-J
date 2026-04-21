@@ -108,6 +108,47 @@ export async function GET() {
     });
   }
 
+  /* ── 4. 同業聯賣 — every 21 days check-in ── */
+  const twentyOneDaysAgo = new Date(Date.now() - 21 * 86400000).toISOString().slice(0, 10);
+  const colistingRows = await query(
+    `SELECT id, listing_id, subarea, property_type, colisting_company, colisting_contact, colisting_last_check
+     FROM properties
+     WHERE client_id = $1
+       AND commission_type = '同業聯賣'
+       AND (colisting_last_check IS NULL OR colisting_last_check <= $2)
+     ORDER BY colisting_last_check ASC NULLS FIRST`,
+    [clientId, twentyOneDaysAgo]
+  );
+
+  for (const r of colistingRows) {
+    const rawCheck = r.colisting_last_check as string | Date | null;
+    const lastCheck = rawCheck
+      ? (rawCheck instanceof Date ? rawCheck.toISOString() : String(rawCheck)).slice(0, 10)
+      : null;
+    const daysSince = lastCheck
+      ? Math.floor((Date.now() - new Date(lastCheck).getTime()) / 86400000)
+      : null;
+
+    const propLabel = r.listing_id
+      ? `[${r.listing_id as string}] ${r.subarea as string} ${r.property_type as string}`
+      : `${r.subarea as string} ${r.property_type as string}`;
+
+    items.push({
+      id: `colisting-${r.id as string}`,
+      type: 'colisting',
+      source_id: r.id as string,
+      title: `同業聯賣詢問：${propLabel}`,
+      subtitle: [
+        r.colisting_company ? `${r.colisting_company as string}` : null,
+        r.colisting_contact ? `窗口：${r.colisting_contact as string}` : null,
+        daysSince !== null ? `上次詢問 ${daysSince} 天前` : '尚未詢問過',
+      ].filter(Boolean).join(' · '),
+      date: todayStr,
+      is_overdue: lastCheck === null,
+      done: false,
+    });
+  }
+
   /* Sort: overdue first, then by date */
   items.sort((a, b) => {
     if (a.is_overdue && !b.is_overdue) return -1;

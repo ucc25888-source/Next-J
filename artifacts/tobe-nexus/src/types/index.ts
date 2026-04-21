@@ -43,6 +43,9 @@ export interface Property {
   img4_url: string;
   owner_follow_up_date?: string | null;
   owner_follow_up_notes?: string;
+  colisting_company?: string;
+  colisting_contact?: string;
+  colisting_last_check?: string | null;
   updated_at: string;
   last_generated_at?: string;
   last_fingerprint?: string;
@@ -99,6 +102,8 @@ export interface Counter {
 export interface OptionItem {
   value: string;
 }
+
+export type DailyFocusType = 'buyer' | 'showing' | 'property' | 'colisting';
 
 export type PostType =
   | '物件開箱'
@@ -160,7 +165,7 @@ export interface Showing {
 
 export interface DailyFocusItem {
   id: string;
-  type: 'buyer' | 'showing' | 'property';
+  type: 'buyer' | 'showing' | 'property' | 'colisting';
   source_id: string;
   title: string;
   subtitle: string;
