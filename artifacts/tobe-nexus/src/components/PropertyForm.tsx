@@ -108,6 +108,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   };
 
   const [form, setForm] = useState(blank);
+  const [isLoadingProperty, setIsLoadingProperty] = useState(isEditMode);
 
   const isLandType = LAND_PROPERTY_TYPES.includes(form.property_type);
   const isTransparentType = TRANSPARENT_TYPES.includes(form.property_type);
@@ -120,68 +121,87 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     [form.region_key]
   );
 
+  const populateFormFromProperty = (property: import('@/types').Property) => {
+    const rKey = Object.keys(GEOGRAPHIC_DATA).find(k => k.split(' | ')[1] === property.area_code) ?? '';
+    setForm({
+      client_id: property.client_id || currentClient?.client_id || 'A0001',
+      listing_type: property.listing_type || 'C',
+      listing_id: property.listing_id,
+      region_key: rKey,
+      area_code: property.area_code,
+      subarea: property.subarea,
+      address_note: property.address_note,
+      property_type: property.property_type,
+      price_wan: property.price_wan.toString(),
+      reserve_price_wan: property.reserve_price_wan ? property.reserve_price_wan.toString() : '',
+      build_ping: property.build_ping.toString(),
+      land_ping: property.land_ping.toString(),
+      floor_num: property.floor_num ?? '',
+      total_floors: property.total_floors ?? '',
+      common_area_ratio: property.common_area_ratio ? property.common_area_ratio.toString() : '',
+      garden_area: property.garden_area ?? '',
+      face_width: property.face_width ?? '',
+      road_width: property.road_width ?? '',
+      depth_m: property.depth_m ?? '',
+      agri_zone_type: property.agri_zone_type ?? '',
+      ownership_status: property.ownership_status ?? '',
+      rooms: property.rooms || '3',
+      halls: property.halls || '2',
+      baths: property.baths || '1',
+      balconies: property.balconies || '1',
+      parking: property.parking,
+      commission_type: property.commission_type ?? '一般',
+      contract_start_date: property.contract_start_date
+        ? new Date(property.contract_start_date).toISOString().split('T')[0]
+        : '',
+      contract_end_date: property.contract_end_date
+        ? new Date(property.contract_end_date).toISOString().split('T')[0]
+        : '',
+      main_point: property.main_point,
+      second_point: property.second_point,
+      target_buyer: property.target_buyer,
+      must_say_3: property.must_say_3 ? property.must_say_3.split('\n').filter(Boolean) : [],
+      notes_private: property.notes_private,
+      status_now: property.status_now,
+      status_push: property.status_push,
+      alert_level: property.alert_level ?? 'green',
+      negotiation_progress: property.negotiation_progress ?? '',
+      fb_post_count: property.fb_post_count ?? 0,
+      img1_url: property.img1_url,
+      img2_url: property.img2_url,
+      img3_url: property.img3_url,
+      img4_url: property.img4_url,
+      owner_follow_up_date: property.owner_follow_up_date ?? '',
+      owner_follow_up_notes: property.owner_follow_up_notes ?? '',
+      colisting_company: property.colisting_company ?? '',
+      colisting_contact: property.colisting_contact ?? '',
+    });
+  };
+
   useEffect(() => {
-    if (isEditMode && id) {
-      const property = getPropertyById(id);
-      if (property) {
-        const rKey = Object.keys(GEOGRAPHIC_DATA).find(k => k.split(' | ')[1] === property.area_code) ?? '';
-        setForm({
-          client_id: property.client_id || currentClient?.client_id || 'A0001',
-          listing_type: property.listing_type || 'C',
-          listing_id: property.listing_id,
-          region_key: rKey,
-          area_code: property.area_code,
-          subarea: property.subarea,
-          address_note: property.address_note,
-          property_type: property.property_type,
-          price_wan: property.price_wan.toString(),
-          reserve_price_wan: property.reserve_price_wan ? property.reserve_price_wan.toString() : '',
-          build_ping: property.build_ping.toString(),
-          land_ping: property.land_ping.toString(),
-          floor_num: property.floor_num ?? '',
-          total_floors: property.total_floors ?? '',
-          common_area_ratio: property.common_area_ratio ? property.common_area_ratio.toString() : '',
-          garden_area: property.garden_area ?? '',
-          face_width: property.face_width ?? '',
-          road_width: property.road_width ?? '',
-          depth_m: property.depth_m ?? '',
-          agri_zone_type: property.agri_zone_type ?? '',
-          ownership_status: property.ownership_status ?? '',
-          rooms: property.rooms || '3',
-          halls: property.halls || '2',
-          baths: property.baths || '1',
-          balconies: property.balconies || '1',
-          parking: property.parking,
-          commission_type: property.commission_type ?? '一般',
-          contract_start_date: property.contract_start_date
-            ? new Date(property.contract_start_date).toISOString().split('T')[0]
-            : '',
-          contract_end_date: property.contract_end_date
-            ? new Date(property.contract_end_date).toISOString().split('T')[0]
-            : '',
-          main_point: property.main_point,
-          second_point: property.second_point,
-          target_buyer: property.target_buyer,
-          must_say_3: property.must_say_3 ? property.must_say_3.split('\n').filter(Boolean) : [],
-          notes_private: property.notes_private,
-          status_now: property.status_now,
-          status_push: property.status_push,
-          alert_level: property.alert_level ?? 'green',
-          negotiation_progress: property.negotiation_progress ?? '',
-          fb_post_count: property.fb_post_count ?? 0,
-          img1_url: property.img1_url,
-          img2_url: property.img2_url,
-          img3_url: property.img3_url,
-          img4_url: property.img4_url,
-          owner_follow_up_date: property.owner_follow_up_date ?? '',
-          owner_follow_up_notes: property.owner_follow_up_notes ?? '',
-          colisting_company: property.colisting_company ?? '',
-          colisting_contact: property.colisting_contact ?? '',
-        });
-      } else {
-        router.push('/properties');
-      }
+    if (!isEditMode || !id) return;
+
+    const fromStore = getPropertyById(id);
+    if (fromStore) {
+      populateFormFromProperty(fromStore);
+      setIsLoadingProperty(false);
+      return;
     }
+
+    // Store not ready yet — fetch directly from API
+    setIsLoadingProperty(true);
+    fetch(`/api/properties/${id}`)
+      .then(async (res) => {
+        if (!res.ok) { router.push('/properties'); return; }
+        const { property } = await res.json();
+        if (property) {
+          populateFormFromProperty(property);
+        } else {
+          router.push('/properties');
+        }
+      })
+      .catch(() => router.push('/properties'))
+      .finally(() => setIsLoadingProperty(false));
   }, [id, isEditMode]);
 
   const getPointCategory = (pt: string) => {
@@ -303,6 +323,15 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     { value: 'yellow', label: '🟡 黃燈 — 快到期／需降價' },
     { value: 'red', label: '🔴 紅燈 — 屋主轉向／急需處理' },
   ];
+
+  if (isLoadingProperty) {
+    return (
+      <div className="max-w-4xl mx-auto flex flex-col items-center justify-center py-24 gap-4">
+        <div className="w-8 h-8 border-2 border-aurora-500/30 border-t-aurora-500 rounded-full animate-spin" />
+        <p className="text-sm text-glacier-500">載入案件資料中…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6" translate="no">

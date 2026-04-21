@@ -125,8 +125,8 @@ export default function PropertiesPage() {
                       : 'border-glacier-200/[0.07] hover:border-aurora-500/20'
                   }`}
                 >
-                  {/* Image */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-titanium-800">
+                  {/* Image — click to open */}
+                  <Link href={`/properties/${property.id}`} className="relative aspect-[4/3] w-full overflow-hidden bg-titanium-800 block">
                     <img
                       src={property.img1_url || "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=800"}
                       alt={getTitle(property)}
@@ -153,7 +153,7 @@ export default function PropertiesPage() {
                         </span>
                       )}
                     </div>
-                  </div>
+                  </Link>
 
                   {/* Info */}
                   <div className="flex flex-1 flex-col p-4">
