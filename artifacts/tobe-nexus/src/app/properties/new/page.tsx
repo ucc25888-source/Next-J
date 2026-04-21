@@ -9,7 +9,7 @@ export default function NewPropertyPage() {
         badge="Properties"
         subtitle="登錄新的房產物件資訊"
       />
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 md:p-6 lg:p-8">
         <PropertyForm />
       </main>
     </div>

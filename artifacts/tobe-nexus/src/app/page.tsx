@@ -45,7 +45,7 @@ export default function DashboardPage() {
         }
       />
 
-      <main className="flex-1 p-8 space-y-7">
+      <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-5 lg:space-y-7">
         {/* Stats */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
           {stats.map((stat) => {

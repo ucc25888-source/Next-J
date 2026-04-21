@@ -10,7 +10,7 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
         badge="Properties"
         subtitle="修改現有房產物件資料"
       />
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 md:p-6 lg:p-8">
         <PropertyForm id={id} />
       </main>
     </div>

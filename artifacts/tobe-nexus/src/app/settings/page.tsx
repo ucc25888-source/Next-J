@@ -31,8 +31,8 @@ export default function SettingsPage() {
         subtitle="查看您的帳號狀態與本月文案用量"
       />
 
-      <main className="flex-1 p-8">
-        <div className="max-w-2xl space-y-6">
+      <main className="flex-1 p-4 md:p-6 lg:p-8">
+        <div className="max-w-2xl space-y-4 lg:space-y-6">
 
           {/* Client Profile */}
           <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">

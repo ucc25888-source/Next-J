@@ -71,9 +71,9 @@ export default function PropertiesPage() {
         }
       />
 
-      <main className="flex-1 p-8 space-y-6">
+      <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-4 lg:space-y-6">
         {/* Search */}
-        <div className="relative max-w-sm">
+        <div className="relative max-w-full md:max-w-sm">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-glacier-500" />
           <input
             type="text"

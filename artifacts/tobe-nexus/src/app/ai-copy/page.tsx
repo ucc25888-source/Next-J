@@ -17,7 +17,7 @@ export default function AiCopyPage() {
         subtitle="選擇一個物件，AI 自動生成 Facebook 房產銷售文案"
       />
 
-      <main className="flex-1 p-8 space-y-6">
+      <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-4 lg:space-y-6">
         {properties.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 bg-titanium-900 border-2 border-dashed border-glacier-200/[0.08] rounded-xl">
             <div className="w-16 h-16 rounded-2xl bg-aurora-500/10 border border-aurora-500/20 flex items-center justify-center mb-5">
