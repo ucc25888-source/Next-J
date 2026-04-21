@@ -66,6 +66,8 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              translate="no"
+              suppressHydrationWarning
               className={`
                 flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 group relative
                 ${active
@@ -78,7 +80,7 @@ export default function Sidebar() {
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-aurora-500 rounded-r-full" />
               )}
               <Icon className={`w-[15px] h-[15px] shrink-0 ${active ? "text-aurora-500" : "text-slate-500 group-hover:text-slate-300"}`} />
-              <span className="flex-1 min-w-0 text-[13px]">{item.label}</span>
+              <span translate="no" className="flex-1 min-w-0 text-[13px]">{item.label}</span>
               {active && <ChevronRight className="w-3 h-3 text-aurora-500/60 shrink-0" />}
             </Link>
           );

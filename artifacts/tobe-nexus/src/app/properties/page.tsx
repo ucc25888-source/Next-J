@@ -116,6 +116,7 @@ export default function PropertiesPage() {
                 <div
                   key={property.id}
                   translate="no"
+                  suppressHydrationWarning
                   className={`group bg-titanium-900 border rounded-xl overflow-hidden transition-all duration-200 flex flex-col ${
                     property.alert_level === 'red'
                       ? 'border-red-500/25 hover:border-red-500/40'
@@ -133,15 +134,15 @@ export default function PropertiesPage() {
                     />
                     {/* Status badge */}
                     {property.status_now && (
-                      <div className={`absolute top-2 right-2 px-2 py-1 rounded-md text-[10px] font-semibold border ${sc}`}>
+                      <div translate="no" className={`absolute top-2 right-2 px-2 py-1 rounded-md text-[10px] font-semibold border ${sc}`}>
                         {property.status_now}
                       </div>
                     )}
                     {/* Alert level + Commission type */}
-                    <div className="absolute top-2 left-2 flex gap-1 flex-col">
+                    <div translate="no" className="absolute top-2 left-2 flex gap-1 flex-col">
                       <span className="text-sm leading-none">{alertEmoji}</span>
                       {property.commission_type && (
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                        <span translate="no" className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
                           property.commission_type === '專任'
                             ? 'bg-aurora-500 text-titanium-950'
                             : 'bg-titanium-800/80 text-glacier-400'
@@ -171,14 +172,14 @@ export default function PropertiesPage() {
                       {property.price_wan?.toLocaleString()}{" "}
                       <span className="text-xs font-normal text-glacier-500">萬</span>
                     </p>
-                    <div className="space-y-1.5 text-xs text-glacier-500 mb-4 flex-1">
+                    <div suppressHydrationWarning className="space-y-1.5 text-xs text-glacier-500 mb-4 flex-1">
                       <div className="flex items-center gap-1.5">
                         <MapPin className="w-3 h-3 text-glacier-600 shrink-0" />
-                        <span className="truncate">{property.address_note || property.subarea || "無地址備註"}</span>
+                        <span translate="no" className="truncate">{property.address_note || property.subarea || "無地址備註"}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Ruler className="w-3 h-3 text-glacier-600 shrink-0" />
-                        <span translate="no">
+                        <span translate="no" suppressHydrationWarning>
                           {getAreaDisplay(property.property_type, property.build_ping, property.land_ping)}
                         </span>
                       </div>

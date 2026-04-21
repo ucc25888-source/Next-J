@@ -87,13 +87,28 @@ body {
   content: attr(data-t);
 }
 
-/* ── Block Chrome GT's <font> injections ──
-   Chrome Translate adds <font style="vertical-align:inherit"> siblings.
-   Hiding them removes duplicated text without affecting our CSS-generated content. */
+/* ── Block Chrome Translate injected UI ──
+   Chrome Translate injects VIpgJd-* elements including "Retry / Error reason" indicators.
+   These break React reconciliation and clutter the UI. Hide them globally. */
+[class*="VIpgJd-yAWNEb"],
+[class*="VIpgJd-ZVi9od"],
+[class*="VIpgJd-"],
+.goog-te-spinner-pos,
+.goog-te-banner-frame,
+.goog-te-menu-frame,
+.skiptranslate {
+  display: none !important;
+}
+
+/* Chrome also injects bare <font> elements as siblings to translated text */
 .nt ~ font,
 .nt-block ~ font,
 [data-t] ~ font,
-h3 > font {
+h3 > font,
+span > font,
+div > font,
+a > font,
+p > font {
   display: none !important;
 }
 
