@@ -7,9 +7,10 @@ import { DailyFocusDrawer } from "@/components/DailyFocusDrawer";
 import {
   AlertCircle, CalendarCheck, CheckCircle2, Circle,
   Users, AlertTriangle, Bell, RefreshCw, Handshake, Building2,
-  Sparkles, ChevronRight,
+  Sparkles, ChevronRight, ClipboardList,
 } from "lucide-react";
 import type { DailyFocusItem } from "@/types";
+import type { DailyLogEntry } from "@/app/api/daily-log/route";
 
 /* ─── Type metadata ─────────────────────────────────────────────────── */
 const TYPE_META: Record<string, { icon: React.ReactNode; label: string }> = {
@@ -119,6 +120,35 @@ function PropertyAlertRow({ item, onClick }: { item: DailyFocusItem; onClick: (i
   );
 }
 
+/* ─── Daily log entry row ────────────────────────────────────────────── */
+const LOG_TYPE_META: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+  buyer:    { icon: <Users className="w-3.5 h-3.5" />,         label: "買方 CRM",  color: "bg-blue-100 text-blue-700" },
+  showing:  { icon: <CalendarCheck className="w-3.5 h-3.5" />, label: "帶看追蹤",  color: "bg-indigo-100 text-indigo-700" },
+  colisting:{ icon: <Handshake className="w-3.5 h-3.5" />,     label: "同業聯賣",  color: "bg-purple-100 text-purple-700" },
+  property: { icon: <Building2 className="w-3.5 h-3.5" />,     label: "客戶經營",  color: "bg-amber-100 text-amber-700" },
+};
+
+function LogEntryRow({ entry }: { entry: DailyLogEntry }) {
+  const meta = LOG_TYPE_META[entry.type] ?? LOG_TYPE_META.buyer;
+  return (
+    <div className="flex items-start gap-3 bg-white rounded-xl border border-slate-100 px-3.5 py-3 shadow-sm">
+      <div className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shrink-0 mt-0.5 ${meta.color}`}>
+        {meta.icon}
+        <span>{meta.label}</span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-bold text-slate-800 leading-snug">{entry.title}</p>
+        {entry.subtitle && (
+          <p className="text-xs text-slate-500 mt-0.5">{entry.subtitle}</p>
+        )}
+        <p className="text-xs text-slate-600 mt-1.5 bg-slate-50 rounded-lg px-2.5 py-1.5 leading-relaxed font-medium">
+          {entry.note}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Section wrapper ────────────────────────────────────────────────── */
 function Section({
   colorBar, headerBg, headerText, dotClass, pulseDot = false,
@@ -148,6 +178,8 @@ export default function DailyFocusPage() {
   const [focusLoading, setFocusLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<DailyFocusItem | null>(null);
   const [fadingIds, setFadingIds] = useState<Set<string>>(new Set());
+  const [logEntries, setLogEntries] = useState<DailyLogEntry[]>([]);
+  const [logLoading, setLogLoading] = useState(true);
 
   const loadFocus = useCallback(async () => {
     setFocusLoading(true);
@@ -160,7 +192,18 @@ export default function DailyFocusPage() {
     } finally { setFocusLoading(false); }
   }, []);
 
-  useEffect(() => { loadFocus(); }, [loadFocus]);
+  const loadLog = useCallback(async () => {
+    setLogLoading(true);
+    try {
+      const res = await fetch("/api/daily-log");
+      if (res.ok) {
+        const d = await res.json();
+        setLogEntries(d.entries ?? []);
+      }
+    } finally { setLogLoading(false); }
+  }, []);
+
+  useEffect(() => { loadFocus(); loadLog(); }, [loadFocus, loadLog]);
 
   const handleDone = useCallback(async (item: DailyFocusItem) => {
     // Immediately mark as done (grayed out)
@@ -214,7 +257,7 @@ export default function DailyFocusPage() {
         subtitle={dateStr}
         actions={
           <button
-            onClick={loadFocus}
+            onClick={() => { loadFocus(); loadLog(); }}
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-glacier-400 bg-titanium-900 border border-glacier-200/[0.08] rounded-lg hover:text-aurora-500 hover:border-aurora-500/30 transition-all"
           >
             <RefreshCw className={`w-4 h-4 ${focusLoading ? "animate-spin" : ""}`} />
@@ -317,6 +360,24 @@ export default function DailyFocusPage() {
           </div>
         )}
 
+        {/* Today's log */}
+        {!logLoading && logEntries.length > 0 && (
+          <div className="rounded-2xl border-2 border-emerald-200 overflow-hidden shadow-sm">
+            <div className="flex items-center gap-2.5 px-5 py-3 bg-emerald-100">
+              <ClipboardList className="w-4 h-4 text-emerald-700" />
+              <span className="text-sm font-black uppercase tracking-wide text-emerald-800 flex-1">今日已記錄</span>
+              <span className="text-sm font-black w-7 h-7 rounded-full flex items-center justify-center bg-white/60 text-emerald-700">
+                {logEntries.length}
+              </span>
+            </div>
+            <div className="p-3 space-y-2 bg-slate-50/50">
+              {logEntries.map((entry, i) => (
+                <LogEntryRow key={i} entry={entry} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Source hint */}
         {!focusLoading && (
           <p className="text-center text-xs text-slate-400 font-medium pb-2">
@@ -328,7 +389,7 @@ export default function DailyFocusPage() {
       {/* Detail drawer */}
       <DailyFocusDrawer
         item={selectedItem}
-        onClose={() => setSelectedItem(null)}
+        onClose={() => { setSelectedItem(null); loadLog(); }}
         onDone={handleDone}
       />
     </div>
