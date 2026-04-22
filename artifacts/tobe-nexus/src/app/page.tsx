@@ -9,18 +9,16 @@ import {
   Building2, Sparkles, TrendingUp, ChevronRight,
   ArrowUpRight, Plus, PenTool,
   AlertCircle, CalendarCheck, CheckCircle2, Circle,
-  Users, AlertTriangle, Bell, RefreshCw, Handshake,
+  Users, AlertTriangle, Bell, RefreshCw, Handshake, MoveRight,
 } from "lucide-react";
 import type { DailyFocusItem } from "@/types";
 
 /* ── Daily Focus helpers ── */
 function FocusItemRow({
   item,
-  onDone,
   variant = "blue",
 }: {
   item: DailyFocusItem;
-  onDone: (item: DailyFocusItem) => void;
   variant?: "red" | "blue" | "green";
 }) {
   const typeIcon = item.type === "buyer"
@@ -31,29 +29,26 @@ function FocusItemRow({
     ? <Handshake className="w-3.5 h-3.5 shrink-0" />
     : <Building2 className="w-3.5 h-3.5 shrink-0" />;
 
-  const canComplete = item.type !== "property";
   const iconColor = variant === "red" ? "text-red-400" : variant === "green" ? "text-emerald-400" : "text-blue-400";
+  const dotColor  = variant === "red" ? "bg-red-400" : variant === "green" ? "bg-emerald-400" : "bg-blue-400";
 
   return (
-    <div className={`flex items-start gap-3 p-3 bg-white rounded-xl shadow-sm border transition-all ${
+    <div className={`flex items-start gap-3 p-3 bg-white rounded-xl shadow-sm border ${
       item.done
         ? "opacity-50 border-slate-100"
         : variant === "red"
-        ? "border-red-100 hover:shadow-md hover:border-red-200"
+        ? "border-red-100"
         : variant === "green"
-        ? "border-emerald-100 hover:shadow-md hover:border-emerald-200"
-        : "border-blue-100 hover:shadow-md hover:border-blue-200"
+        ? "border-emerald-100"
+        : "border-blue-100"
     }`}>
-      <button
-        onClick={() => canComplete && onDone(item)}
-        className={`mt-0.5 shrink-0 transition-all ${canComplete ? "cursor-pointer hover:scale-110" : "cursor-default"}`}
-        disabled={!canComplete || item.done}
-      >
+      {/* Read-only dot indicator — no click */}
+      <div className="mt-1.5 shrink-0">
         {item.done
-          ? <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-          : <Circle className={`w-5 h-5 ${iconColor}`} />
+          ? <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400" />
+          : <div className={`w-2.5 h-2.5 rounded-full ${dotColor} mt-0.5`} />
         }
-      </button>
+      </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
           <span className={iconColor}>{typeIcon}</span>
@@ -117,31 +112,6 @@ export default function DashboardPage() {
 
   useEffect(() => { loadFocus(); }, [loadFocus]);
 
-  const handleDone = async (item: DailyFocusItem) => {
-    // Optimistically update
-    setFocusItems((prev) => prev.map((i) => i.id === item.id ? { ...i, done: true } : i));
-
-    if (item.type === "buyer") {
-      await fetch(`/api/buyers/${item.source_id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ next_follow_up_date: null }),
-      });
-    } else if (item.type === "showing") {
-      await fetch(`/api/showings/${item.source_id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ follow_up_done: true }),
-      });
-    } else if (item.type === "colisting") {
-      const today = new Date().toISOString().slice(0, 10);
-      await fetch(`/api/properties/${item.source_id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ colisting_last_check: today }),
-      });
-    }
-  };
 
   const activeListings   = properties.filter((p) => p.status_now === "銷售中").length;
   const thisMonthNew     = properties.filter((p) => new Date(p.createdAt).getMonth() === new Date().getMonth()).length;
@@ -284,11 +254,14 @@ export default function DashboardPage() {
                 <div className="rounded-2xl bg-red-50 border border-red-100 shadow-sm overflow-hidden">
                   <div className="flex items-center gap-2 px-4 py-2.5 bg-red-100/60 border-b border-red-100">
                     <div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" />
-                    <span className="text-xs font-black text-red-700 tracking-wide">逾期未處理 ({overdueItems.length})</span>
+                    <span className="text-xs font-black text-red-700 tracking-wide flex-1">逾期未處理 ({overdueItems.length})</span>
+                    <Link href="/daily-focus" className="flex items-center gap-1 text-[10px] font-black text-red-600 hover:text-red-800 transition-colors">
+                      前往處理 <MoveRight className="w-3 h-3" />
+                    </Link>
                   </div>
                   <div className="p-3 space-y-2">
                     {overdueItems.map((item) => (
-                      <FocusItemRow key={item.id} item={item} onDone={handleDone} variant="red" />
+                      <FocusItemRow key={item.id} item={item} variant="red" />
                     ))}
                   </div>
                 </div>
@@ -299,11 +272,14 @@ export default function DashboardPage() {
                 <div className="rounded-2xl bg-blue-50 border border-blue-100 shadow-sm overflow-hidden">
                   <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-100/60 border-b border-blue-100">
                     <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm" />
-                    <span className="text-xs font-black text-blue-700 tracking-wide">今日任務 ({todayItems.length})</span>
+                    <span className="text-xs font-black text-blue-700 tracking-wide flex-1">今日任務 ({todayItems.length})</span>
+                    <Link href="/daily-focus" className="flex items-center gap-1 text-[10px] font-black text-blue-600 hover:text-blue-800 transition-colors">
+                      前往處理 <MoveRight className="w-3 h-3" />
+                    </Link>
                   </div>
                   <div className="p-3 space-y-2">
                     {todayItems.map((item) => (
-                      <FocusItemRow key={item.id} item={item} onDone={handleDone} variant="blue" />
+                      <FocusItemRow key={item.id} item={item} variant="blue" />
                     ))}
                   </div>
                 </div>
@@ -333,7 +309,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="p-3 space-y-2">
                     {doneItems.map((item) => (
-                      <FocusItemRow key={item.id} item={item} onDone={handleDone} variant="green" />
+                      <FocusItemRow key={item.id} item={item} variant="green" />
                     ))}
                   </div>
                 </div>
@@ -341,14 +317,15 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Footer hint */}
-          <div className="flex items-center justify-between px-5 py-3 border-t border-slate-100 bg-slate-50/50">
-            <p className="text-[10px] text-glacier-500">來源：買方 CRM · 帶看追蹤 · 案件委託</p>
-            <Link href="/buyers"
-              className="text-[10px] font-semibold text-aurora-500 hover:text-aurora-400 transition-colors flex items-center gap-1">
-              管理買方 <ChevronRight className="w-3 h-3" />
-            </Link>
-          </div>
+          {/* Footer CTA — guide to daily-focus page */}
+          <Link href="/daily-focus"
+            className="flex items-center justify-between px-5 py-3.5 border-t border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition-colors group">
+            <div>
+              <p className="text-xs font-black text-blue-800">前往每日重點頁面處理任務</p>
+              <p className="text-[10px] text-blue-500 mt-0.5">在此填寫追蹤記錄，資料才會完整</p>
+            </div>
+            <MoveRight className="w-5 h-5 text-blue-500 group-hover:translate-x-1 transition-transform shrink-0" />
+          </Link>
         </div>
 
         {/* Recent Properties */}
