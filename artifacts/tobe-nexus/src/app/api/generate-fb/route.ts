@@ -45,15 +45,16 @@ export async function POST(req: NextRequest) {
     layout, propertyType, parking, highlights, mainPoint, secondPoint, aiNote, property_id,
   } = await req.json();
 
-  const infoLine2 = isLandProperty
+  const infoLine2Raw = isLandProperty
     ? [
         landPing ? `地坪${landPing}坪` : null,
       ].filter(Boolean).join('｜')
     : [
-        ping ? `📏 ${ping}坪` : null,
+        ping ? `${ping}坪` : null,
         parking || null,
         layout,
       ].filter(Boolean).join('｜');
+  const infoLine2 = infoLine2Raw ? `📍 ${infoLine2Raw}` : '';
 
   const propertyContext = isShopProperty
     ? '商用/店面：聚焦地段優勢、商業客流、收租投報，禁止使用家庭溫情、孩童等住宅語彙'
