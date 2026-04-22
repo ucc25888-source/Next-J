@@ -56,11 +56,11 @@ const APARTMENT_PROPERTY_TYPES = ['公寓', '電梯', '大樓', '華廈'];
 const buildCTA = (location: string) =>
 `💬 想了解更多細節或${location}行情？
 點擊下方連結，語音諮詢福哥：
-👉 https://bit.ly/4sJhSzs
+👉https://bit.ly/4sJhSzs
 
-👤 杜美珍 & 周福良 (福哥)
-📞 專線：0925-997779
-證號：(91) 登字第 010851 號`;
+👤杜美珍 & 周福良 (福哥)
+📞專線：0925-997779
+證號：(91)登字第010851號`;
 
 export default function CopywritingPage({ id }: { id: string }) {
   const router = useRouter();
