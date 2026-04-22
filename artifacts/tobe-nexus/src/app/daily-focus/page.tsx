@@ -211,6 +211,13 @@ export default function DailyFocusPage() {
 
   useEffect(() => { loadFocus(); loadLog(); }, [loadFocus, loadLog]);
 
+  // Re-fetch when user switches back to this tab / app (cross-device sync)
+  useEffect(() => {
+    const onVisible = () => { if (document.visibilityState === 'visible') { loadFocus(); loadLog(); } };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [loadFocus, loadLog]);
+
   const handleDone = useCallback(async (item: DailyFocusItem) => {
     // Immediately mark as done (grayed out)
     setFocusItems((prev) => prev.map((i) => i.id === item.id ? { ...i, done: true } : i));

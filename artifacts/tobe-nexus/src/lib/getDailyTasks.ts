@@ -26,9 +26,12 @@ export async function getDailyTasks(clientId: string): Promise<{
     total: number;
   };
 }> {
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const sevenDaysLater = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
-  const twentyOneDaysAgo = new Date(Date.now() - 21 * 86400000).toISOString().slice(0, 10);
+  // Use Taiwan time (UTC+8) so date boundaries match the user's local day
+  const taiwanOffset = 8 * 60 * 60 * 1000;
+  const nowTaiwan = new Date(Date.now() + taiwanOffset);
+  const todayStr = nowTaiwan.toISOString().slice(0, 10);
+  const sevenDaysLater = new Date(Date.now() + taiwanOffset + 7 * 86400000).toISOString().slice(0, 10);
+  const twentyOneDaysAgo = new Date(Date.now() + taiwanOffset - 21 * 86400000).toISOString().slice(0, 10);
 
   const items: DailyFocusItem[] = [];
 
