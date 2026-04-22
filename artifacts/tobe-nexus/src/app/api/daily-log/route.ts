@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
 import { query } from '@/lib/db';
 
@@ -13,17 +13,19 @@ export interface DailyLogEntry {
   note: string;
 }
 
-function todayPrefix() {
+function serverTodayPrefix() {
   const d = new Date();
   return `[${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}]`;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getSession();
   if (!session.clientId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const clientId = session.clientId;
-  const prefix = todayPrefix();
+  // Use client-supplied prefix to avoid UTC vs local timezone mismatch
+  const clientPrefix = req.nextUrl.searchParams.get('prefix');
+  const prefix = clientPrefix ?? serverTodayPrefix();
   const likePattern = `${prefix}%`;
 
   const entries: DailyLogEntry[] = [];
