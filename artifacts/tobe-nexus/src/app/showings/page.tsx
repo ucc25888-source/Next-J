@@ -304,7 +304,7 @@ export default function ShowingsPage() {
                         <MessageSquare className="w-3 h-3 text-blue-500 shrink-0 mt-0.5" />
                         <div>
                           <p className="text-[10px] font-bold text-blue-600 mb-0.5">追蹤事項</p>
-                          <p className="text-[11px] text-blue-900 leading-relaxed">{s.follow_up}</p>
+                          <p className="text-[11px] text-blue-900 leading-relaxed">{s.follow_up.split('\n')[0]}</p>
                         </div>
                       </div>
                     )}

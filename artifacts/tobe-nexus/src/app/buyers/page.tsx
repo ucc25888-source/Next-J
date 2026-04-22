@@ -689,7 +689,7 @@ export default function BuyersPage() {
                                       <Bell className="w-3.5 h-3.5 shrink-0 mt-0.5 text-blue-500" />
                                       <div>
                                         <p className="text-[10px] font-bold text-blue-600 mb-0.5">追蹤事項</p>
-                                        <p className="text-xs text-blue-900 leading-relaxed">{s.follow_up}</p>
+                                        <p className="text-xs text-blue-900 leading-relaxed">{s.follow_up.split('\n')[0]}</p>
                                       </div>
                                     </div>
                                   )}
