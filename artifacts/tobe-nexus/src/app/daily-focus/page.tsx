@@ -360,20 +360,29 @@ export default function DailyFocusPage() {
           </div>
         )}
 
-        {/* Today's log */}
-        {!logLoading && logEntries.length > 0 && (
+        {/* Today's log — always visible */}
+        {!logLoading && (
           <div className="rounded-2xl border-2 border-emerald-200 overflow-hidden shadow-sm">
             <div className="flex items-center gap-2.5 px-5 py-3 bg-emerald-100">
               <ClipboardList className="w-4 h-4 text-emerald-700" />
               <span className="text-sm font-black uppercase tracking-wide text-emerald-800 flex-1">今日已記錄</span>
-              <span className="text-sm font-black w-7 h-7 rounded-full flex items-center justify-center bg-white/60 text-emerald-700">
-                {logEntries.length}
-              </span>
+              {logEntries.length > 0 && (
+                <span className="text-sm font-black w-7 h-7 rounded-full flex items-center justify-center bg-white/60 text-emerald-700">
+                  {logEntries.length}
+                </span>
+              )}
             </div>
             <div className="p-3 space-y-2 bg-slate-50/50">
-              {logEntries.map((entry, i) => (
-                <LogEntryRow key={i} entry={entry} />
-              ))}
+              {logEntries.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <p className="text-sm font-semibold text-slate-500">今日尚無追蹤記錄</p>
+                  <p className="text-xs text-slate-400 mt-1">在上方任務點擊完成並填寫記錄後，會自動出現在這裡</p>
+                </div>
+              ) : (
+                logEntries.map((entry, i) => (
+                  <LogEntryRow key={i} entry={entry} />
+                ))
+              )}
             </div>
           </div>
         )}
