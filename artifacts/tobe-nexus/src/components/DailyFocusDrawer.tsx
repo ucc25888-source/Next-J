@@ -44,18 +44,28 @@ function HistoryBlock({ history, color = "blue" }: { history: string; color?: "b
 }
 
 /* ── Notes input block ─────────────────────────────────────────────── */
+function todayBadge() {
+  const d = new Date();
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
 function NoteInput({
-  label, placeholder, value, onChange, isDone,
+  label, placeholder, value, onChange, isDone, showDate = true,
 }: {
   label: string; placeholder: string;
   value: string; onChange: (v: string) => void;
-  isDone?: boolean;
+  isDone?: boolean; showDate?: boolean;
 }) {
   return (
     <div className="pt-3">
       <div className="flex items-center gap-2 mb-2">
         <PenLine className="w-4 h-4 text-blue-500" />
         <p className="text-xs font-bold text-blue-700">{label}</p>
+        {showDate && !isDone && (
+          <span className="ml-auto text-[10px] font-black bg-blue-600 text-white px-2 py-0.5 rounded-full">
+            {todayBadge()} 記錄
+          </span>
+        )}
       </div>
       {isDone ? (
         <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3 leading-relaxed whitespace-pre-wrap">
@@ -119,7 +129,7 @@ function BuyerDetail({ d, noteInput, setNoteInput, isDone }: {
       <DetailRow icon={<Clock className="w-4 h-4" />}      label="下次追蹤" value={d.next_follow_up_date} />
       {d.notes && <HistoryBlock history={d.notes} color="blue" />}
       <NoteInput
-        label="這次追蹤說了什麼"
+        label="這次追蹤事項"
         placeholder="例：對方說預算可能提高，請下週再報新案..."
         value={noteInput}
         onChange={setNoteInput}
