@@ -69,7 +69,7 @@ artifacts/tobe-nexus/src/
 
 ## OpenAI Integration
 
-- **Primary:** `/api/generate-fb` — gpt-5.2 + streaming, uses `AI_INTEGRATIONS_OPENAI_BASE_URL` / `AI_INTEGRATIONS_OPENAI_API_KEY` (Replit AI Integrations, no own key required)
+- **Primary:** `/api/generate-fb` — gpt-5.2 + streaming, uses `OPENAI_API_KEY` (user's own key, direct OpenAI API)
 - **Legacy:** `/api/generate-copy` — gpt-4o-mini, uses `OPENAI_API_KEY` secret
 
 ## Client Accounts
