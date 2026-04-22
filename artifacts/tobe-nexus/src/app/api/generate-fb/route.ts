@@ -47,11 +47,9 @@ export async function POST(req: NextRequest) {
 
   const infoLine2 = isLandProperty
     ? [
-        `💰 ${price}萬`,
         landPing ? `地坪${landPing}坪` : null,
       ].filter(Boolean).join('｜')
     : [
-        `💰 ${price}萬`,
         ping ? `📏 ${ping}坪` : null,
         parking || null,
         layout,
