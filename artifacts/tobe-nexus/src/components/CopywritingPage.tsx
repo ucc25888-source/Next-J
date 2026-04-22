@@ -43,7 +43,8 @@ const TAG_MODE_LABELS: { value: TagMode; label: string }[] = [
   { value: 'land', label: '土地' },
 ];
 
-const FULL_CTA = `💬 想看內部影片或索取謄本
+const buildCTA = (location: string) =>
+`💬 想了解更多細節或${location}行情？
 點擊下方連結，語音諮詢福哥：
 👉 https://bit.ly/4sJhSzs
 
@@ -166,7 +167,8 @@ export default function CopywritingPage({ id }: { id: string }) {
       }
 
       const HASHTAGS = `#珍選好福邸 #花蓮房產顧問福哥 #TOBENexus`;
-      const finalContent = `${fullText.trim()}\n\n${FULL_CTA}\n\n${HASHTAGS}`;
+      const area = locationOverride || property.subarea;
+      const finalContent = `${fullText.trim()}\n\n${buildCTA(area)}\n\n${HASHTAGS}`;
       setContent(finalContent);
 
       const copyRecord: Copy = {
