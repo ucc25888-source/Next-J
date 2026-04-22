@@ -138,6 +138,7 @@ function ShowingDetail({ d, noteInput, setNoteInput, isDone }: {
       <DetailRow icon={<CalendarCheck className="w-4 h-4" />} label="帶看日期" value={d.showing_date} />
       <DetailRow icon={<StickyNote className="w-4 h-4" />}    label="買方反應" value={d.reaction} />
       <DetailRow icon={<Clock className="w-4 h-4" />}         label="回訪日期" value={d.follow_up_date} />
+      {d.follow_up && <HistoryBlock history={d.follow_up} color="blue" />}
       <NoteInput
         label="這次追蹤事項"
         placeholder="例：傳新物件、確認下次帶看時間、對方說預算可以提高..."
@@ -227,9 +228,7 @@ export function DailyFocusDrawer({
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         setDetail(data);
-        if (item.type === "showing") setNoteInput(data?.follow_up ?? "");
-        if (item.type === "colisting") setNoteInput(data?.colisting_notes ?? "");
-        // buyer & property: blank textarea, history shown separately
+        // All types: blank textarea; history shown separately in HistoryBlock
       })
       .catch(() => setDetail(null))
       .finally(() => setLoading(false));
@@ -260,19 +259,37 @@ export function DailyFocusDrawer({
         });
       }
 
-      if (item.type === "showing") {
+      if (item.type === "showing" && noteInput.trim()) {
+        const newEntry = `[${todayLabel()}] ${noteInput.trim()}`;
+        const existing = detail?.follow_up?.trim() ?? "";
+        const merged = existing ? `${newEntry}\n${existing}` : newEntry;
         await fetch(`/api/showings/${item.source_id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ follow_up_done: true, follow_up: noteInput.trim() }),
+          body: JSON.stringify({ follow_up_done: true, follow_up: merged }),
+        });
+      } else if (item.type === "showing") {
+        await fetch(`/api/showings/${item.source_id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ follow_up_done: true }),
         });
       }
 
-      if (item.type === "colisting") {
+      if (item.type === "colisting" && noteInput.trim()) {
+        const newEntry = `[${todayLabel()}] ${noteInput.trim()}`;
+        const existing = detail?.colisting_notes?.trim() ?? "";
+        const merged = existing ? `${newEntry}\n${existing}` : newEntry;
         await fetch(`/api/properties/${item.source_id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ colisting_last_check: today, colisting_notes: noteInput.trim() }),
+          body: JSON.stringify({ colisting_last_check: today, colisting_notes: merged }),
+        });
+      } else if (item.type === "colisting") {
+        await fetch(`/api/properties/${item.source_id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ colisting_last_check: today }),
         });
       }
 
