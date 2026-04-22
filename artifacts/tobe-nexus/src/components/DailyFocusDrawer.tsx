@@ -3,7 +3,7 @@
 import {
   X, Phone, MapPin, Wallet, StickyNote, Clock,
   Building, Building2, CalendarCheck, Handshake, CheckCircle2,
-  ChevronRight, PenLine,
+  ChevronRight, PenLine, Save,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -25,6 +25,51 @@ function DetailRow({
         <p className="text-xs text-slate-500 font-medium mb-0.5">{label}</p>
         <p className="text-sm font-bold text-slate-800 break-words">{String(value)}</p>
       </div>
+    </div>
+  );
+}
+
+/* ── Accumulated history display ──────────────────────────────────── */
+function HistoryBlock({ history, color = "blue" }: { history: string; color?: "blue" | "amber" }) {
+  if (!history.trim()) return null;
+  const bg = color === "amber" ? "bg-amber-50 border-amber-200" : "bg-blue-50 border-blue-200";
+  const title = color === "amber" ? "text-amber-700" : "text-blue-700";
+  const text = color === "amber" ? "text-amber-900" : "text-blue-900";
+  return (
+    <div className={`rounded-xl border px-3.5 py-3 ${bg}`}>
+      <p className={`text-[10px] font-bold mb-1.5 ${title}`}>累積記錄</p>
+      <p className={`text-xs leading-relaxed whitespace-pre-wrap ${text}`}>{history.trim()}</p>
+    </div>
+  );
+}
+
+/* ── Notes input block ─────────────────────────────────────────────── */
+function NoteInput({
+  label, placeholder, value, onChange, isDone,
+}: {
+  label: string; placeholder: string;
+  value: string; onChange: (v: string) => void;
+  isDone?: boolean;
+}) {
+  return (
+    <div className="pt-3">
+      <div className="flex items-center gap-2 mb-2">
+        <PenLine className="w-4 h-4 text-blue-500" />
+        <p className="text-xs font-bold text-blue-700">{label}</p>
+      </div>
+      {isDone ? (
+        <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3 leading-relaxed whitespace-pre-wrap">
+          {value || "（無紀錄）"}
+        </p>
+      ) : (
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          rows={4}
+          className="w-full text-sm text-slate-800 bg-blue-50/60 border border-blue-200 rounded-xl px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-300 placeholder:text-slate-400 leading-relaxed"
+        />
+      )}
     </div>
   );
 }
@@ -51,93 +96,100 @@ interface DetailData {
   colisting_company?: string;
   colisting_contact?: string;
   colisting_last_check?: string | null;
+  colisting_notes?: string;
   contract_end_date?: string;
   status_now?: string;
   price_wan?: number;
   address_note?: string;
+  owner_follow_up_notes?: string;
 }
 
-function BuyerDetail({ d }: { d: DetailData }) {
+function BuyerDetail({ d, noteInput, setNoteInput, isDone }: {
+  d: DetailData; noteInput: string; setNoteInput: (v: string) => void; isDone: boolean;
+}) {
   const budget = d.budget_min || d.budget_max
-    ? `${d.budget_min ?? 0} ~ ${d.budget_max ?? 0} 萬`
-    : null;
+    ? `${d.budget_min ?? 0} ~ ${d.budget_max ?? 0} 萬` : null;
   return (
     <>
-      <DetailRow icon={<Phone className="w-4 h-4" />}    label="聯絡電話" value={d.phone} />
-      <DetailRow icon={<Wallet className="w-4 h-4" />}   label="預算範圍" value={budget} />
-      <DetailRow icon={<Building2 className="w-4 h-4" />} label="偏好房型" value={d.pref_property_type} />
-      <DetailRow icon={<MapPin className="w-4 h-4" />}   label="偏好區域" value={d.pref_area} />
-      <DetailRow icon={<Building className="w-4 h-4" />} label="偏好格局" value={d.pref_rooms ? `${d.pref_rooms}房` : null} />
-      <DetailRow icon={<Clock className="w-4 h-4" />}    label="下次追蹤" value={d.next_follow_up_date} />
-      <DetailRow icon={<StickyNote className="w-4 h-4" />} label="備註"  value={d.notes} />
+      <DetailRow icon={<Phone className="w-4 h-4" />}      label="聯絡電話" value={d.phone} />
+      <DetailRow icon={<Wallet className="w-4 h-4" />}     label="預算範圍" value={budget} />
+      <DetailRow icon={<Building2 className="w-4 h-4" />}  label="偏好房型" value={d.pref_property_type} />
+      <DetailRow icon={<MapPin className="w-4 h-4" />}     label="偏好區域" value={d.pref_area} />
+      <DetailRow icon={<Building className="w-4 h-4" />}   label="偏好格局" value={d.pref_rooms ? `${d.pref_rooms}房` : null} />
+      <DetailRow icon={<Clock className="w-4 h-4" />}      label="下次追蹤" value={d.next_follow_up_date} />
+      {d.notes && <HistoryBlock history={d.notes} color="blue" />}
+      <NoteInput
+        label="這次追蹤說了什麼"
+        placeholder="例：對方說預算可能提高，請下週再報新案..."
+        value={noteInput}
+        onChange={setNoteInput}
+        isDone={isDone}
+      />
     </>
   );
 }
 
-function ShowingDetail({
-  d,
-  noteInput,
-  setNoteInput,
-  isDone,
-}: {
-  d: DetailData;
-  noteInput: string;
-  setNoteInput: (v: string) => void;
-  isDone: boolean;
+function ShowingDetail({ d, noteInput, setNoteInput, isDone }: {
+  d: DetailData; noteInput: string; setNoteInput: (v: string) => void; isDone: boolean;
 }) {
   return (
     <>
-      <DetailRow icon={<Phone className="w-4 h-4" />}        label="買方電話" value={d.buyer_phone} />
+      <DetailRow icon={<Phone className="w-4 h-4" />}         label="買方電話" value={d.buyer_phone} />
       <DetailRow icon={<CalendarCheck className="w-4 h-4" />} label="帶看日期" value={d.showing_date} />
-      <DetailRow icon={<StickyNote className="w-4 h-4" />}   label="買方反應" value={d.reaction} />
-      <DetailRow icon={<ChevronRight className="w-4 h-4" />} label="後續計畫" value={d.follow_up} />
-      <DetailRow icon={<Clock className="w-4 h-4" />}        label="回訪日期" value={d.follow_up_date} />
-
-      {/* Editable follow-up notes */}
-      <div className="pt-3">
-        <div className="flex items-center gap-2 mb-2">
-          <PenLine className="w-4 h-4 text-blue-500" />
-          <p className="text-xs font-bold text-blue-700">這次回訪說了什麼</p>
-        </div>
-        {isDone ? (
-          <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3 leading-relaxed whitespace-pre-wrap">
-            {noteInput || "（無紀錄）"}
-          </p>
-        ) : (
-          <textarea
-            value={noteInput}
-            onChange={(e) => setNoteInput(e.target.value)}
-            placeholder="例：對方說預算偏低，但對格局很滿意，建議帶去看 B 案..."
-            rows={4}
-            className="w-full text-sm text-slate-800 bg-blue-50/60 border border-blue-200 rounded-xl px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-300 placeholder:text-slate-400 leading-relaxed"
-          />
-        )}
-      </div>
+      <DetailRow icon={<StickyNote className="w-4 h-4" />}    label="買方反應" value={d.reaction} />
+      <DetailRow icon={<ChevronRight className="w-4 h-4" />}  label="後續計畫" value={d.follow_up} />
+      <DetailRow icon={<Clock className="w-4 h-4" />}         label="回訪日期" value={d.follow_up_date} />
+      <NoteInput
+        label="這次回訪說了什麼"
+        placeholder="例：對方說預算偏低，但對格局很滿意，建議帶去看 B 案..."
+        value={noteInput}
+        onChange={setNoteInput}
+        isDone={isDone}
+      />
     </>
   );
 }
 
-function ColistingDetail({ d }: { d: DetailData }) {
+function ColistingDetail({ d, noteInput, setNoteInput, isDone }: {
+  d: DetailData; noteInput: string; setNoteInput: (v: string) => void; isDone: boolean;
+}) {
   return (
     <>
       <DetailRow icon={<Building2 className="w-4 h-4" />}   label="物件編號"  value={d.listing_id} />
-      <DetailRow icon={<MapPin className="w-4 h-4" />}      label="地段"     value={d.subarea} />
-      <DetailRow icon={<Handshake className="w-4 h-4" />}   label="合作公司"  value={d.colisting_company} />
-      <DetailRow icon={<Phone className="w-4 h-4" />}       label="窗口聯絡"  value={d.colisting_contact} />
-      <DetailRow icon={<Clock className="w-4 h-4" />}       label="上次詢問"  value={d.colisting_last_check ?? "尚未詢問過"} />
+      <DetailRow icon={<MapPin className="w-4 h-4" />}       label="地段"      value={d.subarea} />
+      <DetailRow icon={<Handshake className="w-4 h-4" />}    label="合作公司"  value={d.colisting_company} />
+      <DetailRow icon={<Phone className="w-4 h-4" />}        label="窗口聯絡"  value={d.colisting_contact} />
+      <DetailRow icon={<Clock className="w-4 h-4" />}        label="上次詢問"  value={d.colisting_last_check ?? "尚未詢問過"} />
+      {d.colisting_notes && <HistoryBlock history={d.colisting_notes} color="blue" />}
+      <NoteInput
+        label="這次詢問說了什麼"
+        placeholder="例：對方說有意願，要確認業主同意再回覆..."
+        value={noteInput}
+        onChange={setNoteInput}
+        isDone={isDone}
+      />
     </>
   );
 }
 
-function PropertyDetail({ d }: { d: DetailData }) {
+function PropertyDetail({ d, noteInput, setNoteInput }: {
+  d: DetailData; noteInput: string; setNoteInput: (v: string) => void;
+}) {
   return (
     <>
       <DetailRow icon={<Building2 className="w-4 h-4" />}  label="物件編號"  value={d.listing_id} />
-      <DetailRow icon={<MapPin className="w-4 h-4" />}     label="地段"     value={d.subarea} />
-      <DetailRow icon={<Wallet className="w-4 h-4" />}     label="開價"     value={d.price_wan ? `${d.price_wan} 萬` : null} />
-      <DetailRow icon={<Clock className="w-4 h-4" />}      label="委託到期"  value={d.contract_end_date} />
-      <DetailRow icon={<StickyNote className="w-4 h-4" />} label="目前狀態"  value={d.status_now} />
-      <DetailRow icon={<MapPin className="w-4 h-4" />}     label="地址備註"  value={d.address_note} />
+      <DetailRow icon={<MapPin className="w-4 h-4" />}      label="地段"      value={d.subarea} />
+      <DetailRow icon={<Wallet className="w-4 h-4" />}      label="開價"      value={d.price_wan ? `${d.price_wan} 萬` : null} />
+      <DetailRow icon={<Clock className="w-4 h-4" />}       label="委託到期"  value={d.contract_end_date} />
+      <DetailRow icon={<StickyNote className="w-4 h-4" />}  label="目前狀態"  value={d.status_now} />
+      <DetailRow icon={<MapPin className="w-4 h-4" />}      label="地址備註"  value={d.address_note} />
+      {d.owner_follow_up_notes && <HistoryBlock history={d.owner_follow_up_notes} color="amber" />}
+      <NoteInput
+        label="客戶經營記錄（賣方）"
+        placeholder="例：屋主今天說最低可以談 900，下週再確認是否降價..."
+        value={noteInput}
+        onChange={setNoteInput}
+      />
     </>
   );
 }
@@ -147,10 +199,13 @@ const TYPE_LABEL: Record<string, string> = {
   buyer: "買方 CRM", showing: "帶看回訪", colisting: "同業聯賣", property: "案件委託",
 };
 
+function todayLabel() {
+  const d = new Date();
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
 export function DailyFocusDrawer({
-  item,
-  onClose,
-  onDone,
+  item, onClose, onDone,
 }: {
   item: DailyFocusItem | null;
   onClose: () => void;
@@ -173,7 +228,9 @@ export function DailyFocusDrawer({
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         setDetail(data);
-        if (data?.notes) setNoteInput(data.notes);
+        if (item.type === "showing") setNoteInput(data?.notes ?? "");
+        if (item.type === "colisting") setNoteInput(data?.colisting_notes ?? "");
+        // buyer & property: blank textarea, history shown separately
       })
       .catch(() => setDetail(null))
       .finally(() => setLoading(false));
@@ -190,14 +247,56 @@ export function DailyFocusDrawer({
   const handleComplete = async () => {
     setSaving(true);
     try {
-      if (item.type === "showing" && noteInput.trim() !== (detail?.notes ?? "")) {
+      const today = new Date().toISOString().slice(0, 10);
+      const prefix = `[${todayLabel()}] `;
+
+      if (item.type === "buyer" && noteInput.trim()) {
+        const newNote = prefix + noteInput.trim();
+        const existing = detail?.notes?.trim() ?? "";
+        const merged = existing ? `${newNote}\n${existing}` : newNote;
+        await fetch(`/api/buyers/${item.source_id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ next_follow_up_date: null, notes: merged }),
+        });
+      }
+
+      if (item.type === "showing") {
         await fetch(`/api/showings/${item.source_id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ follow_up_done: true, notes: noteInput.trim() }),
         });
       }
+
+      if (item.type === "colisting") {
+        await fetch(`/api/properties/${item.source_id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ colisting_last_check: today, colisting_notes: noteInput.trim() }),
+        });
+      }
+
       onDone(item);
+      onClose();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSavePropertyNotes = async () => {
+    if (!noteInput.trim()) { onClose(); return; }
+    setSaving(true);
+    try {
+      const prefix = `[${todayLabel()}] `;
+      const newNote = prefix + noteInput.trim();
+      const existing = detail?.owner_follow_up_notes?.trim() ?? "";
+      const merged = existing ? `${newNote}\n${existing}` : newNote;
+      await fetch(`/api/properties/${item.source_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ owner_follow_up_notes: merged }),
+      });
       onClose();
     } finally {
       setSaving(false);
@@ -249,17 +348,18 @@ export function DailyFocusDrawer({
             </div>
           ) : detail ? (
             <div className="pb-4">
-              {item.type === "buyer"     && <BuyerDetail d={detail} />}
-              {item.type === "showing"   && (
-                <ShowingDetail
-                  d={detail}
-                  noteInput={noteInput}
-                  setNoteInput={setNoteInput}
-                  isDone={item.done}
-                />
+              {item.type === "buyer" && (
+                <BuyerDetail d={detail} noteInput={noteInput} setNoteInput={setNoteInput} isDone={item.done} />
               )}
-              {item.type === "colisting" && <ColistingDetail d={detail} />}
-              {item.type === "property"  && <PropertyDetail d={detail} />}
+              {item.type === "showing" && (
+                <ShowingDetail d={detail} noteInput={noteInput} setNoteInput={setNoteInput} isDone={item.done} />
+              )}
+              {item.type === "colisting" && (
+                <ColistingDetail d={detail} noteInput={noteInput} setNoteInput={setNoteInput} isDone={item.done} />
+              )}
+              {item.type === "property" && (
+                <PropertyDetail d={detail} noteInput={noteInput} setNoteInput={setNoteInput} />
+              )}
             </div>
           ) : (
             <p className="text-center text-slate-400 py-8 text-sm">無法載入詳細資料</p>
@@ -274,6 +374,8 @@ export function DailyFocusDrawer({
           >
             關閉
           </button>
+
+          {/* Buyer / Showing / Colisting — 完成 button */}
           {canComplete && !item.done && (
             <button
               onClick={handleComplete}
@@ -284,13 +386,26 @@ export function DailyFocusDrawer({
               {saving ? "儲存中..." : "完成"}
             </button>
           )}
+
+          {/* Property — 儲存記錄 button (only when there's content) */}
+          {item.type === "property" && noteInput.trim() && (
+            <button
+              onClick={handleSavePropertyNotes}
+              disabled={saving}
+              className="flex-1 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white font-black text-sm transition-colors flex items-center justify-center gap-2"
+            >
+              <Save className="w-5 h-5" />
+              {saving ? "儲存中..." : "儲存記錄"}
+            </button>
+          )}
+          {/* Property — 前往案件 */}
           {item.type === "property" && (
             <Link
               href="/properties"
               onClick={onClose}
-              className="flex-1 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-sm transition-colors text-center flex items-center justify-center"
+              className="flex-1 py-3 rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-black text-sm transition-colors text-center flex items-center justify-center"
             >
-              查看案件
+              前往案件
             </Link>
           )}
         </div>

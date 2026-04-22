@@ -58,6 +58,7 @@ function dbRowToProperty(row: Record<string, unknown>): Property {
     ai_note: (row.ai_note as string) ?? '',
     colisting_company: (row.colisting_company as string) ?? '',
     colisting_contact: (row.colisting_contact as string) ?? '',
+    colisting_notes: (row.colisting_notes as string) ?? '',
     colisting_last_check: (() => {
       const v = row.colisting_last_check;
       if (!v) return null;
@@ -111,7 +112,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     'last_generated_at', 'last_fingerprint',
     'owner_follow_up_date', 'owner_follow_up_notes',
     'ai_note',
-    'colisting_company', 'colisting_contact', 'colisting_last_check',
+    'colisting_company', 'colisting_contact', 'colisting_last_check', 'colisting_notes',
   ];
 
   for (const key of allowed) {

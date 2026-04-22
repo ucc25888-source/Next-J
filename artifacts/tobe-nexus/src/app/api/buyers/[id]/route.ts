@@ -59,13 +59,18 @@ export async function PATCH(
   if (!session.clientId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
-  const body = await req.json() as { next_follow_up_date?: string | null };
+  const body = await req.json() as { next_follow_up_date?: string | null; notes?: string };
   const now = new Date().toISOString();
 
-  const row = await queryOne(
-    `UPDATE buyers SET next_follow_up_date=$1, updated_at=$2 WHERE id=$3 AND client_id=$4 RETURNING *`,
-    [body.next_follow_up_date || null, now, id, session.clientId]
-  );
+  const row = body.notes !== undefined
+    ? await queryOne(
+        `UPDATE buyers SET next_follow_up_date=$1, notes=$2, updated_at=$3 WHERE id=$4 AND client_id=$5 RETURNING *`,
+        [body.next_follow_up_date || null, body.notes, now, id, session.clientId]
+      )
+    : await queryOne(
+        `UPDATE buyers SET next_follow_up_date=$1, updated_at=$2 WHERE id=$3 AND client_id=$4 RETURNING *`,
+        [body.next_follow_up_date || null, now, id, session.clientId]
+      );
 
   if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ buyer: dbRowToBuyer(row as Record<string, unknown>) });
