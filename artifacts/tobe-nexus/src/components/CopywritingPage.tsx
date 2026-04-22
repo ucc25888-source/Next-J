@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePropertyStore } from '@/store/usePropertyStore';
 import { useSystemStore } from '@/store/useSystemStore';
-import { randomCTA } from '@/data/ctaSentences';
 import { getAreaDisplay } from '@/utils/areaDisplay';
-import { PostType, HookType, Copy } from '@/types';
+import { Copy } from '@/types';
 import {
   ArrowLeft, Copy as CopyIcon, Sparkles, CheckCircle2,
   Download, RefreshCw, ThumbsUp, MessageCircle, Share2, Globe,
@@ -44,33 +43,13 @@ const TAG_MODE_LABELS: { value: TagMode; label: string }[] = [
   { value: 'land', label: '土地' },
 ];
 
-const LAND_POST_TYPES: PostType[] = ['土地潛力', '資產配置', '知識教學'];
-const SHOP_POST_TYPES: PostType[] = ['商辦店面', '物件開箱', '降價急售', '知識教學', '人設生活', '成交喜報'];
+const FULL_CTA = `💬 想看內部影片或索取謄本
+點擊下方連結，語音諮詢福哥：
+👉 https://bit.ly/4sJhSzs
 
-const POST_TYPES: { value: PostType; label: string }[] = [
-  { value: '無', label: '無' },
-  { value: '物件開箱', label: '物件開箱' },
-  { value: '降價急售', label: '降價急售' },
-  { value: '知識教學', label: '知識教學' },
-  { value: '人設生活', label: '人設生活' },
-  { value: '成交喜報', label: '成交喜報' },
-  { value: '資產配置', label: '資產配置' },
-  { value: '土地潛力', label: '土地潛力' },
-  { value: '成家圓夢', label: '成家圓夢' },
-  { value: '商辦店面', label: '商辦店面' },
-];
-
-const HOOK_TYPES: { value: HookType; label: string }[] = [
-  { value: '情感溫度鉤', label: '情感溫度鉤' },
-  { value: '專業焦慮鉤', label: '專業焦慮鉤' },
-  { value: '知識佈道鉤', label: '知識佈道鉤' },
-  { value: '利益誘惑鉤', label: '利益誘惑鉤' },
-  { value: '無', label: '無（不使用開場白）' },
-];
-
-const CONTACT_BLOCK = `📞 專線：0925-997779
-🟢 LINE 直通專線：https://bit.ly/4sJhSzs
-👤 杜美珍 & 周福良 (福哥)`;
+👤 杜美珍 & 周福良 (福哥)
+📞 專線：0925-997779
+證號：(91) 登字第 010851 號`;
 
 export default function CopywritingPage({ id }: { id: string }) {
   const router = useRouter();
@@ -83,8 +62,6 @@ export default function CopywritingPage({ id }: { id: string }) {
     ? `${property.rooms}房${property.halls}廳${property.baths}衛`
     : '';
 
-  const [postType, setPostType] = useState<PostType>('無');
-  const [hookType, setHookType] = useState<HookType>('無');
   const [locationOverride, setLocationOverride] = useState(property?.subarea ?? '');
   const [highlightsText, setHighlightsText] = useState('');
   const [content, setContent] = useState('');
@@ -143,24 +120,18 @@ export default function CopywritingPage({ id }: { id: string }) {
     }
   }, []);
 
-  const handleGenerate = async (pType: PostType, hType: HookType) => {
+  const handleGenerate = async () => {
     if (!property || !currentClient || isOverQuota) return;
 
     setIsGenerating(true);
-    setPostType(pType);
-    setHookType(hType);
     setSaved(false);
     setContent('');
-
-    const cta = randomCTA(isShopProperty, isLandProperty);
 
     try {
       const resp = await fetch('/api/generate-fb', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          postType: pType,
-          hookType: hType,
           location: locationOverride || property.subarea,
           price: property.price_wan,
           ping: property.build_ping,
@@ -195,16 +166,7 @@ export default function CopywritingPage({ id }: { id: string }) {
       }
 
       const HASHTAGS = `#珍選好福邸 #花蓮房產顧問福哥 #TOBENexus`;
-      const sloganSectionRe = /===\s*珍選好福邸\s*===/g;
-      const matches = [...fullText.matchAll(sloganSectionRe)];
-      let cleanText = fullText;
-      if (matches.length > 1) {
-        // Keep only content up to the end of the last three slogan lines after the first marker
-        const secondMatchIdx = matches[1].index!;
-        // Remove from the second marker onwards (including its slogan lines)
-        cleanText = fullText.slice(0, secondMatchIdx).trimEnd();
-      }
-      const finalContent = `${cleanText}\n\n${cta}\n${CONTACT_BLOCK}\n\n${HASHTAGS}`;
+      const finalContent = `${fullText.trim()}\n\n${FULL_CTA}\n\n${HASHTAGS}`;
       setContent(finalContent);
 
       const copyRecord: Copy = {
@@ -212,7 +174,7 @@ export default function CopywritingPage({ id }: { id: string }) {
         client_id: currentClient.client_id,
         listing_id: property.listing_id || property.id,
         generated_at: new Date().toISOString(),
-        direction: `${pType}-${hType}`,
+        direction: 'FB自動',
         channel: 'FB個人/粉專',
         title: `${property.subarea} ${property.property_type}`,
         copy: finalContent,
@@ -278,55 +240,26 @@ export default function CopywritingPage({ id }: { id: string }) {
         {/* Controls */}
         <div className="space-y-5">
 
-          {/* Strategy panel */}
+          {/* Location override */}
           <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
             <div className="px-4 py-2.5 border-b border-slate-100 bg-slate-50">
-              <h2 className="text-sm font-bold text-slate-500">1. 發文策略</h2>
+              <h2 className="text-sm font-bold text-slate-500">物件地點設定</h2>
             </div>
-            <div className="p-4 space-y-3">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className={labelCls}>貼文類型</label>
-                  <select
-                    className={selectCls}
-                    value={postType}
-                    onChange={(e) => setPostType(e.target.value as PostType)}
-                  >
-                    {POST_TYPES.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelCls}>HOOK 開場白</label>
-                  <select
-                    className={selectCls}
-                    value={hookType}
-                    onChange={(e) => setHookType(e.target.value as HookType)}
-                  >
-                    {HOOK_TYPES.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className={labelCls}>地點名稱（可覆寫）</label>
-                <input
-                  className={inputCls}
-                  value={locationOverride}
-                  onChange={(e) => setLocationOverride(e.target.value)}
-                  placeholder={property.subarea}
-                />
-              </div>
+            <div className="p-4">
+              <label className={labelCls}>地點名稱（可覆寫）</label>
+              <input
+                className={inputCls}
+                value={locationOverride}
+                onChange={(e) => setLocationOverride(e.target.value)}
+                placeholder={property.subarea}
+              />
             </div>
           </div>
 
           {/* Highlights panel */}
           <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
             <div className="px-4 py-2.5 border-b border-slate-100 bg-slate-50">
-              <h2 className="text-sm font-bold text-slate-500">2. 精華亮點</h2>
+              <h2 className="text-sm font-bold text-slate-500">精華亮點</h2>
             </div>
             <div className="p-4 space-y-5">
               {/* Property quick info */}
@@ -473,7 +406,7 @@ export default function CopywritingPage({ id }: { id: string }) {
                 </div>
               ) : (
                 <button
-                  onClick={() => handleGenerate(postType, hookType)}
+                  onClick={handleGenerate}
                   disabled={isGenerating}
                   className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all glow-aurora-sm"
                 >
