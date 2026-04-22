@@ -182,8 +182,8 @@ export default function CopywritingPage({ id }: { id: string }) {
       // 後處理：校正 AI 亂改的固定文字，並補回缺失的空行
       const corrected = fullText
         .replace(/珍選好福邸｜三十年.{0,6}把關！/g, '珍選好福邸｜三十年經驗把關！')
-        .replace(/[✨🌟⭐]*\s*(?:[^\n]*真心話|顧問福哥[^\n]*話|福哥[^\n]*真心話)[：:：]?/g, '顧問福哥真心話：')
-        .replace(/([^\n])(顧問福哥真心話：)/g, '$1\n\n$2')
+        .replace(/[✨🌟⭐\s]*(?:房產三十年|顧問福哥|福哥)真心話[：:：]?/g, '顧問福哥真心話：')
+        .replace(/([^\n])\n*(顧問福哥真心話：)/g, '$1\n\n$2')
         .replace(/\n{3,}/g, '\n\n');
 
       const area = locationOverride || property.subarea;
