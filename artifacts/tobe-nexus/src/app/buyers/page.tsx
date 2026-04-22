@@ -690,6 +690,15 @@ export default function BuyersPage() {
                                       <span>{s.follow_up}</span>
                                     </p>
                                   )}
+                                  {s.notes && (
+                                    <div className="mt-1.5 flex items-start gap-1.5 bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-2">
+                                      <Bell className="w-3.5 h-3.5 shrink-0 mt-0.5 text-blue-500" />
+                                      <div>
+                                        <p className="text-[10px] font-bold text-blue-600 mb-0.5">回訪紀錄</p>
+                                        <p className="text-xs text-blue-900 leading-relaxed">{s.notes}</p>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-1 shrink-0">
                                   <button

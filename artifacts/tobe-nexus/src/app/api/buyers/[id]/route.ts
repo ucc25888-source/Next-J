@@ -3,6 +3,19 @@ import { getSession } from '@/lib/session';
 import { queryOne } from '@/lib/db';
 import { dbRowToBuyer } from '../_utils';
 
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getSession();
+  if (!session.clientId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await params;
+  const row = await queryOne('SELECT * FROM buyers WHERE id = $1 AND client_id = $2', [id, session.clientId]);
+  if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  return NextResponse.json(dbRowToBuyer(row as Record<string, unknown>));
+}
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

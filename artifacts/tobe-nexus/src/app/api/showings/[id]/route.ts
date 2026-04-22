@@ -3,6 +3,25 @@ import { getSession } from '@/lib/session';
 import { queryOne } from '@/lib/db';
 import { dbRowToShowing } from '../_utils';
 
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getSession();
+  if (!session.clientId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await params;
+  const row = await queryOne(
+    `SELECT s.*, p.subarea, p.property_type, p.listing_id
+     FROM showings s
+     LEFT JOIN properties p ON p.id = s.property_id
+     WHERE s.id = $1 AND s.client_id = $2`,
+    [id, session.clientId]
+  );
+  if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  return NextResponse.json(dbRowToShowing(row as Record<string, unknown>));
+}
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -43,12 +62,17 @@ export async function PATCH(
   if (!session.clientId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
-  const body = await req.json() as { follow_up_done?: boolean };
+  const body = await req.json() as { follow_up_done?: boolean; notes?: string };
 
-  const row = await queryOne(
-    `UPDATE showings SET follow_up_done = $1 WHERE id = $2 AND client_id = $3 RETURNING *`,
-    [body.follow_up_done ?? true, id, session.clientId]
-  );
+  const row = body.notes !== undefined
+    ? await queryOne(
+        `UPDATE showings SET follow_up_done = $1, notes = $2 WHERE id = $3 AND client_id = $4 RETURNING *`,
+        [body.follow_up_done ?? true, body.notes, id, session.clientId]
+      )
+    : await queryOne(
+        `UPDATE showings SET follow_up_done = $1 WHERE id = $2 AND client_id = $3 RETURNING *`,
+        [body.follow_up_done ?? true, id, session.clientId]
+      );
 
   if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ showing: dbRowToShowing(row as Record<string, unknown>) });

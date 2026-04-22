@@ -1,0 +1,300 @@
+"use client";
+
+import {
+  X, Phone, MapPin, Wallet, StickyNote, Clock,
+  Building, Building2, CalendarCheck, Handshake, CheckCircle2,
+  ChevronRight, PenLine,
+} from "lucide-react";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import type { DailyFocusItem } from "@/types";
+
+/* ── Row in the drawer ─────────────────────────────────────────────── */
+function DetailRow({
+  icon, label, value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value?: string | number | null;
+}) {
+  if (!value && value !== 0) return null;
+  return (
+    <div className="flex items-start gap-3 py-2.5 border-b border-slate-100 last:border-0">
+      <span className="shrink-0 text-slate-400 mt-0.5">{icon}</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-slate-500 font-medium mb-0.5">{label}</p>
+        <p className="text-sm font-bold text-slate-800 break-words">{String(value)}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ── Per-type detail sections ──────────────────────────────────────── */
+interface DetailData {
+  phone?: string;
+  budget_min?: number;
+  budget_max?: number;
+  pref_property_type?: string;
+  pref_area?: string;
+  pref_rooms?: string;
+  next_follow_up_date?: string | null;
+  notes?: string;
+  buyer_name?: string;
+  buyer_phone?: string;
+  showing_date?: string;
+  reaction?: string;
+  follow_up?: string;
+  follow_up_date?: string | null;
+  listing_id?: string;
+  subarea?: string;
+  property_type?: string;
+  colisting_company?: string;
+  colisting_contact?: string;
+  colisting_last_check?: string | null;
+  contract_end_date?: string;
+  status_now?: string;
+  price_wan?: number;
+  address_note?: string;
+}
+
+function BuyerDetail({ d }: { d: DetailData }) {
+  const budget = d.budget_min || d.budget_max
+    ? `${d.budget_min ?? 0} ~ ${d.budget_max ?? 0} 萬`
+    : null;
+  return (
+    <>
+      <DetailRow icon={<Phone className="w-4 h-4" />}    label="聯絡電話" value={d.phone} />
+      <DetailRow icon={<Wallet className="w-4 h-4" />}   label="預算範圍" value={budget} />
+      <DetailRow icon={<Building2 className="w-4 h-4" />} label="偏好房型" value={d.pref_property_type} />
+      <DetailRow icon={<MapPin className="w-4 h-4" />}   label="偏好區域" value={d.pref_area} />
+      <DetailRow icon={<Building className="w-4 h-4" />} label="偏好格局" value={d.pref_rooms ? `${d.pref_rooms}房` : null} />
+      <DetailRow icon={<Clock className="w-4 h-4" />}    label="下次追蹤" value={d.next_follow_up_date} />
+      <DetailRow icon={<StickyNote className="w-4 h-4" />} label="備註"  value={d.notes} />
+    </>
+  );
+}
+
+function ShowingDetail({
+  d,
+  noteInput,
+  setNoteInput,
+  isDone,
+}: {
+  d: DetailData;
+  noteInput: string;
+  setNoteInput: (v: string) => void;
+  isDone: boolean;
+}) {
+  return (
+    <>
+      <DetailRow icon={<Phone className="w-4 h-4" />}        label="買方電話" value={d.buyer_phone} />
+      <DetailRow icon={<CalendarCheck className="w-4 h-4" />} label="帶看日期" value={d.showing_date} />
+      <DetailRow icon={<StickyNote className="w-4 h-4" />}   label="買方反應" value={d.reaction} />
+      <DetailRow icon={<ChevronRight className="w-4 h-4" />} label="後續計畫" value={d.follow_up} />
+      <DetailRow icon={<Clock className="w-4 h-4" />}        label="回訪日期" value={d.follow_up_date} />
+
+      {/* Editable follow-up notes */}
+      <div className="pt-3">
+        <div className="flex items-center gap-2 mb-2">
+          <PenLine className="w-4 h-4 text-blue-500" />
+          <p className="text-xs font-bold text-blue-700">這次回訪說了什麼</p>
+        </div>
+        {isDone ? (
+          <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3 leading-relaxed whitespace-pre-wrap">
+            {noteInput || "（無紀錄）"}
+          </p>
+        ) : (
+          <textarea
+            value={noteInput}
+            onChange={(e) => setNoteInput(e.target.value)}
+            placeholder="例：對方說預算偏低，但對格局很滿意，建議帶去看 B 案..."
+            rows={4}
+            className="w-full text-sm text-slate-800 bg-blue-50/60 border border-blue-200 rounded-xl px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-300 placeholder:text-slate-400 leading-relaxed"
+          />
+        )}
+      </div>
+    </>
+  );
+}
+
+function ColistingDetail({ d }: { d: DetailData }) {
+  return (
+    <>
+      <DetailRow icon={<Building2 className="w-4 h-4" />}   label="物件編號"  value={d.listing_id} />
+      <DetailRow icon={<MapPin className="w-4 h-4" />}      label="地段"     value={d.subarea} />
+      <DetailRow icon={<Handshake className="w-4 h-4" />}   label="合作公司"  value={d.colisting_company} />
+      <DetailRow icon={<Phone className="w-4 h-4" />}       label="窗口聯絡"  value={d.colisting_contact} />
+      <DetailRow icon={<Clock className="w-4 h-4" />}       label="上次詢問"  value={d.colisting_last_check ?? "尚未詢問過"} />
+    </>
+  );
+}
+
+function PropertyDetail({ d }: { d: DetailData }) {
+  return (
+    <>
+      <DetailRow icon={<Building2 className="w-4 h-4" />}  label="物件編號"  value={d.listing_id} />
+      <DetailRow icon={<MapPin className="w-4 h-4" />}     label="地段"     value={d.subarea} />
+      <DetailRow icon={<Wallet className="w-4 h-4" />}     label="開價"     value={d.price_wan ? `${d.price_wan} 萬` : null} />
+      <DetailRow icon={<Clock className="w-4 h-4" />}      label="委託到期"  value={d.contract_end_date} />
+      <DetailRow icon={<StickyNote className="w-4 h-4" />} label="目前狀態"  value={d.status_now} />
+      <DetailRow icon={<MapPin className="w-4 h-4" />}     label="地址備註"  value={d.address_note} />
+    </>
+  );
+}
+
+/* ── Main drawer component ─────────────────────────────────────────── */
+const TYPE_LABEL: Record<string, string> = {
+  buyer: "買方 CRM", showing: "帶看回訪", colisting: "同業聯賣", property: "案件委託",
+};
+
+export function DailyFocusDrawer({
+  item,
+  onClose,
+  onDone,
+}: {
+  item: DailyFocusItem | null;
+  onClose: () => void;
+  onDone: (item: DailyFocusItem) => void;
+}) {
+  const [detail, setDetail] = useState<DetailData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [noteInput, setNoteInput] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!item) { setDetail(null); setNoteInput(""); return; }
+    setLoading(true);
+    const url =
+      item.type === "buyer"   ? `/api/buyers/${item.source_id}` :
+      item.type === "showing" ? `/api/showings/${item.source_id}` :
+      `/api/properties/${item.source_id}`;
+
+    fetch(url)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        setDetail(data);
+        if (data?.notes) setNoteInput(data.notes);
+      })
+      .catch(() => setDetail(null))
+      .finally(() => setLoading(false));
+  }, [item]);
+
+  if (!item) return null;
+
+  const canComplete = item.type !== "property";
+  const overdueDays = item.is_overdue
+    ? Math.ceil((Date.now() - new Date(item.date).getTime()) / 86400000)
+    : 0;
+  const typeLabel = TYPE_LABEL[item.type] ?? item.type;
+
+  const handleComplete = async () => {
+    setSaving(true);
+    try {
+      if (item.type === "showing" && noteInput.trim() !== (detail?.notes ?? "")) {
+        await fetch(`/api/showings/${item.source_id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ follow_up_done: true, notes: noteInput.trim() }),
+        });
+      }
+      onDone(item);
+      onClose();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
+
+      {/* Drawer panel */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl max-h-[88vh] flex flex-col">
+
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-slate-300" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-start gap-3 px-5 pt-3 pb-4 border-b border-slate-100">
+          <div className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full mt-0.5 shrink-0 ${
+            item.is_overdue ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700"
+          }`}>
+            <span>{typeLabel}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className={`text-lg font-black leading-tight ${item.is_overdue ? "text-red-900" : "text-slate-900"}`}>
+              {item.title}
+            </p>
+            {item.is_overdue && (
+              <span className="inline-block mt-1 text-xs font-black bg-red-600 text-white px-2 py-0.5 rounded-lg">
+                逾期 {overdueDays} 天
+              </span>
+            )}
+          </div>
+          <button onClick={onClose} className="shrink-0 p-1.5 rounded-full hover:bg-slate-100 transition-colors">
+            <X className="w-5 h-5 text-slate-500" />
+          </button>
+        </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-5 py-3">
+          {loading ? (
+            <div className="space-y-3 py-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-10 bg-slate-100 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          ) : detail ? (
+            <div className="pb-4">
+              {item.type === "buyer"     && <BuyerDetail d={detail} />}
+              {item.type === "showing"   && (
+                <ShowingDetail
+                  d={detail}
+                  noteInput={noteInput}
+                  setNoteInput={setNoteInput}
+                  isDone={item.done}
+                />
+              )}
+              {item.type === "colisting" && <ColistingDetail d={detail} />}
+              {item.type === "property"  && <PropertyDetail d={detail} />}
+            </div>
+          ) : (
+            <p className="text-center text-slate-400 py-8 text-sm">無法載入詳細資料</p>
+          )}
+        </div>
+
+        {/* Action buttons */}
+        <div className="px-5 py-4 border-t border-slate-100 flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 rounded-2xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-colors"
+          >
+            關閉
+          </button>
+          {canComplete && !item.done && (
+            <button
+              onClick={handleComplete}
+              disabled={saving}
+              className="flex-1 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white font-black text-sm transition-colors flex items-center justify-center gap-2"
+            >
+              <CheckCircle2 className="w-5 h-5" />
+              {saving ? "儲存中..." : "完成"}
+            </button>
+          )}
+          {item.type === "property" && (
+            <Link
+              href="/properties"
+              onClick={onClose}
+              className="flex-1 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-sm transition-colors text-center flex items-center justify-center"
+            >
+              查看案件
+            </Link>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}

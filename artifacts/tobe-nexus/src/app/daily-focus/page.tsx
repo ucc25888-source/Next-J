@@ -3,13 +3,15 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
+import { DailyFocusDrawer } from "@/components/DailyFocusDrawer";
 import {
   AlertCircle, CalendarCheck, CheckCircle2, Circle,
   Users, AlertTriangle, Bell, RefreshCw, Handshake, Building2,
-  Sparkles,
+  Sparkles, ChevronRight,
 } from "lucide-react";
 import type { DailyFocusItem } from "@/types";
 
+/* ─── Type metadata ─────────────────────────────────────────────────── */
 const TYPE_META: Record<string, { icon: React.ReactNode; label: string }> = {
   buyer:    { icon: <Users className="w-4 h-4" />,         label: "買方 CRM"  },
   showing:  { icon: <CalendarCheck className="w-4 h-4" />, label: "帶看回訪" },
@@ -17,12 +19,16 @@ const TYPE_META: Record<string, { icon: React.ReactNode; label: string }> = {
   property: { icon: <Building2 className="w-4 h-4" />,     label: "案件委託" },
 };
 
+
+/* ─── Task card ──────────────────────────────────────────────────────── */
 function FocusItemRow({
   item,
   onDone,
+  onClick,
 }: {
   item: DailyFocusItem;
   onDone: (item: DailyFocusItem) => void;
+  onClick: (item: DailyFocusItem) => void;
 }) {
   const meta = TYPE_META[item.type] ?? TYPE_META.buyer;
   const canComplete = item.type !== "property";
@@ -31,16 +37,19 @@ function FocusItemRow({
     : 0;
 
   return (
-    <div className={`flex items-start gap-4 p-4 rounded-2xl border-2 bg-white shadow-sm transition-all ${
-      item.done
-        ? "opacity-40 border-slate-200"
-        : item.is_overdue
-        ? "border-red-300 hover:border-red-400"
-        : "border-blue-200 hover:border-blue-300"
-    }`}>
-      {/* Checkbox */}
+    <div
+      className={`flex items-start gap-4 p-4 rounded-2xl border-2 bg-white shadow-sm transition-all cursor-pointer active:scale-[0.98] ${
+        item.done
+          ? "opacity-40 border-slate-200"
+          : item.is_overdue
+          ? "border-red-300 hover:border-red-400"
+          : "border-blue-200 hover:border-blue-300"
+      }`}
+      onClick={() => onClick(item)}
+    >
+      {/* Checkbox — stop propagation so tapping checkbox doesn't open drawer */}
       <button
-        onClick={() => canComplete && !item.done && onDone(item)}
+        onClick={(e) => { e.stopPropagation(); canComplete && !item.done && onDone(item); }}
         className={`mt-0.5 shrink-0 transition-transform ${
           canComplete && !item.done ? "cursor-pointer hover:scale-110 active:scale-95" : "cursor-default"
         }`}
@@ -55,33 +64,29 @@ function FocusItemRow({
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        {/* Type tag */}
         <div className={`inline-flex items-center gap-1.5 text-xs font-bold mb-1.5 px-2 py-0.5 rounded-full ${
-          item.is_overdue
-            ? "bg-red-100 text-red-700"
-            : "bg-blue-100 text-blue-700"
+          item.is_overdue ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700"
         }`}>
           {meta.icon}
           <span>{meta.label}</span>
         </div>
-
-        {/* Title — large, high contrast */}
         <p className={`text-lg font-black leading-tight ${
           item.done ? "line-through text-slate-400" : "text-slate-900"
         }`}>
           {item.title}
         </p>
-
-        {/* Subtitle */}
-        <p className="text-sm text-slate-600 mt-1 leading-relaxed">{item.subtitle}</p>
+        <p className="text-sm text-slate-500 mt-1 leading-relaxed line-clamp-1">{item.subtitle}</p>
+        {!item.done && (
+          <p className="text-xs text-slate-400 mt-1.5 flex items-center gap-1">
+            <ChevronRight className="w-3 h-3" />點擊查看詳細內容
+          </p>
+        )}
       </div>
 
       {/* Status badge */}
       {!item.done && (
         <span className={`shrink-0 mt-1 text-sm font-black px-3 py-1.5 rounded-xl whitespace-nowrap ${
-          item.is_overdue
-            ? "bg-red-600 text-white"
-            : "bg-blue-600 text-white"
+          item.is_overdue ? "bg-red-600 text-white" : "bg-blue-600 text-white"
         }`}>
           {item.is_overdue ? `逾期 ${overdueDays}天` : "今日"}
         </span>
@@ -90,26 +95,31 @@ function FocusItemRow({
   );
 }
 
-function PropertyAlertRow({ item }: { item: DailyFocusItem }) {
+function PropertyAlertRow({ item, onClick }: { item: DailyFocusItem; onClick: (item: DailyFocusItem) => void }) {
   return (
-    <div className="flex items-start gap-4 p-4 rounded-2xl border-2 border-amber-300 bg-white shadow-sm hover:border-amber-400 transition-all">
+    <div
+      className="flex items-start gap-4 p-4 rounded-2xl border-2 border-amber-300 bg-white shadow-sm hover:border-amber-400 transition-all cursor-pointer active:scale-[0.98]"
+      onClick={() => onClick(item)}
+    >
       <AlertTriangle className="w-7 h-7 text-amber-500 shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
         <div className="inline-flex items-center gap-1.5 text-xs font-bold mb-1.5 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
           <Building2 className="w-4 h-4" /><span>案件委託</span>
         </div>
         <p className="text-lg font-black text-slate-900 leading-tight">{item.title}</p>
-        <p className="text-sm text-slate-600 mt-1">{item.subtitle}</p>
+        <p className="text-sm text-slate-500 mt-1 line-clamp-1">{item.subtitle}</p>
+        <p className="text-xs text-slate-400 mt-1.5 flex items-center gap-1">
+          <ChevronRight className="w-3 h-3" />點擊查看詳細內容
+        </p>
       </div>
-      <Link href="/properties"
-        className="shrink-0 mt-1 text-sm font-black px-3 py-1.5 rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition-colors whitespace-nowrap">
+      <span className="shrink-0 mt-1 text-sm font-black px-3 py-1.5 rounded-xl bg-amber-500 text-white whitespace-nowrap">
         查看
-      </Link>
+      </span>
     </div>
   );
 }
 
-/* ── Section wrapper ── */
+/* ─── Section wrapper ────────────────────────────────────────────────── */
 function Section({
   colorBar, headerBg, headerText, dotClass, pulseDot = false,
   label, count, children,
@@ -122,10 +132,8 @@ function Section({
     <div className={`rounded-2xl border-2 overflow-hidden shadow-sm ${colorBar}`}>
       <div className={`flex items-center gap-2.5 px-5 py-3 ${headerBg}`}>
         <div className={`w-2.5 h-2.5 rounded-full ${dotClass} ${pulseDot ? "animate-pulse" : ""}`} />
-        <span className={`text-sm font-black uppercase tracking-wide ${headerText}`}>
-          {label}
-        </span>
-        <span className={`ml-auto text-sm font-black w-7 h-7 rounded-full flex items-center justify-center ${dotClass.replace("bg-", "bg-")} ${headerText} bg-white/60`}>
+        <span className={`text-sm font-black uppercase tracking-wide ${headerText}`}>{label}</span>
+        <span className={`ml-auto text-sm font-black w-7 h-7 rounded-full flex items-center justify-center bg-white/60 ${headerText}`}>
           {count}
         </span>
       </div>
@@ -134,9 +142,12 @@ function Section({
   );
 }
 
+/* ─── Page ───────────────────────────────────────────────────────────── */
 export default function DailyFocusPage() {
   const [focusItems, setFocusItems] = useState<DailyFocusItem[]>([]);
   const [focusLoading, setFocusLoading] = useState(true);
+  const [selectedItem, setSelectedItem] = useState<DailyFocusItem | null>(null);
+  const [fadingIds, setFadingIds] = useState<Set<string>>(new Set());
 
   const loadFocus = useCallback(async () => {
     setFocusLoading(true);
@@ -151,8 +162,20 @@ export default function DailyFocusPage() {
 
   useEffect(() => { loadFocus(); }, [loadFocus]);
 
-  const handleDone = async (item: DailyFocusItem) => {
+  const handleDone = useCallback(async (item: DailyFocusItem) => {
+    // Immediately mark as done (grayed out)
     setFocusItems((prev) => prev.map((i) => i.id === item.id ? { ...i, done: true } : i));
+
+    // Start fade-out after a short delay, then remove
+    setTimeout(() => {
+      setFadingIds((prev) => new Set(prev).add(item.id));
+      setTimeout(() => {
+        setFocusItems((prev) => prev.filter((i) => i.id !== item.id));
+        setFadingIds((prev) => { const s = new Set(prev); s.delete(item.id); return s; });
+      }, 500);
+    }, 800);
+
+    // API call
     if (item.type === "buyer") {
       await fetch(`/api/buyers/${item.source_id}`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
@@ -170,13 +193,15 @@ export default function DailyFocusPage() {
         body: JSON.stringify({ colisting_last_check: today }),
       });
     }
-  };
+  }, []);
 
-  const overdueItems   = focusItems.filter((i) => i.is_overdue && !i.done && i.type !== "property");
-  const todayItems     = focusItems.filter((i) => !i.is_overdue && !i.done && i.type !== "property");
-  const propertyAlerts = focusItems.filter((i) => i.type === "property");
-  const doneItems      = focusItems.filter((i) => i.done && i.type !== "property");
-  const totalPending   = overdueItems.length + todayItems.length;
+  const visibleItems = focusItems.filter((i) => !i.done || fadingIds.has(i.id));
+
+  const overdueItems   = visibleItems.filter((i) => i.is_overdue && !i.done && i.type !== "property");
+  const todayItems     = visibleItems.filter((i) => !i.is_overdue && !i.done && i.type !== "property");
+  const propertyAlerts = visibleItems.filter((i) => i.type === "property");
+  const fadingItems    = focusItems.filter((i) => i.done && fadingIds.has(i.id));
+  const totalPending   = focusItems.filter((i) => !i.done && i.type !== "property").length;
 
   const dateStr = new Date().toLocaleDateString("zh-TW", {
     year: "numeric", month: "long", day: "numeric", weekday: "long",
@@ -200,11 +225,9 @@ export default function DailyFocusPage() {
 
       <main className="flex-1 p-4 md:p-6 space-y-4 max-w-2xl w-full mx-auto">
 
-        {/* ── Summary banner ── */}
+        {/* Summary banner */}
         <div className={`flex items-center gap-4 px-5 py-5 rounded-2xl border-2 shadow-sm ${
-          totalPending > 0
-            ? "bg-red-50 border-red-300"
-            : "bg-emerald-50 border-emerald-300"
+          totalPending > 0 ? "bg-red-50 border-red-300" : "bg-emerald-50 border-emerald-300"
         }`}>
           <div className={`shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center ${
             totalPending > 0 ? "bg-red-200" : "bg-emerald-200"
@@ -224,9 +247,7 @@ export default function DailyFocusPage() {
             ) : (
               <>
                 <p className="text-xl font-black text-emerald-800">今日全部清零！</p>
-                <p className="text-sm font-bold text-emerald-600 mt-1">
-                  {doneItems.length > 0 ? `已完成 ${doneItems.length} 件，繼續保持！` : "目前沒有待追蹤的任務"}
-                </p>
+                <p className="text-sm font-bold text-emerald-600 mt-1">所有任務已完成，繼續保持！</p>
               </>
             )}
           </div>
@@ -235,7 +256,7 @@ export default function DailyFocusPage() {
           )}
         </div>
 
-        {/* ── Loading skeleton ── */}
+        {/* Loading */}
         {focusLoading && (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
@@ -244,60 +265,47 @@ export default function DailyFocusPage() {
           </div>
         )}
 
-        {/* ── Overdue ── */}
+        {/* Fading-out items (done, transitioning out) */}
+        {fadingItems.length > 0 && (
+          <div className="space-y-2 transition-all duration-500 opacity-0">
+            {fadingItems.map((item) => (
+              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={() => {}} />
+            ))}
+          </div>
+        )}
+
+        {/* Overdue */}
         {!focusLoading && overdueItems.length > 0 && (
-          <Section
-            colorBar="border-red-400" headerBg="bg-red-100" headerText="text-red-800"
-            dotClass="bg-red-500" pulseDot
-            label="逾期未處理" count={overdueItems.length}
-          >
+          <Section colorBar="border-red-400" headerBg="bg-red-100" headerText="text-red-800"
+            dotClass="bg-red-500" pulseDot label="逾期未處理" count={overdueItems.length}>
             {overdueItems.map((item) => (
-              <FocusItemRow key={item.id} item={item} onDone={handleDone} />
+              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={setSelectedItem} />
             ))}
           </Section>
         )}
 
-        {/* ── Today ── */}
+        {/* Today */}
         {!focusLoading && todayItems.length > 0 && (
-          <Section
-            colorBar="border-blue-300" headerBg="bg-blue-100" headerText="text-blue-800"
-            dotClass="bg-blue-500"
-            label="今日任務" count={todayItems.length}
-          >
+          <Section colorBar="border-blue-300" headerBg="bg-blue-100" headerText="text-blue-800"
+            dotClass="bg-blue-500" label="今日任務" count={todayItems.length}>
             {todayItems.map((item) => (
-              <FocusItemRow key={item.id} item={item} onDone={handleDone} />
+              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={setSelectedItem} />
             ))}
           </Section>
         )}
 
-        {/* ── Property alerts ── */}
+        {/* Property alerts */}
         {!focusLoading && propertyAlerts.length > 0 && (
-          <Section
-            colorBar="border-amber-400" headerBg="bg-amber-100" headerText="text-amber-800"
-            dotClass="bg-amber-500"
-            label="委託到期提醒" count={propertyAlerts.length}
-          >
+          <Section colorBar="border-amber-400" headerBg="bg-amber-100" headerText="text-amber-800"
+            dotClass="bg-amber-500" label="委託到期提醒" count={propertyAlerts.length}>
             {propertyAlerts.map((item) => (
-              <PropertyAlertRow key={item.id} item={item} />
+              <PropertyAlertRow key={item.id} item={item} onClick={setSelectedItem} />
             ))}
           </Section>
         )}
 
-        {/* ── Done ── */}
-        {!focusLoading && doneItems.length > 0 && (
-          <Section
-            colorBar="border-slate-200" headerBg="bg-slate-100" headerText="text-slate-600"
-            dotClass="bg-emerald-500"
-            label="已完成" count={doneItems.length}
-          >
-            {doneItems.map((item) => (
-              <FocusItemRow key={item.id} item={item} onDone={handleDone} />
-            ))}
-          </Section>
-        )}
-
-        {/* ── Empty state ── */}
-        {!focusLoading && totalPending === 0 && propertyAlerts.length === 0 && doneItems.length === 0 && (
+        {/* Empty */}
+        {!focusLoading && totalPending === 0 && propertyAlerts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border-2 border-slate-200 shadow-sm">
             <div className="w-20 h-20 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
               <Bell className="w-10 h-10 text-slate-400" />
@@ -309,13 +317,20 @@ export default function DailyFocusPage() {
           </div>
         )}
 
-        {/* ── Source hint ── */}
+        {/* Source hint */}
         {!focusLoading && (
           <p className="text-center text-xs text-slate-400 font-medium pb-2">
             來源：買方 CRM · 帶看追蹤 · 案件委託 · 同業聯賣
           </p>
         )}
       </main>
+
+      {/* Detail drawer */}
+      <DailyFocusDrawer
+        item={selectedItem}
+        onClose={() => setSelectedItem(null)}
+        onDone={handleDone}
+      />
     </div>
   );
 }

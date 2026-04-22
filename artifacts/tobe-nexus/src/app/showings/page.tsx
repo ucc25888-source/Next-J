@@ -306,9 +306,15 @@ export default function ShowingsPage() {
                       </div>
                     )}
 
-                    {/* Notes */}
+                    {/* Notes (回訪紀錄) */}
                     {s.notes && (
-                      <p className="text-[11px] text-glacier-500 leading-relaxed line-clamp-2 border-t border-slate-100 pt-2">{s.notes}</p>
+                      <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+                        <MessageSquare className="w-3 h-3 text-blue-500 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-[10px] font-bold text-blue-600 mb-0.5">回訪紀錄</p>
+                          <p className="text-[11px] text-blue-900 leading-relaxed">{s.notes}</p>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
