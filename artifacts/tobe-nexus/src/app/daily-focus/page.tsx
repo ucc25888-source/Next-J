@@ -195,10 +195,13 @@ export default function DailyFocusPage() {
   const loadLog = useCallback(async () => {
     setLogLoading(true);
     try {
-      // Pass client-side date to avoid UTC/local timezone mismatch
+      // Pass client-side date (both full and short format) to avoid UTC/local timezone mismatch
       const d = new Date();
-      const clientPrefix = `[${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}]`;
-      const res = await fetch(`/api/daily-log?prefix=${encodeURIComponent(clientPrefix)}`);
+      const fullPrefix  = `[${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}]`;
+      const shortPrefix = `[${d.getMonth() + 1}/${d.getDate()}]`;
+      const res = await fetch(
+        `/api/daily-log?prefix=${encodeURIComponent(fullPrefix)}&shortPrefix=${encodeURIComponent(shortPrefix)}`
+      );
       if (res.ok) {
         const data = await res.json();
         setLogEntries(data.entries ?? []);
