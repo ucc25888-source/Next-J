@@ -685,19 +685,16 @@ export default function BuyersPage() {
                                     <p className="text-sm font-semibold text-slate-700 leading-snug">{propTitle}</p>
                                   )}
                                   {s.follow_up && (
-                                    <p className="text-sm text-amber-700 mt-1 flex items-start gap-1.5 font-medium">
-                                      <MessageSquare className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                                      <span>{s.follow_up}</span>
-                                    </p>
-                                  )}
-                                  {s.notes && (
                                     <div className="mt-1.5 flex items-start gap-1.5 bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-2">
                                       <Bell className="w-3.5 h-3.5 shrink-0 mt-0.5 text-blue-500" />
                                       <div>
-                                        <p className="text-[10px] font-bold text-blue-600 mb-0.5">回訪紀錄</p>
-                                        <p className="text-xs text-blue-900 leading-relaxed">{s.notes}</p>
+                                        <p className="text-[10px] font-bold text-blue-600 mb-0.5">追蹤事項</p>
+                                        <p className="text-xs text-blue-900 leading-relaxed">{s.follow_up}</p>
                                       </div>
                                     </div>
+                                  )}
+                                  {s.notes && (
+                                    <p className="text-xs text-slate-500 mt-1 pl-1">備註：{s.notes}</p>
                                   )}
                                 </div>
                                 <div className="flex items-center gap-1 shrink-0">

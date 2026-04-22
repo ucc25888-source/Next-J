@@ -137,11 +137,10 @@ function ShowingDetail({ d, noteInput, setNoteInput, isDone }: {
       <DetailRow icon={<Phone className="w-4 h-4" />}         label="買方電話" value={d.buyer_phone} />
       <DetailRow icon={<CalendarCheck className="w-4 h-4" />} label="帶看日期" value={d.showing_date} />
       <DetailRow icon={<StickyNote className="w-4 h-4" />}    label="買方反應" value={d.reaction} />
-      <DetailRow icon={<ChevronRight className="w-4 h-4" />}  label="後續計畫" value={d.follow_up} />
       <DetailRow icon={<Clock className="w-4 h-4" />}         label="回訪日期" value={d.follow_up_date} />
       <NoteInput
-        label="這次回訪說了什麼"
-        placeholder="例：對方說預算偏低，但對格局很滿意，建議帶去看 B 案..."
+        label="這次追蹤事項"
+        placeholder="例：傳新物件、確認下次帶看時間、對方說預算可以提高..."
         value={noteInput}
         onChange={setNoteInput}
         isDone={isDone}
@@ -228,7 +227,7 @@ export function DailyFocusDrawer({
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         setDetail(data);
-        if (item.type === "showing") setNoteInput(data?.notes ?? "");
+        if (item.type === "showing") setNoteInput(data?.follow_up ?? "");
         if (item.type === "colisting") setNoteInput(data?.colisting_notes ?? "");
         // buyer & property: blank textarea, history shown separately
       })
@@ -265,7 +264,7 @@ export function DailyFocusDrawer({
         await fetch(`/api/showings/${item.source_id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ follow_up_done: true, notes: noteInput.trim() }),
+          body: JSON.stringify({ follow_up_done: true, follow_up: noteInput.trim() }),
         });
       }
 

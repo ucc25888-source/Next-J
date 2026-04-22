@@ -62,9 +62,14 @@ export async function PATCH(
   if (!session.clientId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
-  const body = await req.json() as { follow_up_done?: boolean; notes?: string };
+  const body = await req.json() as { follow_up_done?: boolean; follow_up?: string; notes?: string };
 
-  const row = body.notes !== undefined
+  const row = body.follow_up !== undefined
+    ? await queryOne(
+        `UPDATE showings SET follow_up_done = $1, follow_up = $2 WHERE id = $3 AND client_id = $4 RETURNING *`,
+        [body.follow_up_done ?? true, body.follow_up, id, session.clientId]
+      )
+    : body.notes !== undefined
     ? await queryOne(
         `UPDATE showings SET follow_up_done = $1, notes = $2 WHERE id = $3 AND client_id = $4 RETURNING *`,
         [body.follow_up_done ?? true, body.notes, id, session.clientId]
