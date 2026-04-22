@@ -11,21 +11,22 @@ import {
   Download, RefreshCw, ThumbsUp, MessageCircle, Share2, Globe,
 } from 'lucide-react';
 
-type TagMode = 'residential' | 'land' | 'shop';
+type TagMode = 'residential' | 'apartment' | 'shop' | 'land';
 
 const TAG_LIBRARY: Record<TagMode, string[]> = {
   residential: [
     '低於實價登錄', '近市區機能', '景觀採光佳', '格局方正漂亮',
     '近車站通勤', '有車位好停車', '屋況佳免整理', '低總價好入手',
-    '低公設比', '新屋/新裝潢', '學區首選', '邊間三面採光',
-    '一層一戶', '電梯大樓管理', '近公園/生活圈', '稀有釋出',
-    '可隔套好出租', '高投報收租', '稀有急售', '重劃開發潛力',
+    '新屋/新裝潢', '學區首選', '邊間三面採光', '一層一戶',
+    '近公園/生活圈', '稀有釋出', '可隔套好出租', '高投報收租',
+    '稀有急售', '重劃開發潛力', '前後院好利用', '獨棟自由規劃',
   ],
-  land: [
-    '地形方正漂亮', '大面寬好規劃', '臨大馬路好進出', '特定農業區',
-    '建商開發首選', '可蓋夢想家', '投資重劃核心', '合法資材室',
-    '產權單純乾淨', '變更潛力大', '稀有大坪數', '可當農場民宿',
-    '適合資產配置', '節稅規劃首選', '水源路徑清晰', '地形平坦好用',
+  apartment: [
+    '低公設比', '電梯大樓管理', '一層一戶', '管理室保全',
+    '景觀採光佳', '格局方正漂亮', '低於實價登錄', '屋況佳免整理',
+    '低總價好入手', '學區首選', '近市區機能', '近公園/生活圈',
+    '近車站通勤', '高樓層視野好', '有車位好停車', '新屋/新裝潢',
+    '稀有釋出', '可隔套好出租', '高投報收租', '社區環境整潔',
   ],
   shop: [
     '黃金路段人流旺', '一樓黃金店面', '大面寬好招牌', '角間三面曝光',
@@ -35,13 +36,22 @@ const TAG_LIBRARY: Record<TagMode, string[]> = {
     '格局方正好規劃', '屋況佳即可開業', '低總價好入手', '低於實價登錄',
     '空間利用率高', '整棟釋出稀有', '稀有釋出', '急售可談',
   ],
+  land: [
+    '地形方正漂亮', '大面寬好規劃', '臨大馬路好進出', '特定農業區',
+    '建商開發首選', '可蓋夢想家', '投資重劃核心', '合法資材室',
+    '產權單純乾淨', '變更潛力大', '稀有大坪數', '可當農場民宿',
+    '適合資產配置', '節稅規劃首選', '水源路徑清晰', '地形平坦好用',
+  ],
 };
 
 const TAG_MODE_LABELS: { value: TagMode; label: string }[] = [
-  { value: 'residential', label: '住宅' },
+  { value: 'residential', label: '別墅/透天' },
+  { value: 'apartment', label: '電梯/公寓' },
   { value: 'shop', label: '店面/商辦' },
   { value: 'land', label: '土地' },
 ];
+
+const APARTMENT_PROPERTY_TYPES = ['公寓', '電梯', '大樓', '華廈'];
 
 const buildCTA = (location: string) =>
 `💬 想了解更多細節或${location}行情？
@@ -97,7 +107,8 @@ export default function CopywritingPage({ id }: { id: string }) {
     }).join('\n');
   };
 
-  const defaultTagMode: TagMode = isLandProperty ? 'land' : isShopProperty ? 'shop' : 'residential';
+  const isApartmentProperty = APARTMENT_PROPERTY_TYPES.some(k => (property?.property_type ?? '').includes(k));
+  const defaultTagMode: TagMode = isLandProperty ? 'land' : isShopProperty ? 'shop' : isApartmentProperty ? 'apartment' : 'residential';
   const [tagMode, setTagMode] = useState<TagMode>(defaultTagMode);
   const activeTags = TAG_LIBRARY[tagMode];
   const selectedTagSet = new Set(
