@@ -3,15 +3,27 @@ import OpenAI from 'openai';
 import { getSession } from '@/lib/session';
 import { queryOne, query } from '@/lib/db';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAIClient(clientId: string): OpenAI {
+  const isDevAccount = (() => {
+    if (clientId === 'ADMIN') return true;
+    const m = clientId.match(/^A(\d+)$/i);
+    return m ? parseInt(m[1], 10) <= 1000 : false;
+  })();
+
+  return new OpenAI({
+    apiKey: isDevAccount
+      ? process.env.DEV_OPENAI_API_KEY
+      : process.env.OPENAI_API_KEY,
+  });
+}
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session.clientId) {
     return NextResponse.json({ error: '請先登入' }, { status: 401 });
   }
+
+  const openai = getOpenAIClient(session.clientId);
 
   const currentMonthKey = new Date().toISOString().slice(0, 7).replace('-', '');
 
