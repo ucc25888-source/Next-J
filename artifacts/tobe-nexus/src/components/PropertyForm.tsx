@@ -746,11 +746,11 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                           disabled={!selected && form.must_say_3.length >= 3}
                           className={`text-left px-3 py-2 rounded-lg text-xs border transition-all ${
                             selected
-                              ? 'bg-aurora-500/25 border-aurora-500 text-aurora-300 font-semibold'
+                              ? 'bg-aurora-500 border-aurora-600 text-white font-semibold shadow-sm'
                               : 'bg-titanium-800 border-glacier-200/[0.07] text-glacier-400 hover:border-glacier-200/15 disabled:opacity-40 disabled:cursor-not-allowed'
                           }`}
                         >
-                          {selected && <span className="text-aurora-400 mr-1 font-bold">✓</span>}
+                          {selected && <span className="text-white mr-1 font-bold">✓</span>}
                           {o.value.split(' | ')[0]}
                         </button>
                       );
