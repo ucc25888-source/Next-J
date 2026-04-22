@@ -46,7 +46,7 @@ function HistoryBlock({ history, color = "blue" }: { history: string; color?: "b
 /* ── Notes input block ─────────────────────────────────────────────── */
 function todayBadge() {
   const d = new Date();
-  return `${d.getMonth() + 1}/${d.getDate()}`;
+  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 function NoteInput({
@@ -211,7 +211,7 @@ const TYPE_LABEL: Record<string, string> = {
 
 function todayLabel() {
   const d = new Date();
-  return `${d.getMonth() + 1}/${d.getDate()}`;
+  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 export function DailyFocusDrawer({
