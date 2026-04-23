@@ -102,6 +102,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     img2_url: '',
     img3_url: '',
     img4_url: '',
+    img5_url: '',
     owner_follow_up_date: '',
     owner_follow_up_notes: '',
     colisting_company: '',
@@ -173,6 +174,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       img2_url: property.img2_url,
       img3_url: property.img3_url,
       img4_url: property.img4_url,
+      img5_url: property.img5_url ?? '',
       owner_follow_up_date: property.owner_follow_up_date ?? '',
       owner_follow_up_notes: property.owner_follow_up_notes ?? '',
       colisting_company: property.colisting_company ?? '',
@@ -228,7 +230,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       return next;
     });
 
-  const handleImageUpload = async (file: File, index: 1 | 2 | 3 | 4) => {
+  const handleImageUpload = async (file: File, index: 1 | 2 | 3 | 4 | 5) => {
     try {
       const base64Url = await compressImage(file, 1200, 0.85, 900);
       setForm((prev) => ({ ...prev, [`img${index}_url`]: base64Url }));
@@ -241,7 +243,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     setForm((prev) => {
       const already = prev.must_say_3.includes(val);
       if (already) return { ...prev, must_say_3: prev.must_say_3.filter((v) => v !== val) };
-      if (prev.must_say_3.length >= 3) return prev;
+      if (prev.must_say_3.length >= 5) return prev;
       return { ...prev, must_say_3: [...prev.must_say_3, val] };
     });
   };
@@ -293,6 +295,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       img2_url: form.img2_url,
       img3_url: form.img3_url,
       img4_url: form.img4_url,
+      img5_url: form.img5_url,
       owner_follow_up_date: form.owner_follow_up_date || '',
       owner_follow_up_notes: form.owner_follow_up_notes,
       colisting_company: form.colisting_company,
@@ -309,8 +312,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const inputCls = 'w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-glacier-200 placeholder:text-glacier-500 focus:outline-none focus:border-aurora-500/60 focus:ring-1 focus:ring-aurora-500/20 transition-colors';
   const selectCls = `${inputCls} cursor-pointer`;
 
-  const imageSlots = [1, 2, 3, 4] as const;
-  const imgKeys = { 1: 'img1_url', 2: 'img2_url', 3: 'img3_url', 4: 'img4_url' } as const;
+  const imageSlots = [1, 2, 3, 4, 5] as const;
+  const imgKeys = { 1: 'img1_url', 2: 'img2_url', 3: 'img3_url', 4: 'img4_url', 5: 'img5_url' } as const;
 
   const TABS = [
     { label: '基本資料', icon: MapPin },
@@ -730,7 +733,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
                 <div className="md:col-span-3">
                   <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-3">
-                    必講 3 點 <span className="text-glacier-600 normal-case tracking-normal font-normal">（最多選 3 項，已選 {form.must_say_3.length}/3）</span>
+                    綜合賣點 <span className="text-glacier-600 normal-case tracking-normal font-normal">（最多選 5 項，已選 {form.must_say_3.length}/5）</span>
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-52 overflow-y-auto pr-1">
                     {activePoints.map((o) => {
@@ -740,7 +743,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                           key={o.value}
                           type="button"
                           onClick={() => toggleMustSay(o.value)}
-                          disabled={!selected && form.must_say_3.length >= 3}
+                          disabled={!selected && form.must_say_3.length >= 5}
                           className={`text-left px-3 py-2 rounded-lg text-xs border transition-all ${
                             selected
                               ? 'bg-aurora-500 border-aurora-600 text-white font-semibold shadow-sm'

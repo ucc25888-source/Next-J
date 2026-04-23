@@ -176,7 +176,12 @@ ${infoLine2}
         {
           role: 'user',
           content: highlights
-            ? `【精華亮點 — 三個✅賣點必須取材於此，優先使用原文或精煉改寫，禁止忽略】\n${highlights}`
+            ? (() => {
+                const lines = highlights.split('\n').map((l: string) => l.trim()).filter(Boolean);
+                return lines.length > 3
+                  ? `【綜合賣點（共${lines.length}項）— 請從中挑選最具市場競爭力的 3 項作為✅賣點，其餘可融入感言或捨棄，禁止全部列出】\n${highlights}`
+                  : `【精華亮點 — 三個✅賣點必須取材於此，優先使用原文或精煉改寫，禁止忽略】\n${highlights}`;
+              })()
             : `【未提供精華亮點】請根據物件地點「${location}」、類型「${propertyType}」與售價「${price}萬」自行判斷合適的賣點。`,
         },
       ],

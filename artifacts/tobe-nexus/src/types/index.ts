@@ -41,6 +41,7 @@ export interface Property {
   img2_url: string;
   img3_url: string;
   img4_url: string;
+  img5_url: string;
   garden_area?: string;
   owner_follow_up_date?: string | null;
   owner_follow_up_notes?: string;
