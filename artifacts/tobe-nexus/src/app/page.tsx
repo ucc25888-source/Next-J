@@ -9,8 +9,19 @@ import {
   Building2, Sparkles, TrendingUp, ChevronRight,
   ArrowUpRight, Plus, PenTool,
   AlertCircle, CheckCircle2, Bell, MoveRight,
+  CalendarCheck, Smile, Meh, ThumbsDown, Star,
 } from "lucide-react";
 import type { DailyFocusItem } from "@/types";
+
+interface ShowingReaction { reaction: string; cnt: number; }
+
+const STATUS_STYLE: Record<string, string> = {
+  "銷售中":  "bg-emerald-100 text-emerald-700",
+  "議價中":  "bg-sky-100 text-sky-700",
+  "洽談中":  "bg-sky-100 text-sky-700",
+  "已成交":  "bg-slate-100 text-slate-500",
+  "暫停銷售": "bg-orange-100 text-orange-700",
+};
 
 export default function DashboardPage() {
   const properties = usePropertyStore((s) => s.properties);
@@ -19,6 +30,8 @@ export default function DashboardPage() {
 
   const [focusItems, setFocusItems] = useState<DailyFocusItem[]>([]);
   const [focusLoading, setFocusLoading] = useState(true);
+  const [showingReactions, setShowingReactions] = useState<ShowingReaction[]>([]);
+  const [showingTotal, setShowingTotal] = useState(0);
 
   const loadFocus = useCallback(async () => {
     setFocusLoading(true);
@@ -43,6 +56,15 @@ export default function DashboardPage() {
       window.removeEventListener("focus", onFocus);
     };
   }, [loadFocus]);
+
+  useEffect(() => {
+    fetch("/api/showings/stats", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(d => {
+      if (!d) return;
+      setShowingReactions(d.reactions ?? []);
+      const total = (d.reactions ?? []).reduce((s: number, r: ShowingReaction) => s + r.cnt, 0);
+      setShowingTotal(total);
+    });
+  }, []);
 
   const activeListings    = properties.filter((p) => p.status_now === "銷售中").length;
   const negotiatingCount  = properties.filter((p) => p.status_now === "議價中" || p.status_now === "洽談中").length;
@@ -90,6 +112,13 @@ export default function DashboardPage() {
   const getTitle = (p: ReturnType<typeof usePropertyStore.getState>["properties"][0]) =>
     `${p.listing_id ? `[${p.listing_id}] ` : ""}${p.subarea} ${p.property_type}`;
 
+  const reactionConfig: Record<string, { icon: React.ReactNode; color: string; bg: string }> = {
+    "很有興趣": { icon: <Star className="w-3.5 h-3.5" />, color: "text-amber-600", bg: "bg-amber-50 border-amber-200" },
+    "有點興趣": { icon: <Smile className="w-3.5 h-3.5" />, color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" },
+    "普通":     { icon: <Meh className="w-3.5 h-3.5" />, color: "text-slate-500", bg: "bg-slate-50 border-slate-200" },
+    "否定":     { icon: <ThumbsDown className="w-3.5 h-3.5" />, color: "text-red-500", bg: "bg-red-50 border-red-200" },
+  };
+
   void copies;
 
   return (
@@ -105,7 +134,7 @@ export default function DashboardPage() {
         }
       />
 
-      <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-5 lg:space-y-7">
+      <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-5 lg:space-y-6">
 
         {/* Stats */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
@@ -131,49 +160,97 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* ── Daily Focus Section (simplified) ── */}
+        {/* ── 每日重點 (大卡片) ── */}
         <Link href="/daily-focus"
-          className="flex items-center gap-4 bg-white rounded-2xl border border-slate-200 shadow-sm px-5 py-4 hover:border-blue-300 hover:shadow-md transition-all group">
-          <div className="p-2.5 rounded-xl bg-blue-500 shadow-sm shrink-0">
-            <Bell className="w-5 h-5 text-white" />
+          className={`block rounded-2xl border shadow-sm transition-all group hover:shadow-lg hover:-translate-y-0.5
+            ${totalPending > 0
+              ? "bg-gradient-to-r from-blue-600 to-indigo-600 border-blue-500"
+              : "bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-400"}`}>
+          <div className="px-5 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-white/20 shrink-0">
+                <Bell className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-base font-black text-white tracking-tight">每日重點</p>
+                <p className="text-[11px] text-white/70 mt-0.5">
+                  {focusLoading ? "載入中…" : totalPending === 0 && alertCount === 0 ? "今日任務全部清零 🎉" : "點擊查看今日待辦清單"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 text-white/90 font-bold text-xs shrink-0">
+              {!focusLoading && totalPending === 0 && alertCount === 0 && (
+                <CheckCircle2 className="w-5 h-5 text-white" />
+              )}
+              <span>前往</span>
+              <MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-bold text-slate-800">每日重點</span>
-              {!focusLoading && totalPending > 0 && (
-                <span className="flex items-center gap-1 text-[11px] font-black px-2 py-0.5 rounded-full bg-red-500 text-white">
-                  <AlertCircle className="w-3 h-3" /> {totalPending} 件待辦
-                </span>
+
+          {!focusLoading && (overdueCount > 0 || todayCount > 0 || alertCount > 0) && (
+            <div className="px-5 pb-4 flex flex-wrap gap-2">
+              {overdueCount > 0 && (
+                <div className="flex items-center gap-1.5 bg-red-500/90 text-white rounded-full px-3 py-1.5 text-[12px] font-bold">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  逾期未處理 {overdueCount} 件
+                </div>
+              )}
+              {todayCount > 0 && (
+                <div className="flex items-center gap-1.5 bg-white/20 text-white rounded-full px-3 py-1.5 text-[12px] font-bold">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  今日待辦 {todayCount} 件
+                </div>
+              )}
+              {alertCount > 0 && (
+                <div className="flex items-center gap-1.5 bg-amber-400/80 text-white rounded-full px-3 py-1.5 text-[12px] font-bold">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  委託到期提醒 {alertCount} 件
+                </div>
               )}
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {focusLoading
-                ? "載入中…"
-                : totalPending === 0 && alertCount === 0
-                ? "今日全部清零！"
-                : [
-                    overdueCount > 0 && `逾期未處理 ${overdueCount} 件`,
-                    todayCount > 0 && `今日待辦 ${todayCount} 件`,
-                    alertCount > 0 && `委託到期提醒 ${alertCount} 件`,
-                  ].filter(Boolean).join("　｜　")
-              }
-            </p>
-          </div>
-          <div className="flex items-center gap-1 text-xs font-bold text-blue-600 shrink-0">
-            {focusLoading
-              ? null
-              : totalPending === 0 && alertCount === 0
-              ? <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-              : null
-            }
-            前往每日重點
-            <MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </div>
+          )}
         </Link>
 
-        {/* Recent Properties */}
+        {/* ── 帶看記錄引導 ── */}
+        <Link href="/showings"
+          className="block bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-orange-300 hover:shadow-md transition-all group">
+          <div className="px-5 pt-4 pb-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-orange-500 shrink-0">
+                <CalendarCheck className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-base font-black text-slate-800">帶看記錄</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  {showingTotal > 0 ? `累積 ${showingTotal} 筆帶看資料` : "尚無帶看記錄，點擊新增"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 text-xs font-bold text-orange-500 shrink-0">
+              查看全部
+              <MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+          {showingTotal > 0 && (
+            <div className="px-5 pb-4 flex flex-wrap gap-2">
+              {["很有興趣", "有點興趣", "普通", "否定"].map((reaction) => {
+                const cnt = showingReactions.find(r => r.reaction === reaction)?.cnt ?? 0;
+                const cfg = reactionConfig[reaction];
+                return (
+                  <div key={reaction}
+                    className={`flex items-center gap-1.5 border rounded-full px-3 py-1.5 text-[12px] font-bold ${cfg.bg} ${cfg.color}`}>
+                    {cfg.icon}
+                    {reaction} {cnt}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Link>
+
+        {/* ── 最新案件（緊湊清單） ── */}
         <div>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase">最新案件</p>
             <Link href="/properties"
               className="flex items-center gap-1 text-xs text-aurora-500 hover:text-aurora-400 transition-colors font-medium">
@@ -182,45 +259,38 @@ export default function DashboardPage() {
           </div>
 
           {properties.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 bg-titanium-900 border border-glacier-200/[0.06] rounded-xl">
-              <Building2 className="w-10 h-10 text-glacier-600 mb-3" />
+            <div className="flex flex-col items-center justify-center py-8 bg-titanium-900 border border-glacier-200/[0.06] rounded-xl">
+              <Building2 className="w-8 h-8 text-glacier-600 mb-2" />
               <p className="text-sm font-medium text-glacier-400">尚無案件</p>
-              <p className="text-xs text-glacier-600 mt-1">點擊「新增案件」開始建立您的委託案件資料庫</p>
+              <p className="text-xs text-glacier-600 mt-1">點擊「新增案件」開始建立委託案件資料庫</p>
             </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {properties.slice(0, 4).map((property) => (
+            <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden divide-y divide-glacier-200/[0.06]">
+              {properties.slice(0, 5).map((property) => (
                 <div key={property.id}
-                  className="group bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden hover:border-aurora-500/20 transition-all duration-200">
-                  <div className="aspect-[4/3] w-full overflow-hidden bg-titanium-800">
-                    <img
-                      src={property.img1_url || "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=800"}
-                      alt={getTitle(property)}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-titanium-700 text-glacier-500 border border-glacier-200/[0.06] font-medium">
-                        {property.rooms}房{property.halls}廳{property.baths}衛
-                      </span>
-                    </div>
-                    <h3 className="text-[13px] font-bold text-glacier-200 truncate" title={getTitle(property)}>
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-titanium-800/60 transition-colors group">
+                  <div className="flex-1 min-w-0 flex items-center gap-2.5">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${STATUS_STYLE[property.status_now ?? ""] ?? "bg-slate-100 text-slate-500"}`}>
+                      {property.status_now ?? "未設定"}
+                    </span>
+                    <span className="text-[13px] font-semibold text-glacier-200 truncate">
                       {getTitle(property)}
-                    </h3>
-                    <p className="text-lg font-bold text-aurora-500 mt-1">
-                      {property.price_wan?.toLocaleString()} <span className="text-xs font-normal text-glacier-500">萬</span>
-                    </p>
-                    <div className="flex gap-2 mt-3 pt-3 border-t border-glacier-200/[0.06]">
-                      <Link href={`/properties/${property.id}`}
-                        className="flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-medium text-glacier-400 bg-titanium-800 border border-glacier-200/[0.08] rounded-lg hover:border-glacier-200/15 hover:text-glacier-200 transition-all">
-                        <PenTool className="w-3 h-3" /> 編輯
-                      </Link>
-                      <Link href={`/generate/${property.id}`}
-                        className="flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all">
-                        <Sparkles className="w-3 h-3" /> 生文案
-                      </Link>
-                    </div>
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold text-aurora-500 shrink-0 tabular-nums">
+                    {property.price_wan?.toLocaleString()}<span className="text-[10px] font-normal text-glacier-500 ml-0.5">萬</span>
+                  </span>
+                  <div className="flex gap-1.5 shrink-0">
+                    <Link href={`/properties/${property.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium text-glacier-400 bg-titanium-800 border border-glacier-200/[0.08] rounded-lg hover:text-glacier-200 transition-all">
+                      <PenTool className="w-3 h-3" /> 編輯
+                    </Link>
+                    <Link href={`/generate/${property.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all">
+                      <Sparkles className="w-3 h-3" /> 生文案
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -230,7 +300,7 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div>
-          <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase mb-4">快捷操作</p>
+          <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase mb-3">快捷操作</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               { label: "新增案件", desc: "登錄新的委託案件資訊", href: "/properties/new", icon: Plus },
