@@ -45,9 +45,9 @@ export async function POST(req: NextRequest) {
     `INSERT INTO buyers (
       id, client_id, buyer_no, name, phone, email, line_id, source,
       budget_min, budget_max, pref_property_type, pref_area,
-      pref_rooms, pref_min_ping, status, notes, last_contact_at,
+      pref_rooms, pref_min_ping, status, notes, visit_log, last_contact_at,
       next_follow_up_date, created_at, updated_at
-    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)`,
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`,
     [
       id, session.clientId, buyerNo,
       body.name ?? '', body.phone ?? '', body.email ?? '', body.line_id ?? '',
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       Number(body.budget_min) || 0, Number(body.budget_max) || 0,
       body.pref_property_type ?? '', body.pref_area ?? '',
       body.pref_rooms ?? '', Number(body.pref_min_ping) || 0,
-      body.status ?? '潛在', body.notes ?? '',
+      body.status ?? '潛在', body.notes ?? '', body.visit_log ?? '',
       body.last_contact_at || null,
       body.next_follow_up_date || null,
       now, now,

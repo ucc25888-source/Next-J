@@ -83,7 +83,7 @@ const blankForm = {
   name: "", phone: "", email: "", line_id: "",
   source: "平台", budget_min: "", budget_max: "",
   pref_property_type: "", pref_area: "", pref_rooms: "", pref_min_ping: "",
-  status: "潛在", notes: "", last_contact_at: "", next_follow_up_date: "",
+  status: "潛在", notes: "", visit_log: "", last_contact_at: "", next_follow_up_date: "",
 };
 type FormState = typeof blankForm;
 
@@ -101,7 +101,8 @@ function toForm(b: Buyer): FormState {
     pref_property_type: b.pref_property_type, pref_area: b.pref_area,
     pref_rooms: b.pref_rooms,
     pref_min_ping: b.pref_min_ping > 0 ? String(b.pref_min_ping) : "",
-    status: b.status, notes: b.notes, last_contact_at: b.last_contact_at ?? "",
+    status: b.status, notes: b.notes, visit_log: b.visit_log,
+    last_contact_at: b.last_contact_at ?? "",
     next_follow_up_date: b.next_follow_up_date ?? "",
   };
 }
@@ -669,9 +670,27 @@ export default function BuyersPage() {
                       );
                     })()}
 
-                    {/* Notes */}
+                    {/* 備註 */}
                     {b.notes && (
-                      <p className="text-sm text-slate-600 leading-relaxed line-clamp-3 border-t border-slate-100 pt-3">{b.notes}</p>
+                      <div className="border-t border-slate-100 pt-3">
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">備註</p>
+                        <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">{b.notes}</p>
+                      </div>
+                    )}
+
+                    {/* 回訪記錄 */}
+                    {b.visit_log && (
+                      <div className={`${b.notes ? "" : "border-t border-slate-100 pt-3"}`}>
+                        <p className="text-xs font-bold text-indigo-400 uppercase tracking-wide mb-1.5">回訪記錄</p>
+                        <div className="space-y-1">
+                          {b.visit_log.split("\n").filter(Boolean).slice(0, 4).map((line, i) => (
+                            <p key={i} className="text-sm text-slate-600 leading-relaxed">{line}</p>
+                          ))}
+                          {b.visit_log.split("\n").filter(Boolean).length > 4 && (
+                            <p className="text-xs text-slate-400 italic">…更多記錄</p>
+                          )}
+                        </div>
+                      </div>
                     )}
 
                     {/* ── Showings section ── */}
@@ -1017,9 +1036,16 @@ export default function BuyersPage() {
               </div>
               <div>
                 <label className={labelCls}>備註</label>
-                <textarea className={inputCls + " resize-none"} rows={3} value={form.notes}
-                  placeholder="客戶偏好、注意事項等..."
+                <textarea className={inputCls + " resize-none"} rows={2} value={form.notes}
+                  placeholder="客戶偏好、注意事項、特殊條件等..."
                   onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} />
+              </div>
+              <div>
+                <label className={labelCls + " text-indigo-600"}>📋 回訪記錄</label>
+                <textarea className={inputCls + " resize-none font-mono text-xs"} rows={4} value={form.visit_log}
+                  placeholder={"[2026/4/23] 先不看了\n[2026/4/20] 要三房，不考慮二房"}
+                  onChange={(e) => setForm((f) => ({ ...f, visit_log: e.target.value }))} />
+                <p className="text-xs text-slate-400 mt-1">每行一筆，系統「完成」追蹤時會自動加入日期記錄</p>
               </div>
             </div>
 

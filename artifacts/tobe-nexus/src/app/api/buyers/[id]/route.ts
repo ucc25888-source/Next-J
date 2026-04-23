@@ -31,16 +31,16 @@ export async function PUT(
     `UPDATE buyers SET
       name=$1, phone=$2, email=$3, line_id=$4, source=$5,
       budget_min=$6, budget_max=$7, pref_property_type=$8, pref_area=$9,
-      pref_rooms=$10, pref_min_ping=$11, status=$12, notes=$13,
-      last_contact_at=$14, next_follow_up_date=$15, updated_at=$16
-    WHERE id=$17 AND client_id=$18`,
+      pref_rooms=$10, pref_min_ping=$11, status=$12, notes=$13, visit_log=$14,
+      last_contact_at=$15, next_follow_up_date=$16, updated_at=$17
+    WHERE id=$18 AND client_id=$19`,
     [
       body.name ?? '', body.phone ?? '', body.email ?? '', body.line_id ?? '',
       body.source ?? '平台',
       Number(body.budget_min) || 0, Number(body.budget_max) || 0,
       body.pref_property_type ?? '', body.pref_area ?? '',
       body.pref_rooms ?? '', Number(body.pref_min_ping) || 0,
-      body.status ?? '潛在', body.notes ?? '',
+      body.status ?? '潛在', body.notes ?? '', body.visit_log ?? '',
       body.last_contact_at || null,
       body.next_follow_up_date || null,
       now, id, session.clientId,
@@ -60,10 +60,15 @@ export async function PATCH(
   if (!session.clientId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
-  const body = await req.json() as { next_follow_up_date?: string | null; notes?: string };
+  const body = await req.json() as { next_follow_up_date?: string | null; visit_log?: string; notes?: string };
   const now = new Date().toISOString();
 
-  if (body.notes !== undefined) {
+  if (body.visit_log !== undefined) {
+    await query(
+      `UPDATE buyers SET next_follow_up_date=$1, visit_log=$2, last_contact_at=$3, updated_at=$4 WHERE id=$5 AND client_id=$6`,
+      [body.next_follow_up_date || null, body.visit_log, now.slice(0, 10), now, id, session.clientId]
+    );
+  } else if (body.notes !== undefined) {
     await query(
       `UPDATE buyers SET next_follow_up_date=$1, notes=$2, last_contact_at=$3, updated_at=$4 WHERE id=$5 AND client_id=$6`,
       [body.next_follow_up_date || null, body.notes, now.slice(0, 10), now, id, session.clientId]

@@ -30,6 +30,7 @@ export function dbRowToBuyer(row: Record<string, unknown>): Buyer {
     pref_min_ping: Number(row.pref_min_ping) ?? 0,
     status: (row.status as string) ?? '潛在',
     notes: (row.notes as string) ?? '',
+    visit_log: (row.visit_log as string) ?? '',
     last_contact_at: toDateStr(row.last_contact_at),
     next_follow_up_date: toDateStr(row.next_follow_up_date),
     created_at: toISOStr(row.created_at),

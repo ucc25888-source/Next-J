@@ -259,13 +259,13 @@ export function DailyFocusDrawer({
       const prefix = `[${todayLabel()}] `;
 
       if (item.type === "buyer" && noteInput.trim()) {
-        const newNote = prefix + noteInput.trim();
-        const existing = detail?.notes?.trim() ?? "";
-        const merged = existing ? `${newNote}\n${existing}` : newNote;
+        const newEntry = prefix + noteInput.trim();
+        const existing = (detail as Record<string, unknown>)?.visit_log as string | undefined;
+        const merged = existing?.trim() ? `${newEntry}\n${existing.trim()}` : newEntry;
         await fetch(`/api/buyers/${item.source_id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ next_follow_up_date: null, notes: merged }),
+          body: JSON.stringify({ next_follow_up_date: null, visit_log: merged }),
         });
       }
 

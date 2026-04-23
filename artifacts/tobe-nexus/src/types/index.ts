@@ -147,6 +147,7 @@ export interface Buyer {
   pref_min_ping: number;
   status: string;
   notes: string;
+  visit_log: string;
   last_contact_at: string | null;
   next_follow_up_date: string | null;
   created_at: string;

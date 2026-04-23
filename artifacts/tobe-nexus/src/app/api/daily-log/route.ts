@@ -55,10 +55,10 @@ export async function GET(req: NextRequest) {
   const entries: DailyLogEntry[] = [];
   const todayPrefixes = [fullPrefix, shortPrefix];
 
-  // ── Buyers: notes contains today's date ────────────────────────────
+  // ── Buyers: visit_log contains today's date ────────────────────────
   const buyerRows = await query(
-    `SELECT id, name, phone, notes FROM buyers
-     WHERE client_id = $1 AND (notes LIKE $2 OR notes LIKE $3)`,
+    `SELECT id, name, phone, visit_log FROM buyers
+     WHERE client_id = $1 AND (visit_log LIKE $2 OR visit_log LIKE $3)`,
     [clientId, fullLike, shortLike]
   );
   for (const r of buyerRows) {
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       source_id: String(r.id),
       title: r.name as string,
       subtitle: (r.phone as string) || '',
-      note: findTodayLine(r.notes as string, todayPrefixes),
+      note: findTodayLine(r.visit_log as string, todayPrefixes),
     });
   }
 
