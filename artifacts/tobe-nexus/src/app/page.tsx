@@ -139,7 +139,7 @@ export default function DashboardPage() {
         {/* ── 戰力標語 ── */}
         <div className="flex items-center justify-between gap-3 -mt-1 -mb-1">
           <p className="text-[13px] font-bold text-glacier-300 leading-snug tracking-wide">
-            跟進一次，勝過沉默三週。今天先出手。⚡
+            TOBE Nexus AI｜把繁瑣交給系統，把靈魂還給自己
           </p>
           <p className="font-signature text-[24px] text-glacier-500 leading-none shrink-0 mr-1">Veda · Du</p>
         </div>
