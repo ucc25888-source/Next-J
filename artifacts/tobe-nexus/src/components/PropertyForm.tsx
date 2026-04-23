@@ -25,7 +25,8 @@ const GEOGRAPHIC_DATA: Record<string, string[]> = {
 const LAND_PROPERTY_TYPES = ['土地 / 農地', '建地 / 工業地'];
 const TRANSPARENT_TYPES = ['透天厝 (住宅)', '透天厝 (店住)', '別墅 / 莊園'];
 const VILLA_TYPE = '別墅 / 莊園';
-const SHOP_PROPERTY_TYPES = ['透天厝 (店住)', '純店面 / 商用辦公'];
+const SHOP_PROPERTY_TYPES = ['透天厝 (店住)', '店面'];
+const OFFICE_PROPERTY_TYPES = ['商辦'];
 
 interface PropertyFormProps {
   id?: string;
@@ -49,7 +50,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const router = useRouter();
   const { addProperty, updateProperty, getPropertyById } = usePropertyStore();
   const {
-    mainPoints, landPoints, shopPoints, villaPoints, targetBuyers, propertyTypes,
+    mainPoints, landPoints, shopPoints, officePoints, villaPoints, targetBuyers, propertyTypes,
     parkingOptions, statusNowOptions, statusPushOptions,
     currentClient,
   } = useSystemStore();
@@ -120,7 +121,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const isTransparentType = TRANSPARENT_TYPES.includes(form.property_type);
   const isVilla = form.property_type === VILLA_TYPE;
   const isShopType = SHOP_PROPERTY_TYPES.includes(form.property_type);
-  const activePoints = isLandType ? landPoints : isVilla ? villaPoints : isShopType ? shopPoints : mainPoints;
+  const isOfficeType = OFFICE_PROPERTY_TYPES.includes(form.property_type);
+  const activePoints = isLandType ? landPoints : isVilla ? villaPoints : isOfficeType ? officePoints : isShopType ? shopPoints : mainPoints;
 
   const availableSubareas = useMemo(
     () => form.region_key ? (GEOGRAPHIC_DATA[form.region_key] ?? []) : [],
@@ -217,6 +219,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const getPointCategory = (pt: string) => {
     if (LAND_PROPERTY_TYPES.includes(pt)) return 'land';
     if (pt === VILLA_TYPE) return 'villa';
+    if (OFFICE_PROPERTY_TYPES.includes(pt)) return 'office';
     if (SHOP_PROPERTY_TYPES.includes(pt)) return 'shop';
     return 'main';
   };

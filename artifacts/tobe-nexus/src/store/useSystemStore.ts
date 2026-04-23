@@ -10,6 +10,7 @@ interface SystemState {
   mainPoints: OptionItem[];
   landPoints: OptionItem[];
   shopPoints: OptionItem[];
+  officePoints: OptionItem[];
   villaPoints: OptionItem[];
   targetBuyers: OptionItem[];
   propertyTypes: OptionItem[];
@@ -152,6 +153,37 @@ export const useSystemStore = create<SystemState>()((set, get) => ({
     { value: '可分層出租' },
     { value: '稀有釋出' },
     { value: '急售可談' },
+    { value: '大面寬' },
+    { value: '招牌顯眼' },
+    { value: '人潮聚集' },
+    { value: '有天然瓦斯' },
+    { value: '門口方便卸貨' },
+  ],
+  officePoints: [
+    { value: '氣派大廳' },
+    { value: '保全管理' },
+    { value: '電梯快速' },
+    { value: '好隔間採光佳' },
+    { value: '員工通勤便利' },
+    { value: '純商業分區' },
+    { value: '附設停車位' },
+    { value: '電梯設備齊全' },
+    { value: '水電充足三相電力' },
+    { value: '格局方正好規劃' },
+    { value: '挑高空間格局彈性' },
+    { value: '屋況佳即可進駐' },
+    { value: '近銀行公家機關' },
+    { value: '近花蓮火車站' },
+    { value: '空屋即刻進駐' },
+    { value: '可分層出租' },
+    { value: '現租金收益中' },
+    { value: '高投報穩收租' },
+    { value: '適合辦公工作室' },
+    { value: '重劃區增值潛力' },
+    { value: '低總價好入手' },
+    { value: '低於實價登錄' },
+    { value: '稀有釋出' },
+    { value: '急售可談' },
   ],
   villaPoints: [
     { value: '獨棟別墅隱私極佳' },
@@ -291,7 +323,8 @@ export const useSystemStore = create<SystemState>()((set, get) => ({
     { value: '透天厝 (住宅)' },
     { value: '透天厝 (店住)' },
     { value: '別墅 / 莊園' },
-    { value: '純店面 / 商用辦公' },
+    { value: '店面' },
+    { value: '商辦' },
     { value: '土地 / 農地' },
     { value: '建地 / 工業地' },
   ],

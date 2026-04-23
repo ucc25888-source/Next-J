@@ -21,7 +21,22 @@ export const generateCopywriting = (
   const title = `${subarea} ${property_type}`;
   const layoutStr = `${rooms}房${halls}廳${baths}衛${balconies}陽台`;
 
-  const baseInfo = `📍 【核心物件資訊】
+  const isOffice = property_type === '商辦';
+  const isShop   = property_type === '店面' || property_type === '透天厝 (店住)';
+
+  const baseInfo = isOffice
+    ? `📍 【核心物件資訊】
+位於${subarea}的稀有${property_type}，專為重視企業形象的經營者打造。
+總建坪 ${build_ping} 坪，格局方正、採光優越，${parking ? `附有${extractText(parking)}，` : ''}
+員工上下班動線便利，辦公效率倍增。
+現在開價 ${price_wan} 萬，是花蓮商辦市場的精選入主機會！`
+    : isShop
+    ? `📍 【核心物件資訊】
+${subarea}黃金地段的優質${property_type}，吸金人流就是您最大的資產。
+總建坪 ${build_ping} 坪，${parking ? `附有${extractText(parking)}，` : ''}
+鄰近人潮聚集核心，進出卸貨方便，開店即有穩定客源。
+現在開價 ${price_wan} 萬，是創業自營、收租投資的首選！`
+    : `📍 【核心物件資訊】
 這是一間位於${subarea}的優質${property_type}。
 總建坪達 ${build_ping} 坪，擁有 ${layoutStr} 的格局，
 ${parking ? `附有${extractText(parking)}` : '目前無車位'}。
@@ -148,6 +163,29 @@ ${mustSayStr}
 
 好的物件總是不等人！如果您也正在尋找類似的房子，
 或是您的愛屋正準備出售，請放心交給福哥！
+
+${footer}`;
+
+    case '商辦店面':
+      return isOffice
+        ? `${hookPrefix}【🏢 商辦精選 | ${subarea}${property_type} | ${price_wan}萬】
+企業形象決定客戶第一印象，辦公環境決定員工生產力！
+
+${baseInfo}
+
+${mustSayStr}
+${second ? `\n✨ 【辦公環境加分項】\n✓ ${second}` : ''}
+${target ? `\n🎯 【最適合對象】\n${target}的企業主與投資人` : ''}
+
+${footer}`
+        : `${hookPrefix}【🏪 黃金店面 | ${subarea}${property_type} | ${price_wan}萬】
+人潮就是錢潮，地段選對，生意強強滾！
+
+${baseInfo}
+
+${mustSayStr}
+${second ? `\n✨ 【經營便利加分項】\n✓ ${second}` : ''}
+${target ? `\n🎯 【最適合對象】\n${target}的創業者與投資人` : ''}
 
 ${footer}`;
 
