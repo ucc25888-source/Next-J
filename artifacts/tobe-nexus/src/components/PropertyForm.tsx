@@ -22,11 +22,14 @@ const GEOGRAPHIC_DATA: Record<string, string[]> = {
   '其他 | OT': ['外縣市聯動', '跨區整合案件'],
 };
 
-const LAND_PROPERTY_TYPES = ['土地 / 農地', '建地 / 工業地'];
-const TRANSPARENT_TYPES = ['透天厝 (住宅)', '透天厝 (店住)', '別墅 / 莊園'];
-const VILLA_TYPES = ['別墅 / 莊園', '透天厝 (住宅)'];
-const SHOP_PROPERTY_TYPES = ['透天厝 (店住)', '店面'];
-const OFFICE_PROPERTY_TYPES = ['商辦'];
+const LAND_PROPERTY_TYPES   = ['土地 / 農地', '建地 / 工業地'];
+const TRANSPARENT_TYPES     = ['透天厝 (住宅)', '透天厝 (店住)', '別墅 / 莊園'];
+const VILLA_TYPES            = ['別墅 / 莊園', '透天厝 (住宅)'];
+const SHOP_PROPERTY_TYPES    = ['透天厝 (店住)', '店面'];
+const OFFICE_PROPERTY_TYPES  = ['商辦'];
+const ELEVATOR_PROPERTY_TYPES = ['電梯大樓 / 華廈'];
+const APARTMENT_PROPERTY_TYPES = ['步梯公寓'];
+const SUITE_PROPERTY_TYPES   = ['套房'];
 
 interface PropertyFormProps {
   id?: string;
@@ -50,7 +53,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const router = useRouter();
   const { addProperty, updateProperty, getPropertyById } = usePropertyStore();
   const {
-    mainPoints, landPoints, shopPoints, officePoints, villaPoints, targetBuyers, propertyTypes,
+    commonPoints, apartmentHooks, elevatorHooks, suiteHooks, villaHooks,
+    landPoints, shopPoints, officePoints, targetBuyers, propertyTypes,
     parkingOptions, statusNowOptions, statusPushOptions,
     currentClient,
   } = useSystemStore();
@@ -117,12 +121,32 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
 
-  const isLandType = LAND_PROPERTY_TYPES.includes(form.property_type);
+  const isLandType       = LAND_PROPERTY_TYPES.includes(form.property_type);
   const isTransparentType = TRANSPARENT_TYPES.includes(form.property_type);
-  const isVilla = VILLA_TYPES.includes(form.property_type);
-  const isShopType = SHOP_PROPERTY_TYPES.includes(form.property_type);
-  const isOfficeType = OFFICE_PROPERTY_TYPES.includes(form.property_type);
-  const activePoints = isLandType ? landPoints : isVilla ? villaPoints : isOfficeType ? officePoints : isShopType ? shopPoints : mainPoints;
+  const isVilla          = VILLA_TYPES.includes(form.property_type);
+  const isShopType       = SHOP_PROPERTY_TYPES.includes(form.property_type);
+  const isOfficeType     = OFFICE_PROPERTY_TYPES.includes(form.property_type);
+  const isElevatorType   = ELEVATOR_PROPERTY_TYPES.includes(form.property_type);
+  const isApartmentType  = APARTMENT_PROPERTY_TYPES.includes(form.property_type);
+  const isSuiteType      = SUITE_PROPERTY_TYPES.includes(form.property_type);
+
+  // 取得該類型的專屬鉤子標籤（置頂顯示）
+  const typeHooks = isVilla         ? villaHooks
+                  : isElevatorType  ? elevatorHooks
+                  : isApartmentType ? apartmentHooks
+                  : isSuiteType     ? suiteHooks
+                  : [];
+
+  // 合併：鉤子在前，共用池去重在後
+  const mergedResidential = [
+    ...typeHooks,
+    ...commonPoints.filter(p => !typeHooks.some(h => h.value === p.value)),
+  ];
+
+  const activePoints = isLandType    ? landPoints
+                     : isOfficeType  ? officePoints
+                     : isShopType    ? shopPoints
+                     : mergedResidential;
 
   const availableSubareas = useMemo(
     () => form.region_key ? (GEOGRAPHIC_DATA[form.region_key] ?? []) : [],
@@ -218,10 +242,9 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
   const getPointCategory = (pt: string) => {
     if (LAND_PROPERTY_TYPES.includes(pt)) return 'land';
-    if (VILLA_TYPES.includes(pt)) return 'villa';
     if (OFFICE_PROPERTY_TYPES.includes(pt)) return 'office';
     if (SHOP_PROPERTY_TYPES.includes(pt)) return 'shop';
-    return 'main';
+    return 'residential';
   };
 
   const set = (key: string, value: string) =>
