@@ -123,8 +123,8 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <PageHeader
-        title="總覽儀表板"
-        subtitle={`歡迎回來，${currentClient?.display_name ?? "用戶"} · TOBE-Nexus Business AI Hub`}
+        title="TOBE Nexus AI"
+        subtitle="甩開燒腦負累，活成妳喜歡的樣子"
         actions={
           <Link href="/properties/new"
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm">
@@ -298,39 +298,39 @@ export default function DashboardPage() {
         {/* ── 系統亮點 ── */}
         <div>
           <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase mb-3">系統亮點</p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
               {
-                emoji: "⚡", title: "AI 文案 30 秒完成",
-                desc: "一鍵產出 Facebook / LINE 推廣文案，抓住買方眼球不用從頭想",
-                from: "from-violet-50", to: "to-purple-100", border: "border-violet-200/80",
-                titleColor: "text-violet-800", descColor: "text-violet-600",
+                emoji: "⚙️", title: "數位雙生建檔",
+                desc: "植入精通戰略的房仲大腦。用對的解方簡化流程，讓生活變好、壓力變少。",
+                href: "/properties/new",
+                from: "from-slate-700", to: "to-slate-800", border: "border-slate-600/60",
+                titleColor: "text-white", descColor: "text-slate-300",
+                ring: "hover:ring-2 hover:ring-aurora-400/50",
               },
               {
-                emoji: "🎯", title: "每日追蹤不漏接",
-                desc: "逾期未處理自動置頂，買方回訪、帶看跟進、委託到期全掌握",
-                from: "from-blue-50", to: "to-indigo-100", border: "border-blue-200/80",
-                titleColor: "text-blue-800", descColor: "text-blue-600",
+                emoji: "🪄", title: "靈感鉤子生成",
+                desc: "告別長時間服務的疲累感。AI 戰略對接 DNA，一鍵產出妳專屬的高成交文案。",
+                href: "/properties",
+                from: "from-aurora-500", to: "to-amber-400", border: "border-aurora-400/40",
+                titleColor: "text-titanium-950", descColor: "text-titanium-900/80",
+                ring: "hover:ring-2 hover:ring-aurora-300/60",
               },
               {
-                emoji: "👥", title: "買方關係全管理",
-                desc: "帶看紀錄、追蹤歷程、下次回訪日期，每位客戶狀況一目了然",
-                from: "from-emerald-50", to: "to-teal-100", border: "border-emerald-200/80",
-                titleColor: "text-emerald-800", descColor: "text-emerald-600",
-              },
-              {
-                emoji: "🏠", title: "委託案件數位化",
-                desc: "照片、賣點、定價、業主資訊集中管理，資料不再散落各處",
-                from: "from-amber-50", to: "to-orange-100", border: "border-amber-200/80",
-                titleColor: "text-amber-800", descColor: "text-amber-600",
+                emoji: "📈", title: "自由時間管理",
+                desc: "看見效率，奪回生活主導權。數據化妳的成功，支持妳去經營喜歡的人生。",
+                href: "/daily-focus",
+                from: "from-indigo-600", to: "to-blue-700", border: "border-indigo-400/40",
+                titleColor: "text-white", descColor: "text-indigo-100",
+                ring: "hover:ring-2 hover:ring-indigo-300/50",
               },
             ].map((item) => (
-              <div key={item.title}
-                className={`bg-gradient-to-br ${item.from} ${item.to} border ${item.border} rounded-2xl p-4`}>
-                <div className="text-2xl mb-2">{item.emoji}</div>
-                <p className={`text-[13px] font-black ${item.titleColor} leading-snug`}>{item.title}</p>
-                <p className={`text-[11px] ${item.descColor} mt-1.5 leading-relaxed opacity-90`}>{item.desc}</p>
-              </div>
+              <Link key={item.title} href={item.href}
+                className={`group bg-gradient-to-br ${item.from} ${item.to} border ${item.border} rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${item.ring} block`}>
+                <div className="text-3xl mb-3">{item.emoji}</div>
+                <p className={`text-[15px] font-black ${item.titleColor} leading-snug`}>{item.title}</p>
+                <p className={`text-[12px] ${item.descColor} mt-2 leading-relaxed`}>{item.desc}</p>
+              </Link>
             ))}
           </div>
         </div>
