@@ -11,13 +11,11 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.104.0",
-    "@types/pg": "^8.18.0",
     "clsx": "catalog:",
     "iron-session": "^8.0.4",
     "lucide-react": "catalog:",
     "next": "^15.3.3",
     "openai": "^4.104.0",
-    "pg": "^8.20.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwind-merge": "catalog:",

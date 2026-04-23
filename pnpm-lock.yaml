@@ -408,9 +408,6 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.104.0
         version: 2.104.0
-      '@types/pg':
-        specifier: ^8.18.0
-        version: 8.18.0
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -426,9 +423,6 @@ importers:
       openai:
         specifier: ^4.104.0
         version: 4.104.0(ws@8.20.0)(zod@3.25.76)
-      pg:
-        specifier: ^8.20.0
-        version: 8.20.0
       react:
         specifier: 'catalog:'
         version: 19.1.0
