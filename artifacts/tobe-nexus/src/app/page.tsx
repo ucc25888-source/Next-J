@@ -344,35 +344,27 @@ export default function DashboardPage() {
         {/* ── 使用流程 ── */}
         <div>
           <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase mb-3">使用流程</p>
-          <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-2xl p-5">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-2xl px-5 py-4">
+            <div className="flex items-center justify-between gap-2">
               {[
-                { step: "01", emoji: "🎯", title: "讓 AI 幫妳摸透這間房", desc: "別再靠感覺介紹。AI 自動分析買家畫像與核心賣點，帶看前就胸有成竹。", href: "/properties/new" },
-                { step: "02", emoji: "🔥", title: "買家的眼神一個都不漏", desc: "帶完看立刻記溫度。下次回電直接踩中心坎，追蹤不再踩空、不再失溫。", href: "/showings" },
-                { step: "03", emoji: "⚡", title: "30 秒出稿，讓文案替妳賣", desc: "卡文案最浪費時間。AI 讀懂房子靈魂，生出讓人衝動下訂的 FB / LINE 貼文。", href: "/properties" },
-                { step: "04", emoji: "🔔", title: "每天開機就知道要贏誰", desc: "哪個客戶要追、哪個案件快逾期，系統全幫妳盯。不靠記憶，一個機會都不漏。", href: "/daily-focus" },
+                { step: "01", emoji: "🎯", title: "AI 建案分析", href: "/properties/new" },
+                { step: "02", emoji: "🔥", title: "帶看即時記錄", href: "/showings" },
+                { step: "03", emoji: "⚡", title: "一鍵生文案", href: "/properties" },
+                { step: "04", emoji: "🔔", title: "每日戰略追蹤", href: "/daily-focus" },
               ].map((item, i, arr) => (
-                <Link key={item.step} href={item.href} className="group relative">
-                  <div className="flex flex-col items-center text-center gap-2 p-3 rounded-xl hover:bg-titanium-800/60 transition-colors">
-                    <div className="relative">
-                      <div className="w-12 h-12 rounded-2xl bg-aurora-500/10 border border-aurora-500/20 flex items-center justify-center text-2xl group-hover:bg-aurora-500/20 transition-colors">
-                        {item.emoji}
-                      </div>
-                      <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-aurora-500 text-titanium-950 text-[9px] font-black flex items-center justify-center">
-                        {item.step}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-[12px] font-bold text-glacier-200 group-hover:text-aurora-400 transition-colors leading-snug">{item.title}</p>
-                      <p className="text-[10px] text-glacier-500 mt-1 leading-relaxed">{item.desc}</p>
-                    </div>
-                  </div>
+                <div key={item.step} className="flex items-center gap-2 flex-1 min-w-0">
+                  <Link href={item.href}
+                    className="group flex items-center gap-2.5 flex-1 min-w-0 px-3 py-2.5 rounded-xl hover:bg-titanium-800/60 transition-colors">
+                    <span className="w-5 h-5 rounded-full bg-aurora-500 text-titanium-950 text-[9px] font-black flex items-center justify-center shrink-0">
+                      {item.step}
+                    </span>
+                    <span className="text-base leading-none">{item.emoji}</span>
+                    <span className="text-[11px] font-bold text-glacier-300 group-hover:text-aurora-400 transition-colors truncate">{item.title}</span>
+                  </Link>
                   {i < arr.length - 1 && (
-                    <div className="hidden md:flex absolute top-6 -right-2 w-4 h-4 items-center justify-center z-10">
-                      <ChevronRight className="w-3.5 h-3.5 text-aurora-500/50" />
-                    </div>
+                    <ChevronRight className="w-3 h-3 text-aurora-500/40 shrink-0" />
                   )}
-                </Link>
+                </div>
               ))}
             </div>
           </div>
