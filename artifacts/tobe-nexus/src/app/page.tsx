@@ -377,7 +377,7 @@ export default function DashboardPage() {
             TOBE Nexus AI 執行長—
           </p>
           <p className="text-[13px] font-bold text-glacier-400 tracking-widest mt-0.5">
-            ＶＥＤＡ．ｄｕ
+            Ｖｅｄａ．Ｄｕ
           </p>
         </div>
 
