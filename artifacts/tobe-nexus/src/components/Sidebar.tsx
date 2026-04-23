@@ -13,11 +13,13 @@ import {
   LogOut,
   Users,
   Bell,
+  CalendarCheck,
 } from "lucide-react";
 
 const navItems = [
   { label: "總覽儀表板", href: "/", icon: LayoutDashboard },
   { label: "案件管理", href: "/properties", icon: Building2 },
+  { label: "帶看紀錄", href: "/showings", icon: CalendarCheck },
   { label: "買方 CRM", href: "/buyers", icon: Users },
   { label: "AI 文案生成", href: "/ai-copy", icon: Sparkles },
   { label: "每日重點", href: "/daily-focus", icon: Bell },

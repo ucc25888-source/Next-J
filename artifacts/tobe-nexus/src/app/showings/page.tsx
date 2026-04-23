@@ -277,7 +277,7 @@ export default function ShowingsPage() {
                       </span>
                     </div>
                     <button onClick={() => handleDelete(s.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all">
+                      className="opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 active:text-red-500 active:bg-red-50 transition-all">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
