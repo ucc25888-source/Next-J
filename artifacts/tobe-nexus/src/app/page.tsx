@@ -123,8 +123,8 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <PageHeader
-        title="TOBE Nexus AI"
-        subtitle="甩開燒腦負累，活成妳喜歡的樣子"
+        title={`早安！戰鬥力滿格的${currentClient?.display_name ?? "妳"}，今天準備好要讓哪一位買家心動成交了嗎？🚀`}
+        subtitle="TOBE-Nexus Business AI Hub | 妳的成交戰略守護者"
         actions={
           <Link href="/properties/new"
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm">
