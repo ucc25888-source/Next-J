@@ -161,25 +161,25 @@ export default function DashboardPage() {
 
         {/* ── 每日重點 (大卡片) ── */}
         <Link href="/daily-focus"
-          className={`block rounded-2xl border shadow-sm transition-all group hover:shadow-lg hover:-translate-y-0.5
+          className={`block rounded-2xl border shadow-sm transition-all group hover:shadow-md hover:-translate-y-0.5
             ${totalPending > 0
-              ? "bg-gradient-to-r from-blue-600 to-indigo-600 border-blue-500"
-              : "bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-400"}`}>
+              ? "bg-white border-slate-200 border-l-4 border-l-blue-400"
+              : "bg-white border-slate-200 border-l-4 border-l-emerald-400"}`}>
           <div className="px-5 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-white/20 shrink-0">
-                <Bell className="w-5 h-5 text-white" />
+              <div className={`p-2.5 rounded-xl shrink-0 ${totalPending > 0 ? "bg-blue-100" : "bg-emerald-100"}`}>
+                <Bell className={`w-5 h-5 ${totalPending > 0 ? "text-blue-600" : "text-emerald-600"}`} />
               </div>
               <div>
-                <p className="text-base font-black text-white tracking-tight">每日重點</p>
-                <p className="text-[11px] text-white/70 mt-0.5">
+                <p className="text-base font-black text-slate-800 tracking-tight">每日重點</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
                   {focusLoading ? "載入中…" : totalPending === 0 && alertCount === 0 ? "今日任務全部清零 🎉" : "點擊查看今日待辦清單"}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 text-white/90 font-bold text-xs shrink-0">
+            <div className={`flex items-center gap-1.5 font-bold text-xs shrink-0 ${totalPending > 0 ? "text-blue-500" : "text-emerald-500"}`}>
               {!focusLoading && totalPending === 0 && alertCount === 0 && (
-                <CheckCircle2 className="w-5 h-5 text-white" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
               )}
               <span>前往</span>
               <MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -189,19 +189,19 @@ export default function DashboardPage() {
           {!focusLoading && (overdueCount > 0 || todayCount > 0 || alertCount > 0) && (
             <div className="px-5 pb-4 flex flex-wrap gap-2">
               {overdueCount > 0 && (
-                <div className="flex items-center gap-1.5 bg-red-500/90 text-white rounded-full px-3 py-1.5 text-[12px] font-bold">
+                <div className="flex items-center gap-1.5 bg-red-100 text-red-600 rounded-full px-3 py-1.5 text-[12px] font-bold">
                   <AlertCircle className="w-3.5 h-3.5" />
                   逾期未處理 {overdueCount} 件
                 </div>
               )}
               {todayCount > 0 && (
-                <div className="flex items-center gap-1.5 bg-white/20 text-white rounded-full px-3 py-1.5 text-[12px] font-bold">
+                <div className="flex items-center gap-1.5 bg-blue-100 text-blue-600 rounded-full px-3 py-1.5 text-[12px] font-bold">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   今日待辦 {todayCount} 件
                 </div>
               )}
               {alertCount > 0 && (
-                <div className="flex items-center gap-1.5 bg-amber-400/80 text-white rounded-full px-3 py-1.5 text-[12px] font-bold">
+                <div className="flex items-center gap-1.5 bg-amber-100 text-amber-600 rounded-full px-3 py-1.5 text-[12px] font-bold">
                   <AlertCircle className="w-3.5 h-3.5" />
                   委託到期提醒 {alertCount} 件
                 </div>
