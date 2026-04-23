@@ -371,6 +371,16 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+        {/* ── 品牌落款 ── */}
+        <div className="pt-2 pb-6 text-right">
+          <p className="text-[11px] text-glacier-600 leading-relaxed tracking-wide">
+            TOBE Nexus AI 執行長—
+          </p>
+          <p className="text-[13px] font-bold text-glacier-400 tracking-widest mt-0.5">
+            ＶＥＤＡ．ｄｕ
+          </p>
+        </div>
+
       </main>
     </div>
   );
