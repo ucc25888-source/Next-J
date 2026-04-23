@@ -26,7 +26,13 @@ function inlineParams(sql: string, params: unknown[]): string {
     if (val === null || val === undefined) {
       sqlVal = 'NULL';
     } else if (typeof val === 'string') {
-      sqlVal = `'${val.replace(/'/g, "''")}'`;
+      const esc = val
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "''")
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r')
+        .replace(/\t/g, '\\t');
+      sqlVal = `E'${esc}'`;
     } else if (typeof val === 'boolean') {
       sqlVal = val ? 'true' : 'false';
     } else {

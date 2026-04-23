@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
-import { queryOne } from '@/lib/db';
+import { query, queryOne } from '@/lib/db';
 import { dbRowToShowing } from '../_utils';
 
 export async function GET(
@@ -32,11 +32,11 @@ export async function PUT(
   const { id } = await params;
   const body = await req.json();
 
-  const row = await queryOne(
+  await query(
     `UPDATE showings SET
       showing_date=$1, property_id=$2, reaction=$3,
       offer_wan=$4, follow_up=$5, follow_up_date=$6, notes=$7
-    WHERE id=$8 AND client_id=$9 RETURNING *`,
+    WHERE id=$8 AND client_id=$9`,
     [
       body.showing_date ?? new Date().toISOString().slice(0, 10),
       body.property_id || null,
@@ -50,6 +50,7 @@ export async function PUT(
     ]
   );
 
+  const row = await queryOne('SELECT * FROM showings WHERE id = $1 AND client_id = $2', [id, session.clientId]);
   if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ showing: dbRowToShowing(row as Record<string, unknown>) });
 }
@@ -64,21 +65,24 @@ export async function PATCH(
   const { id } = await params;
   const body = await req.json() as { follow_up_done?: boolean; follow_up?: string; notes?: string };
 
-  const row = body.follow_up !== undefined
-    ? await queryOne(
-        `UPDATE showings SET follow_up_done = $1, follow_up = $2 WHERE id = $3 AND client_id = $4 RETURNING *`,
-        [body.follow_up_done ?? true, body.follow_up, id, session.clientId]
-      )
-    : body.notes !== undefined
-    ? await queryOne(
-        `UPDATE showings SET follow_up_done = $1, notes = $2 WHERE id = $3 AND client_id = $4 RETURNING *`,
-        [body.follow_up_done ?? true, body.notes, id, session.clientId]
-      )
-    : await queryOne(
-        `UPDATE showings SET follow_up_done = $1 WHERE id = $2 AND client_id = $3 RETURNING *`,
-        [body.follow_up_done ?? true, id, session.clientId]
-      );
+  if (body.follow_up !== undefined) {
+    await query(
+      `UPDATE showings SET follow_up_done=$1, follow_up=$2 WHERE id=$3 AND client_id=$4`,
+      [body.follow_up_done ?? true, body.follow_up, id, session.clientId]
+    );
+  } else if (body.notes !== undefined) {
+    await query(
+      `UPDATE showings SET follow_up_done=$1, notes=$2 WHERE id=$3 AND client_id=$4`,
+      [body.follow_up_done ?? true, body.notes, id, session.clientId]
+    );
+  } else {
+    await query(
+      `UPDATE showings SET follow_up_done=$1 WHERE id=$2 AND client_id=$3`,
+      [body.follow_up_done ?? true, id, session.clientId]
+    );
+  }
 
+  const row = await queryOne('SELECT * FROM showings WHERE id = $1 AND client_id = $2', [id, session.clientId]);
   if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ showing: dbRowToShowing(row as Record<string, unknown>) });
 }
@@ -91,6 +95,6 @@ export async function DELETE(
   if (!session.clientId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
-  await queryOne('DELETE FROM showings WHERE id = $1 AND client_id = $2', [id, session.clientId]);
+  await query('DELETE FROM showings WHERE id = $1 AND client_id = $2', [id, session.clientId]);
   return NextResponse.json({ ok: true });
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
-import { queryOne } from '@/lib/db';
+import { query, queryOne } from '@/lib/db';
 import { dbRowToBuyer } from '../_utils';
 
 export async function GET(
@@ -27,13 +27,13 @@ export async function PUT(
   const body = await req.json();
   const now = new Date().toISOString();
 
-  const row = await queryOne(
+  await query(
     `UPDATE buyers SET
       name=$1, phone=$2, email=$3, line_id=$4, source=$5,
       budget_min=$6, budget_max=$7, pref_property_type=$8, pref_area=$9,
       pref_rooms=$10, pref_min_ping=$11, status=$12, notes=$13,
       last_contact_at=$14, next_follow_up_date=$15, updated_at=$16
-    WHERE id=$17 AND client_id=$18 RETURNING *`,
+    WHERE id=$17 AND client_id=$18`,
     [
       body.name ?? '', body.phone ?? '', body.email ?? '', body.line_id ?? '',
       body.source ?? '平台',
@@ -47,6 +47,7 @@ export async function PUT(
     ]
   );
 
+  const row = await queryOne('SELECT * FROM buyers WHERE id = $1 AND client_id = $2', [id, session.clientId]);
   if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ buyer: dbRowToBuyer(row as Record<string, unknown>) });
 }
@@ -62,16 +63,19 @@ export async function PATCH(
   const body = await req.json() as { next_follow_up_date?: string | null; notes?: string };
   const now = new Date().toISOString();
 
-  const row = body.notes !== undefined
-    ? await queryOne(
-        `UPDATE buyers SET next_follow_up_date=$1, notes=$2, updated_at=$3 WHERE id=$4 AND client_id=$5 RETURNING *`,
-        [body.next_follow_up_date || null, body.notes, now, id, session.clientId]
-      )
-    : await queryOne(
-        `UPDATE buyers SET next_follow_up_date=$1, updated_at=$2 WHERE id=$3 AND client_id=$4 RETURNING *`,
-        [body.next_follow_up_date || null, now, id, session.clientId]
-      );
+  if (body.notes !== undefined) {
+    await query(
+      `UPDATE buyers SET next_follow_up_date=$1, notes=$2, last_contact_at=$3, updated_at=$4 WHERE id=$5 AND client_id=$6`,
+      [body.next_follow_up_date || null, body.notes, now.slice(0, 10), now, id, session.clientId]
+    );
+  } else {
+    await query(
+      `UPDATE buyers SET next_follow_up_date=$1, updated_at=$2 WHERE id=$3 AND client_id=$4`,
+      [body.next_follow_up_date || null, now, id, session.clientId]
+    );
+  }
 
+  const row = await queryOne('SELECT * FROM buyers WHERE id = $1 AND client_id = $2', [id, session.clientId]);
   if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ buyer: dbRowToBuyer(row as Record<string, unknown>) });
 }
@@ -84,6 +88,6 @@ export async function DELETE(
   if (!session.clientId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
-  await queryOne('DELETE FROM buyers WHERE id = $1 AND client_id = $2', [id, session.clientId]);
+  await query('DELETE FROM buyers WHERE id = $1 AND client_id = $2', [id, session.clientId]);
   return NextResponse.json({ ok: true });
 }

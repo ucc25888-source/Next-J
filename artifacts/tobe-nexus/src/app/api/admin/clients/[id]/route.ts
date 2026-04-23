@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
-import { queryOne } from '@/lib/db';
+import { query, queryOne } from '@/lib/db';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -54,11 +54,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 
   values.push(id);
-  const row = await queryOne(
-    `UPDATE clients SET ${updates.join(', ')} WHERE client_id = $${idx} RETURNING *`,
+  await query(
+    `UPDATE clients SET ${updates.join(', ')} WHERE client_id = $${idx}`,
     values
   );
 
+  const row = await queryOne('SELECT * FROM clients WHERE client_id = $1', [id]);
   return NextResponse.json({ client: row });
 }
 
@@ -67,7 +68,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!session.isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const { id } = await params;
-  await queryOne('DELETE FROM clients WHERE client_id = $1 AND client_id != $2', [id, 'ADMIN']);
+  await query('DELETE FROM clients WHERE client_id = $1 AND client_id != $2', [id, 'ADMIN']);
   return NextResponse.json({ ok: true });
 }
 
@@ -83,11 +84,12 @@ export async function POST(req: NextRequest) {
     monthly_quota?: number;
   };
 
-  const row = await queryOne(
+  const clientId = body.client_id.toUpperCase();
+  await query(
     `INSERT INTO clients (client_id, display_name, login_token, plan_name, monthly_quota, status)
-     VALUES ($1, $2, $3, $4, $5, 'active') RETURNING *`,
+     VALUES ($1, $2, $3, $4, $5, 'active')`,
     [
-      body.client_id.toUpperCase(),
+      clientId,
       body.display_name,
       body.login_token,
       body.plan_name ?? 'basic',
@@ -95,5 +97,6 @@ export async function POST(req: NextRequest) {
     ]
   );
 
+  const row = await queryOne('SELECT * FROM clients WHERE client_id = $1', [clientId]);
   return NextResponse.json({ client: row }, { status: 201 });
 }
