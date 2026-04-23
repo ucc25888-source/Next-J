@@ -10,7 +10,7 @@ import {
   Sparkles, ChevronRight, ClipboardList,
 } from "lucide-react";
 import type { DailyFocusItem } from "@/types";
-import type { DailyLogEntry } from "@/app/api/daily-log/route";
+import type { DailyLogEntry, TodayNewEntry } from "@/app/api/daily-log/route";
 
 /* ─── Type metadata ─────────────────────────────────────────────────── */
 const TYPE_META: Record<string, { icon: React.ReactNode; label: string }> = {
@@ -179,6 +179,7 @@ export default function DailyFocusPage() {
   const [selectedItem, setSelectedItem] = useState<DailyFocusItem | null>(null);
   const [fadingIds, setFadingIds] = useState<Set<string>>(new Set());
   const [logEntries, setLogEntries] = useState<DailyLogEntry[]>([]);
+  const [newEntries, setNewEntries] = useState<TodayNewEntry[]>([]);
   const [logLoading, setLogLoading] = useState(true);
 
   const loadFocus = useCallback(async () => {
@@ -206,6 +207,7 @@ export default function DailyFocusPage() {
       if (res.ok) {
         const data = await res.json();
         setLogEntries(data.entries ?? []);
+        setNewEntries(data.newEntries ?? []);
       }
     } finally { setLogLoading(false); }
   }, []);
@@ -371,6 +373,42 @@ export default function DailyFocusPage() {
             <p className="text-sm text-slate-500 mt-2 text-center px-6 leading-relaxed">
               設定買方跟進日期或帶看回訪日期後，<br/>會自動出現在這裡
             </p>
+          </div>
+        )}
+
+        {/* Today's NEW entries (created today by created_at) */}
+        {!logLoading && newEntries.length > 0 && (
+          <div className="rounded-2xl border-2 border-violet-200 overflow-hidden shadow-sm">
+            <div className="flex items-center gap-2.5 px-5 py-3 bg-violet-100">
+              <Sparkles className="w-4 h-4 text-violet-700" />
+              <span className="text-sm font-black uppercase tracking-wide text-violet-800 flex-1">今日新增</span>
+              <span className="text-sm font-black w-7 h-7 rounded-full flex items-center justify-center bg-white/60 text-violet-700">
+                {newEntries.length}
+              </span>
+            </div>
+            <div className="p-3 space-y-2 bg-slate-50/50">
+              {newEntries.map((entry, i) => {
+                const meta = (() => {
+                  if (entry.type === 'property') return { icon: <Building2 className="w-3.5 h-3.5" />, label: '新增案件', color: 'bg-amber-100 text-amber-700' };
+                  if (entry.type === 'buyer')    return { icon: <Users className="w-3.5 h-3.5" />,    label: '新增買方', color: 'bg-blue-100 text-blue-700' };
+                  return { icon: <CalendarCheck className="w-3.5 h-3.5" />, label: '新增帶看', color: 'bg-indigo-100 text-indigo-700' };
+                })();
+                return (
+                  <div key={i} className="flex items-start gap-3 bg-white rounded-xl border border-slate-100 px-3.5 py-3 shadow-sm">
+                    <div className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shrink-0 mt-0.5 ${meta.color}`}>
+                      {meta.icon}
+                      <span>{meta.label}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-slate-800 leading-snug">{entry.title}</p>
+                      {entry.subtitle && (
+                        <p className="text-xs text-slate-500 mt-0.5">{entry.subtitle}</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
