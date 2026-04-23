@@ -51,7 +51,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const {
     mainPoints, landPoints, shopPoints, villaPoints, targetBuyers, propertyTypes,
     parkingOptions, statusNowOptions, statusPushOptions,
-    getNextListingId, currentClient,
+    currentClient,
   } = useSystemStore();
 
   const isEditMode = Boolean(id);
@@ -248,15 +248,11 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    let finalListingId = form.listing_id;
     const clientId = form.client_id || currentClient?.client_id || 'A0001';
-    if (!isEditMode && !finalListingId) {
-      finalListingId = getNextListingId(clientId, form.listing_type, form.area_code);
-    }
     const payload = {
       client_id: clientId,
       listing_type: form.listing_type,
-      listing_id: finalListingId,
+      listing_id: isEditMode ? form.listing_id : '',
       area_code: form.area_code,
       subarea: form.subarea,
       address_note: form.address_note,

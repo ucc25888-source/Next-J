@@ -3,6 +3,31 @@ import { getSession } from '@/lib/session';
 import { query, queryOne } from '@/lib/db';
 import type { Property } from '@/types';
 
+async function nextListingId(clientId: string, areaCode: string): Promise<string> {
+  const counterKey = `LISTING_${clientId}_${areaCode}`;
+  const prefixLen = areaCode.length + 2;
+  await query(
+    `INSERT INTO listing_counters (key, value, updated_at)
+     SELECT '${counterKey}',
+       COALESCE((
+         SELECT MAX(CAST(SUBSTRING(listing_id, ${prefixLen}) AS INTEGER))
+         FROM properties
+         WHERE client_id = '${clientId}' AND area_code = '${areaCode}'
+           AND listing_id ~ '^C${areaCode}[0-9]+$'
+       ), 0) + 1,
+       NOW()
+     ON CONFLICT (key) DO UPDATE
+       SET value = listing_counters.value + 1, updated_at = NOW()`,
+    []
+  );
+  const rows = await query<{ value: number }>(
+    `SELECT value FROM listing_counters WHERE key = '${counterKey}'`,
+    []
+  );
+  const seq = rows[0]?.value ?? 1;
+  return `C${areaCode}${String(seq).padStart(4, '0')}`;
+}
+
 function dbRowToProperty(row: Record<string, unknown>): Property {
   return {
     id: row.id as string,
@@ -90,6 +115,13 @@ export async function POST(req: NextRequest) {
   const body = (await req.json()) as Partial<Property>;
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
+  const areaCode = body.area_code ?? '';
+  const clientId = session.clientId;
+
+  let listingId = body.listing_id ?? '';
+  if (!listingId && areaCode) {
+    listingId = await nextListingId(clientId, areaCode);
+  }
 
   await queryOne(
     `INSERT INTO properties (
@@ -113,7 +145,7 @@ export async function POST(req: NextRequest) {
       $33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51
     )`,
     [
-      id, session.clientId, body.listing_type ?? 'C', body.listing_id ?? '',
+      id, clientId, body.listing_type ?? 'C', listingId,
       body.area_code ?? '', body.subarea ?? '', body.address_note ?? '',
       body.property_type ?? '', body.price_wan ?? 0, body.reserve_price_wan ?? 0,
       body.build_ping ?? 0, body.land_ping ?? 0,
