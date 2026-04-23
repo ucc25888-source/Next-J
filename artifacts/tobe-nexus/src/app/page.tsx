@@ -137,11 +137,14 @@ export default function DashboardPage() {
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-5 lg:space-y-6">
 
         {/* ── 戰力標語 ── */}
-        <div className="flex items-center justify-between gap-3 -mt-1 -mb-1">
-          <p className="text-[13px] font-bold text-glacier-300 leading-snug tracking-wide">
-            TOBE Nexus AI｜把繁瑣交給系統，把靈魂還給自己
+        <div className="flex items-end justify-between gap-4 -mt-1 -mb-1">
+          <p className="text-[13px] font-bold text-glacier-300 leading-relaxed flex-1">
+            把繁瑣交給系統，<br />把靈魂還給自己
           </p>
-          <p className="font-signature text-[24px] text-glacier-500 leading-none shrink-0 mr-1">Veda · Du</p>
+          <div className="flex flex-col items-end shrink-0 pb-0.5">
+            <p className="text-[9px] text-glacier-600 tracking-wide leading-snug">TOBE Nexus · 執行長</p>
+            <p className="font-signature text-[22px] text-glacier-500 leading-none mt-0.5">Veda</p>
+          </div>
         </div>
 
         {/* Stats */}
