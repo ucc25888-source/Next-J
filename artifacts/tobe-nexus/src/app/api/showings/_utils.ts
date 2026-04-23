@@ -22,6 +22,7 @@ export function dbRowToShowing(row: Record<string, unknown>): Showing {
     buyer_name: (row.buyer_name as string) ?? '',
     buyer_phone: (row.buyer_phone as string) ?? '',
     buyer_source: (row.buyer_source as string) ?? '平台',
+    buyer_no: (row.buyer_no as string) ?? null,
     reaction: (row.reaction as string) ?? '有點興趣',
     offer_wan: Number(row.offer_wan) ?? 0,
     follow_up: (row.follow_up as string) ?? '',

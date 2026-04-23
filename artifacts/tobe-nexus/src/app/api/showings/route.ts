@@ -15,12 +15,18 @@ export async function GET(req: NextRequest) {
   let rows;
   if (buyerId) {
     rows = await query(
-      'SELECT * FROM showings WHERE client_id = $1 AND buyer_id = $2 ORDER BY showing_date DESC, created_at DESC',
+      `SELECT s.*, b.buyer_no FROM showings s
+       LEFT JOIN buyers b ON b.id = s.buyer_id
+       WHERE s.client_id = $1 AND s.buyer_id = $2
+       ORDER BY s.showing_date DESC, s.created_at DESC`,
       [session.clientId, buyerId]
     );
   } else {
     rows = await query(
-      'SELECT * FROM showings WHERE client_id = $1 ORDER BY showing_date DESC, created_at DESC',
+      `SELECT s.*, b.buyer_no FROM showings s
+       LEFT JOIN buyers b ON b.id = s.buyer_id
+       WHERE s.client_id = $1
+       ORDER BY s.showing_date DESC, s.created_at DESC`,
       [session.clientId]
     );
   }

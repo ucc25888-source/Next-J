@@ -4,9 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import { usePropertyStore } from "@/store/usePropertyStore";
 import PageHeader from "@/components/PageHeader";
 import {
-  Plus, CalendarCheck, Phone, User, Trash2,
-  X, Save, ChevronDown, MessageSquare, Target,
+  Plus, CalendarCheck, Phone, Trash2,
+  X, Save, ChevronDown, MessageSquare,
   Building2, TrendingUp, Frown, Meh, Smile, Star,
+  Edit2, Hash, Clock,
 } from "lucide-react";
 import type { Showing } from "@/types";
 
@@ -79,6 +80,7 @@ const blankForm = {
   reaction: '有點興趣',
   offer_wan: '',
   follow_up: '',
+  follow_up_date: '',
   notes: '',
 };
 
@@ -94,6 +96,7 @@ export default function ShowingsPage() {
   const [showings, setShowings] = useState<Showing[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ ...blankForm });
   const [saving, setSaving] = useState(false);
   const [filterPropId, setFilterPropId] = useState('');
@@ -133,21 +136,52 @@ export default function ShowingsPage() {
     };
   }, [load]);
 
-  const openModal = () => { setForm({ ...blankForm }); setShowModal(true); };
+  const openModal = () => { setEditingId(null); setForm({ ...blankForm }); setShowModal(true); };
+
+  const openEditModal = (s: Showing) => {
+    setEditingId(s.id);
+    setForm({
+      property_id: s.property_id ?? '',
+      showing_date: s.showing_date,
+      buyer_name: s.buyer_name,
+      buyer_phone: s.buyer_phone,
+      buyer_source: s.buyer_source,
+      reaction: s.reaction,
+      offer_wan: s.offer_wan > 0 ? String(s.offer_wan) : '',
+      follow_up: s.follow_up ?? '',
+      follow_up_date: s.follow_up_date ?? '',
+      notes: s.notes ?? '',
+    });
+    setShowModal(true);
+  };
 
   const handleSave = async () => {
     if (!form.buyer_name.trim()) return;
     setSaving(true);
     try {
-      const res = await fetch('/api/showings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, offer_wan: Number(form.offer_wan) || 0, property_id: form.property_id || null }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setShowings((prev) => [data.showing, ...prev]);
-        setShowModal(false);
+      const payload = { ...form, offer_wan: Number(form.offer_wan) || 0, property_id: form.property_id || null, follow_up_date: form.follow_up_date || null };
+      if (editingId) {
+        const res = await fetch(`/api/showings/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setShowings((prev) => prev.map((s) => s.id === editingId ? { ...s, ...data.showing } : s));
+          setShowModal(false);
+        }
+      } else {
+        const res = await fetch('/api/showings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setShowings((prev) => [data.showing, ...prev]);
+          setShowModal(false);
+        }
       }
     } finally { setSaving(false); }
   };
@@ -276,13 +310,20 @@ export default function ShowingsPage() {
                         {new Date(s.showing_date).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </span>
                     </div>
-                    <button onClick={() => handleDelete(s.id)}
-                      className="opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 active:text-red-500 active:bg-red-50 transition-all">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => openEditModal(s)}
+                        className="opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-aurora-500 hover:bg-aurora-50 active:text-aurora-500 active:bg-aurora-50 transition-all">
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => handleDelete(s.id)}
+                        className="opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 active:text-red-500 active:bg-red-50 transition-all">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="p-4 space-y-3">
+                  {/* Clickable body */}
+                  <div className="p-4 space-y-3 cursor-pointer" onClick={() => openEditModal(s)}>
                     {/* Property tag */}
                     {propTitle && (
                       <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-1.5">
@@ -293,11 +334,16 @@ export default function ShowingsPage() {
 
                     {/* Buyer info */}
                     <div className="space-y-1.5">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <div className="w-6 h-6 rounded-full bg-aurora-100 border-2 border-aurora-300 flex items-center justify-center shrink-0">
                           <span className="text-[10px] font-black text-aurora-600">{s.buyer_name.charAt(0)}</span>
                         </div>
                         <span className="text-sm font-bold text-glacier-200">{s.buyer_name}</span>
+                        {s.buyer_no && (
+                          <span className="flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-violet-50 border border-violet-200 text-violet-600 font-bold">
+                            <Hash className="w-2.5 h-2.5" />{s.buyer_no}
+                          </span>
+                        )}
                         <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-semibold ${SOURCE_STYLE[s.buyer_source] ?? SOURCE_STYLE['其他']}`}>
                           {s.buyer_source}
                         </span>
@@ -305,7 +351,7 @@ export default function ShowingsPage() {
                       {s.buyer_phone && (
                         <div className="flex items-center gap-2">
                           <Phone className="w-3 h-3 text-teal-500 shrink-0" />
-                          <a href={`tel:${s.buyer_phone}`} className="text-xs text-glacier-400 hover:text-teal-600 transition-colors">
+                          <a href={`tel:${s.buyer_phone}`} onClick={(e) => e.stopPropagation()} className="text-xs text-glacier-400 hover:text-teal-600 transition-colors">
                             {s.buyer_phone}
                           </a>
                         </div>
@@ -327,20 +373,30 @@ export default function ShowingsPage() {
                     </div>
 
                     {/* 追蹤事項 */}
-                    {s.follow_up && (
-                      <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
-                        <MessageSquare className="w-3 h-3 text-blue-500 shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-[10px] font-bold text-blue-600 mb-0.5">追蹤事項</p>
-                          <p className="text-[11px] text-blue-900 leading-relaxed">{s.follow_up.split('\n')[0]}</p>
-                        </div>
+                    <div className={`flex items-start gap-2 rounded-lg px-3 py-2 border ${s.follow_up ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-100'}`}>
+                      <MessageSquare className={`w-3 h-3 shrink-0 mt-0.5 ${s.follow_up ? 'text-blue-500' : 'text-slate-300'}`} />
+                      <div className="min-w-0">
+                        <p className={`text-[10px] font-bold mb-0.5 ${s.follow_up ? 'text-blue-600' : 'text-slate-400'}`}>追蹤事項</p>
+                        <p className={`text-[11px] leading-relaxed ${s.follow_up ? 'text-blue-900' : 'text-slate-400 italic'}`}>
+                          {s.follow_up ? s.follow_up.split('\n')[0] : '（點擊卡片填寫）'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 下次約 */}
+                    {s.follow_up_date && (
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-3 h-3 text-aurora-500 shrink-0" />
+                        <span className="text-[11px] text-aurora-600 font-semibold">
+                          下次約：{new Date(s.follow_up_date).toLocaleDateString('zh-TW', { month: 'long', day: 'numeric' })}
+                        </span>
                       </div>
                     )}
 
                     {/* 備註 */}
-                    {s.notes && (
-                      <p className="text-[11px] text-slate-500 pl-1">備註：{s.notes}</p>
-                    )}
+                    <p className={`text-[11px] pl-1 ${s.notes ? 'text-slate-500' : 'text-slate-300 italic'}`}>
+                      備註：{s.notes || '（點擊卡片填寫）'}
+                    </p>
                   </div>
                 </div>
               );
@@ -359,7 +415,7 @@ export default function ShowingsPage() {
                 <div className="p-1.5 rounded-lg bg-aurora-500">
                   <CalendarCheck className="w-4 h-4 text-white" />
                 </div>
-                <h2 className="text-sm font-bold text-glacier-200">新增帶看紀錄</h2>
+                <h2 className="text-sm font-bold text-glacier-200">{editingId ? '編輯帶看紀錄' : '新增帶看紀錄'}</h2>
               </div>
               <button onClick={() => setShowModal(false)}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
@@ -444,11 +500,18 @@ export default function ShowingsPage() {
                   placeholder="例：850" min="0" />
               </div>
 
-              <div>
-                <label className={labelCls}>追蹤事項</label>
-                <textarea className={inputCls + ' resize-none'} rows={2} value={form.follow_up}
-                  onChange={(e) => setForm((f) => ({ ...f, follow_up: e.target.value }))}
-                  placeholder="例：3天後再電聯確認意願..." />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls}>追蹤事項</label>
+                  <textarea className={inputCls + ' resize-none'} rows={2} value={form.follow_up}
+                    onChange={(e) => setForm((f) => ({ ...f, follow_up: e.target.value }))}
+                    placeholder="例：3天後再電聯確認意願..." />
+                </div>
+                <div>
+                  <label className={labelCls}>下次約定時間</label>
+                  <input type="date" className={inputCls} value={form.follow_up_date}
+                    onChange={(e) => setForm((f) => ({ ...f, follow_up_date: e.target.value }))} />
+                </div>
               </div>
 
               <div>
@@ -468,7 +531,7 @@ export default function ShowingsPage() {
               <button onClick={handleSave} disabled={saving || !form.buyer_name.trim()}
                 className="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-aurora-500 rounded-lg hover:bg-aurora-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all glow-aurora-sm">
                 <Save className="w-3.5 h-3.5" />
-                {saving ? '儲存中...' : '儲存紀錄'}
+                {saving ? '儲存中...' : editingId ? '更新紀錄' : '儲存紀錄'}
               </button>
             </div>
           </div>

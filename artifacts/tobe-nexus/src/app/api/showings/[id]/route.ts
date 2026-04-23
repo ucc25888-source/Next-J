@@ -35,8 +35,9 @@ export async function PUT(
   await query(
     `UPDATE showings SET
       showing_date=$1, property_id=$2, reaction=$3,
-      offer_wan=$4, follow_up=$5, follow_up_date=$6, notes=$7
-    WHERE id=$8 AND client_id=$9`,
+      offer_wan=$4, follow_up=$5, follow_up_date=$6, notes=$7,
+      buyer_name=$8, buyer_phone=$9, buyer_source=$10
+    WHERE id=$11 AND client_id=$12`,
     [
       body.showing_date ?? new Date().toISOString().slice(0, 10),
       body.property_id || null,
@@ -45,6 +46,9 @@ export async function PUT(
       body.follow_up ?? '',
       body.follow_up_date || null,
       body.notes ?? '',
+      body.buyer_name ?? '',
+      body.buyer_phone ?? '',
+      body.buyer_source ?? '平台',
       id,
       session.clientId,
     ]

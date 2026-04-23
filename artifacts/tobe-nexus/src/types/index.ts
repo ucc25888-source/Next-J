@@ -164,6 +164,7 @@ export interface Showing {
   buyer_name: string;
   buyer_phone: string;
   buyer_source: string;
+  buyer_no?: string | null;
   reaction: string;
   offer_wan: number;
   follow_up: string;
