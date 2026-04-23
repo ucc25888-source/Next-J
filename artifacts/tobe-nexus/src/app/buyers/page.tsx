@@ -112,11 +112,13 @@ export default function BuyersPage() {
   const [buyers, setBuyers]           = useState<Buyer[]>([]);
   const [allShowings, setAllShowings] = useState<Showing[]>([]);
   const [loading, setLoading]         = useState(true);
+  const [loadError, setLoadError]     = useState(false);
 
   const [showDrawer, setShowDrawer]       = useState(false);
   const [editBuyer, setEditBuyer]         = useState<Buyer | null>(null);
   const [form, setForm]                   = useState<FormState>({ ...blankForm });
   const [saving, setSaving]               = useState(false);
+  const [saveError, setSaveError]         = useState("");
   const [filterStatus, setFilterStatus]   = useState("");
   const [search, setSearch]               = useState("");
 
@@ -148,15 +150,22 @@ export default function BuyersPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const [bRes, sRes, stRes] = await Promise.all([
         fetch("/api/buyers"),
         fetch("/api/showings"),
         fetch("/api/showings/stats"),
       ]);
-      if (bRes.ok) setBuyers((await bRes.json()).buyers ?? []);
+      if (bRes.ok) {
+        setBuyers((await bRes.json()).buyers ?? []);
+      } else {
+        setLoadError(true);
+      }
       if (sRes.ok) setAllShowings((await sRes.json()).showings ?? []);
       if (stRes.ok) setShowingStats(await stRes.json());
+    } catch {
+      setLoadError(true);
     } finally { setLoading(false); }
   }, []);
 
@@ -168,6 +177,7 @@ export default function BuyersPage() {
   const handleSave = async () => {
     if (!form.name.trim()) return;
     setSaving(true);
+    setSaveError("");
     const payload = {
       ...form,
       budget_min:   Number(form.budget_min) || 0,
@@ -180,13 +190,28 @@ export default function BuyersPage() {
         const res = await fetch(`/api/buyers/${editBuyer.id}`, {
           method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
         });
-        if (res.ok) { const d = await res.json(); setBuyers((p) => p.map((b) => b.id === editBuyer.id ? d.buyer : b)); setShowDrawer(false); }
+        if (res.ok) {
+          const d = await res.json();
+          setBuyers((p) => p.map((b) => b.id === editBuyer.id ? d.buyer : b));
+          setShowDrawer(false);
+        } else {
+          setSaveError("儲存失敗，請重試");
+        }
       } else {
         const res = await fetch("/api/buyers", {
           method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
         });
-        if (res.ok) { const d = await res.json(); setBuyers((p) => [d.buyer, ...p]); setShowDrawer(false); }
+        if (res.ok) {
+          const d = await res.json();
+          setBuyers((p) => [d.buyer, ...p]);
+          setFilterStatus("");
+          setShowDrawer(false);
+        } else {
+          setSaveError("儲存失敗，請重試");
+        }
       }
+    } catch {
+      setSaveError("網路錯誤，請重試");
     } finally { setSaving(false); }
   };
 
@@ -201,7 +226,11 @@ export default function BuyersPage() {
       method: "PUT", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...buyer, status: newStatus }),
     });
-    if (res.ok) { const d = await res.json(); setBuyers((p) => p.map((b) => b.id === buyer.id ? d.buyer : b)); }
+    if (res.ok) {
+      const d = await res.json();
+      setBuyers((p) => p.map((b) => b.id === buyer.id ? d.buyer : b));
+      if (filterStatus && filterStatus !== newStatus) setFilterStatus("");
+    }
   };
 
   const openShowingModal = (buyer: Buyer) => {
@@ -487,6 +516,14 @@ export default function BuyersPage() {
             {[...Array(4)].map((_, i) => (
               <div key={i} className="bg-titanium-900 rounded-xl p-4 space-y-3 border border-glacier-200/[0.07] animate-pulse h-48" />
             ))}
+          </div>
+        ) : loadError ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-red-500/10 border-2 border-dashed border-red-500/30 rounded-xl">
+            <Users className="w-12 h-12 text-red-400 mb-3" />
+            <p className="text-sm font-medium text-red-400">載入失敗，請重試</p>
+            <button onClick={load} className="mt-4 flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-red-500 rounded-lg hover:bg-red-400 transition-all">
+              重新載入
+            </button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 bg-titanium-900 border-2 border-dashed border-glacier-200/[0.08] rounded-xl">
@@ -986,6 +1023,11 @@ export default function BuyersPage() {
               </div>
             </div>
 
+            {saveError && (
+              <div className="px-5 pb-2">
+                <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{saveError}</p>
+              </div>
+            )}
             <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-glacier-200/[0.07] shrink-0">
               <button onClick={() => setShowDrawer(false)}
                 className="px-4 py-2 text-sm font-medium text-glacier-400 bg-titanium-800 border border-glacier-200/[0.08] rounded-lg hover:text-glacier-200 transition-all">

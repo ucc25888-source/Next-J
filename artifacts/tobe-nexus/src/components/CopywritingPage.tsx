@@ -57,7 +57,6 @@ const buildCTA = (location: string) =>
 `💬 想了解更多細節或${location}行情？
 點擊下方連結，語音諮詢福哥：
 👉https://bit.ly/4sJhSzs
-
 👤杜美珍 & 周福良 (福哥)
 📞專線：0925-997779
 證號：(91)登字第010851號`;
