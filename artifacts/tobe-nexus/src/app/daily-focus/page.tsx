@@ -185,7 +185,7 @@ export default function DailyFocusPage() {
   const loadFocus = useCallback(async () => {
     setFocusLoading(true);
     try {
-      const res = await fetch("/api/daily-focus", { cache: "no-store" });
+      const res = await fetch(`/api/daily-focus?_t=${Date.now()}`, { cache: "no-store" });
       if (res.ok) {
         const d = await res.json();
         setFocusItems(d.items ?? []);
@@ -201,7 +201,7 @@ export default function DailyFocusPage() {
       const fullPrefix  = `[${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}]`;
       const shortPrefix = `[${d.getMonth() + 1}/${d.getDate()}]`;
       const res = await fetch(
-        `/api/daily-log?prefix=${encodeURIComponent(fullPrefix)}&shortPrefix=${encodeURIComponent(shortPrefix)}`,
+        `/api/daily-log?prefix=${encodeURIComponent(fullPrefix)}&shortPrefix=${encodeURIComponent(shortPrefix)}&_t=${Date.now()}`,
         { cache: "no-store" }
       );
       if (res.ok) {
@@ -214,11 +214,16 @@ export default function DailyFocusPage() {
 
   useEffect(() => { loadFocus(); loadLog(); }, [loadFocus, loadLog]);
 
-  // Re-fetch when user switches back to this tab / app (cross-device sync)
+  // Re-fetch when user switches back to this tab / app (cross-device sync, incl. iOS Safari)
   useEffect(() => {
     const onVisible = () => { if (document.visibilityState === 'visible') { loadFocus(); loadLog(); } };
+    const onFocus   = () => { loadFocus(); loadLog(); };
     document.addEventListener('visibilitychange', onVisible);
-    return () => document.removeEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onFocus);
+    };
   }, [loadFocus, loadLog]);
 
   const handleDone = useCallback(async (item: DailyFocusItem) => {

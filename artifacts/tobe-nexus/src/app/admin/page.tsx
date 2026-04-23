@@ -171,7 +171,7 @@ export default function AdminPage() {
   const fetchClients = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/clients');
+      const res = await fetch(`/api/admin/clients?_t=${Date.now()}`, { cache: "no-store" });
       if (res.status === 403) { router.push('/'); return; }
       const data = await res.json();
       setClients(data.clients ?? []);
@@ -181,7 +181,7 @@ export default function AdminPage() {
   const fetchLogs = useCallback(async () => {
     setLogsLoading(true);
     try {
-      const res = await fetch('/api/admin/logs');
+      const res = await fetch(`/api/admin/logs?_t=${Date.now()}`, { cache: "no-store" });
       if (res.ok) {
         const d = await res.json();
         setLogs(d.logs ?? []);

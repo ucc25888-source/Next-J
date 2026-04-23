@@ -153,10 +153,11 @@ export default function BuyersPage() {
     setLoading(true);
     setLoadError(false);
     try {
+      const ts = Date.now();
       const [bRes, sRes, stRes] = await Promise.all([
-        fetch("/api/buyers"),
-        fetch("/api/showings"),
-        fetch("/api/showings/stats"),
+        fetch(`/api/buyers?_t=${ts}`, { cache: "no-store" }),
+        fetch(`/api/showings?_t=${ts}`, { cache: "no-store" }),
+        fetch(`/api/showings/stats?_t=${ts}`, { cache: "no-store" }),
       ]);
       if (bRes.ok) {
         setBuyers((await bRes.json()).buyers ?? []);
@@ -171,6 +172,17 @@ export default function BuyersPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    const onVisible = () => { if (document.visibilityState === "visible") load(); };
+    const onFocus   = () => load();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [load]);
 
   const openAdd  = () => { setEditBuyer(null); setForm({ ...blankForm }); setShowDrawer(true); };
   const openEdit = (b: Buyer) => { setEditBuyer(b); setForm(toForm(b)); setShowDrawer(true); };

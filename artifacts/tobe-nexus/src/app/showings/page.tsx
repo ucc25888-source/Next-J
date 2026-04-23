@@ -94,7 +94,7 @@ export default function ShowingsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/showings');
+      const res = await fetch(`/api/showings?_t=${Date.now()}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         setShowings(data.showings ?? []);
@@ -105,6 +105,17 @@ export default function ShowingsPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    const onVisible = () => { if (document.visibilityState === "visible") load(); };
+    const onFocus   = () => load();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [load]);
 
   const openModal = () => { setForm({ ...blankForm }); setShowModal(true); };
 

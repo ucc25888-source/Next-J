@@ -23,7 +23,7 @@ export default function DashboardPage() {
   const loadFocus = useCallback(async () => {
     setFocusLoading(true);
     try {
-      const res = await fetch("/api/daily-focus", { cache: "no-store" });
+      const res = await fetch(`/api/daily-focus?_t=${Date.now()}`, { cache: "no-store" });
       if (res.ok) {
         const d = await res.json();
         setFocusItems(d.items ?? []);
@@ -32,6 +32,17 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => { loadFocus(); }, [loadFocus]);
+
+  useEffect(() => {
+    const onVisible = () => { if (document.visibilityState === "visible") loadFocus(); };
+    const onFocus   = () => loadFocus();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [loadFocus]);
 
   const activeListings    = properties.filter((p) => p.status_now === "銷售中").length;
   const negotiatingCount  = properties.filter((p) => p.status_now === "議價中" || p.status_now === "洽談中").length;

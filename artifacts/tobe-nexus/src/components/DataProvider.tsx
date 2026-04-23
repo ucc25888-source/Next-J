@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { usePropertyStore } from "@/store/usePropertyStore";
 import { useSystemStore } from "@/store/useSystemStore";
 
-const REFRESH_INTERVAL_MS = 30 * 1000; // 30 seconds
+const MIN_REFETCH_MS = 5 * 1000; // refetch at most every 5s to avoid spam
 
 export default function DataProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -13,10 +13,19 @@ export default function DataProvider({ children }: { children: React.ReactNode }
   const { setCurrentClient } = useSystemStore();
   const initialized = useRef(false);
   const lastFetchedAt = useRef<number>(0);
+  const fetching = useRef(false);
 
   async function fetchProperties() {
+    if (fetching.current) return;
+    const elapsed = Date.now() - lastFetchedAt.current;
+    if (elapsed < MIN_REFETCH_MS) return;
+    fetching.current = true;
     try {
-      const res = await fetch("/api/properties", { cache: "no-store" });
+      const ts = Date.now();
+      const res = await fetch(`/api/properties?_t=${ts}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache, no-store", "Pragma": "no-cache" },
+      });
       if (res.ok) {
         const { properties } = await res.json();
         setProperties(properties ?? []);
@@ -24,6 +33,8 @@ export default function DataProvider({ children }: { children: React.ReactNode }
       }
     } catch {
       // Network error — keep existing state
+    } finally {
+      fetching.current = false;
     }
   }
 
@@ -33,9 +44,13 @@ export default function DataProvider({ children }: { children: React.ReactNode }
 
     async function init() {
       try {
+        const ts = Date.now();
         const [meRes, propsRes] = await Promise.all([
-          fetch("/api/auth/me"),
-          fetch("/api/properties", { cache: "no-store" }),
+          fetch(`/api/auth/me?_t=${ts}`, { cache: "no-store" }),
+          fetch(`/api/properties?_t=${ts}`, {
+            cache: "no-store",
+            headers: { "Cache-Control": "no-cache, no-store", "Pragma": "no-cache" },
+          }),
         ]);
 
         if (meRes.status === 401) {
@@ -60,17 +75,24 @@ export default function DataProvider({ children }: { children: React.ReactNode }
 
     init();
 
+    // visibilitychange: fires when tab becomes visible (most browsers)
     function handleVisibilityChange() {
       if (document.visibilityState === "visible") {
-        const elapsed = Date.now() - lastFetchedAt.current;
-        if (elapsed > REFRESH_INTERVAL_MS) {
-          fetchProperties();
-        }
+        fetchProperties();
       }
     }
 
+    // focus: fires on iOS Safari when user switches back to the browser tab
+    function handleFocus() {
+      fetchProperties();
+    }
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [router, setProperties, setCurrentClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <>{children}</>;
