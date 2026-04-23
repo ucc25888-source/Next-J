@@ -229,7 +229,7 @@ export const useSystemStore = create<SystemState>()((set, get) => ({
     { value: '穩定收租中' },
     { value: '家俱全贈' },
     { value: '近學區/醫院' },
-    { value: '獨立電錶' },
+    { value: '每間獨立分表' },
   ],
   commonPoints: [
     { value: '格局方正' },

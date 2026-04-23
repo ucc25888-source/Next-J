@@ -24,8 +24,14 @@ export const generateCopywriting = (
   const isOffice = property_type === '商辦';
   const isShop   = property_type === '店面' || property_type === '透天厝 (店住)';
   const isVilla  = property_type === '別墅 / 莊園' || property_type === '透天厝 (住宅)';
+  const isSuite  = property_type === '套房';
 
-  const baseInfo = isVilla
+  const baseInfo = isSuite
+    ? `📍 【核心物件資訊】
+${subarea}稀有${property_type}，總建坪 ${build_ping} 坪，開價僅需 ${price_wan} 萬。
+水電管線已重新配置，每間套房獨立分表，帳務清晰好管理。
+${parking ? `附有${extractText(parking)}，` : ''}現租金收益穩定，買到即開始收租！`
+    : isVilla
     ? `📍 【核心物件資訊】
 花蓮稀有釋出：${subarea}獨門獨院${property_type}，總地坪 ${build_ping} 坪。
 ${parking ? `停車機能：${extractText(parking)}，` : ''}無公設耗損、坪坪皆可用。
