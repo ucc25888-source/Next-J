@@ -107,6 +107,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     owner_follow_up_notes: '',
     colisting_company: '',
     colisting_contact: '',
+    colisting_notes: '',
+    push_log: '',
   };
 
   const [form, setForm] = useState(blank);
@@ -181,6 +183,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       owner_follow_up_notes: property.owner_follow_up_notes ?? '',
       colisting_company: property.colisting_company ?? '',
       colisting_contact: property.colisting_contact ?? '',
+      colisting_notes: property.colisting_notes ?? '',
+      push_log: property.push_log ?? '',
     });
   };
 
@@ -302,6 +306,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       owner_follow_up_notes: form.owner_follow_up_notes,
       colisting_company: form.colisting_company,
       colisting_contact: form.colisting_contact,
+      colisting_notes: form.colisting_notes,
+      push_log: form.push_log,
     };
     setSaveError('');
     setIsSaving(true);
@@ -886,6 +892,19 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                         placeholder={placeholder}
                       />
                     </Field>
+                    <div className="sm:col-span-2">
+                      <label className={`block text-xs font-medium mb-1.5 ${isColisting ? 'text-blue-400' : 'text-glacier-400'}`}>
+                        📋 推進記錄
+                      </label>
+                      <textarea
+                        rows={5}
+                        className={inputCls + ' resize-none font-mono text-xs'}
+                        value={isColisting ? form.colisting_notes : form.push_log}
+                        onChange={(e) => set(isColisting ? 'colisting_notes' : 'push_log', e.target.value)}
+                        placeholder={`[2026/4/23] 已聯繫，窗口說屋主願意降價 50 萬\n[2026/4/20] 去電詢問，尚無新報價`}
+                      />
+                      <p className="text-[10px] text-glacier-500 mt-1">每行一筆。按「每日重點」→「完成」時系統會自動在此加入日期記錄。</p>
+                    </div>
                   </div>
                 </div>
               );
@@ -936,7 +955,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
                 <div className="md:col-span-3">
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-medium text-glacier-400">議價／溝通備註</label>
+                    <label className="text-xs font-medium text-glacier-400">備註</label>
                     <button
                       type="button"
                       onClick={() => {

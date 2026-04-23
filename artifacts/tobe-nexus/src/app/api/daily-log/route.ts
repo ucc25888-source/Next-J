@@ -113,12 +113,12 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // ── Properties — owner_follow_up_notes contains today's date ───────
+  // ── Properties — push_log contains today's date ─────────────────
   const propertyRows = await query(
     `SELECT id, listing_id, subarea, property_type,
-            address_note, owner_follow_up_notes
+            address_note, push_log
      FROM properties
-     WHERE client_id = $1 AND (owner_follow_up_notes LIKE $2 OR owner_follow_up_notes LIKE $3)`,
+     WHERE client_id = $1 AND (push_log LIKE $2 OR push_log LIKE $3)`,
     [clientId, fullLike, shortLike]
   );
   for (const r of propertyRows) {
@@ -128,7 +128,7 @@ export async function GET(req: NextRequest) {
       source_id: String(r.id),
       title: propLabel,
       subtitle: (r.address_note as string) || '',
-      note: findTodayLine(r.owner_follow_up_notes as string, todayPrefixes),
+      note: findTodayLine(r.push_log as string, todayPrefixes),
     });
   }
 

@@ -315,13 +315,13 @@ export function DailyFocusDrawer({
     setSaving(true);
     try {
       const prefix = `[${todayLabel()}] `;
-      const newNote = prefix + noteInput.trim();
-      const existing = detail?.owner_follow_up_notes?.trim() ?? "";
-      const merged = existing ? `${newNote}\n${existing}` : newNote;
+      const newEntry = prefix + noteInput.trim();
+      const existing = ((detail as Record<string, unknown>)?.push_log as string | undefined)?.trim() ?? "";
+      const merged = existing ? `${newEntry}\n${existing}` : newEntry;
       await fetch(`/api/properties/${item.source_id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ owner_follow_up_notes: merged }),
+        body: JSON.stringify({ push_log: merged }),
       });
       onClose();
     } finally {

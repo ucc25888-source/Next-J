@@ -50,6 +50,7 @@ export interface Property {
   colisting_contact?: string;
   colisting_last_check?: string | null;
   colisting_notes?: string;
+  push_log?: string;
   updated_at: string;
   last_generated_at?: string;
   last_fingerprint?: string;

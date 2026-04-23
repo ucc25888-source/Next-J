@@ -93,6 +93,8 @@ function dbRowToProperty(row: Record<string, unknown>): Property {
       if (v instanceof Date) return v.toISOString().slice(0, 10);
       return String(v).slice(0, 10);
     })(),
+    colisting_notes: (row.colisting_notes as string) ?? '',
+    push_log: (row.push_log as string) ?? '',
     last_generated_at: row.last_generated_at as string | undefined,
     last_fingerprint: row.last_fingerprint as string | undefined,
     createdAt: (row.created_at as string) ?? new Date().toISOString(),
@@ -141,12 +143,12 @@ export async function POST(req: NextRequest) {
       garden_area,
       owner_follow_up_date, owner_follow_up_notes,
       ai_note,
-      colisting_company, colisting_contact, colisting_last_check,
+      colisting_company, colisting_contact, colisting_last_check, push_log,
       created_at, updated_at
     ) VALUES (
       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,
       $18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,
-      $33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52
+      $33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53
     )`,
     [
       id, clientId, body.listing_type ?? 'C', listingId,
@@ -174,6 +176,7 @@ export async function POST(req: NextRequest) {
       body.colisting_company ?? '',
       body.colisting_contact ?? '',
       body.colisting_last_check || null,
+      body.push_log ?? '',
       now, now,
     ]
   );
