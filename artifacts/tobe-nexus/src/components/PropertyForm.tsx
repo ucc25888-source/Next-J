@@ -24,7 +24,7 @@ const GEOGRAPHIC_DATA: Record<string, string[]> = {
 
 const LAND_PROPERTY_TYPES = ['土地 / 農地', '建地 / 工業地'];
 const TRANSPARENT_TYPES = ['透天厝 (住宅)', '透天厝 (店住)', '別墅 / 莊園'];
-const VILLA_TYPE = '別墅 / 莊園';
+const VILLA_TYPES = ['別墅 / 莊園', '透天厝 (住宅)'];
 const SHOP_PROPERTY_TYPES = ['透天厝 (店住)', '店面'];
 const OFFICE_PROPERTY_TYPES = ['商辦'];
 
@@ -119,7 +119,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
   const isLandType = LAND_PROPERTY_TYPES.includes(form.property_type);
   const isTransparentType = TRANSPARENT_TYPES.includes(form.property_type);
-  const isVilla = form.property_type === VILLA_TYPE;
+  const isVilla = VILLA_TYPES.includes(form.property_type);
   const isShopType = SHOP_PROPERTY_TYPES.includes(form.property_type);
   const isOfficeType = OFFICE_PROPERTY_TYPES.includes(form.property_type);
   const activePoints = isLandType ? landPoints : isVilla ? villaPoints : isOfficeType ? officePoints : isShopType ? shopPoints : mainPoints;
@@ -218,7 +218,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
   const getPointCategory = (pt: string) => {
     if (LAND_PROPERTY_TYPES.includes(pt)) return 'land';
-    if (pt === VILLA_TYPE) return 'villa';
+    if (VILLA_TYPES.includes(pt)) return 'villa';
     if (OFFICE_PROPERTY_TYPES.includes(pt)) return 'office';
     if (SHOP_PROPERTY_TYPES.includes(pt)) return 'shop';
     return 'main';

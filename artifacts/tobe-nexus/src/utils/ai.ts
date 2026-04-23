@@ -23,8 +23,14 @@ export const generateCopywriting = (
 
   const isOffice = property_type === '商辦';
   const isShop   = property_type === '店面' || property_type === '透天厝 (店住)';
+  const isVilla  = property_type === '別墅 / 莊園' || property_type === '透天厝 (住宅)';
 
-  const baseInfo = isOffice
+  const baseInfo = isVilla
+    ? `📍 【核心物件資訊】
+花蓮稀有釋出：${subarea}獨門獨院${property_type}，總地坪 ${build_ping} 坪。
+${parking ? `停車機能：${extractText(parking)}，` : ''}無公設耗損、坪坪皆可用。
+產權清晰合法，可增建擴建，${price_wan} 萬起，真正的稀缺資產。`
+    : isOffice
     ? `📍 【核心物件資訊】
 位於${subarea}的稀有${property_type}，專為重視企業形象的經營者打造。
 總建坪 ${build_ping} 坪，格局方正、採光優越，${parking ? `附有${extractText(parking)}，` : ''}
