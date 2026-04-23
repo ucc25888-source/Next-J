@@ -149,7 +149,7 @@ function LogEntryRow({ entry, onClick }: { entry: DailyLogEntry; onClick: (e: Da
           {entry.note}
         </p>
         <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-          <ChevronRight className="w-3 h-3" />點擊查看原始內容
+          <ChevronRight className="w-3 h-3" />點擊查看您寫的推進記錄
         </p>
       </div>
     </div>
