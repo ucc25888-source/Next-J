@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
 import { DailyFocusDrawer } from "@/components/DailyFocusDrawer";
@@ -128,10 +129,13 @@ const LOG_TYPE_META: Record<string, { icon: React.ReactNode; label: string; colo
   property: { icon: <Building2 className="w-3.5 h-3.5" />,     label: "客戶經營",  color: "bg-amber-100 text-amber-700" },
 };
 
-function LogEntryRow({ entry }: { entry: DailyLogEntry }) {
+function LogEntryRow({ entry, onClick }: { entry: DailyLogEntry; onClick: (e: DailyLogEntry) => void }) {
   const meta = LOG_TYPE_META[entry.type] ?? LOG_TYPE_META.buyer;
   return (
-    <div className="flex items-start gap-3 bg-white rounded-xl border border-slate-100 px-3.5 py-3 shadow-sm">
+    <div
+      className="flex items-start gap-3 bg-white rounded-xl border border-slate-100 px-3.5 py-3 shadow-sm cursor-pointer hover:border-emerald-300 hover:shadow-md active:scale-[0.98] transition-all"
+      onClick={() => onClick(entry)}
+    >
       <div className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shrink-0 mt-0.5 ${meta.color}`}>
         {meta.icon}
         <span>{meta.label}</span>
@@ -143,6 +147,9 @@ function LogEntryRow({ entry }: { entry: DailyLogEntry }) {
         )}
         <p className="text-xs text-slate-600 mt-1.5 bg-slate-50 rounded-lg px-2.5 py-1.5 leading-relaxed font-medium">
           {entry.note}
+        </p>
+        <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+          <ChevronRight className="w-3 h-3" />點擊查看原始內容
         </p>
       </div>
     </div>
@@ -174,6 +181,7 @@ function Section({
 
 /* ─── Page ───────────────────────────────────────────────────────────── */
 export default function DailyFocusPage() {
+  const router = useRouter();
   const [focusItems, setFocusItems] = useState<DailyFocusItem[]>([]);
   const [focusLoading, setFocusLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<DailyFocusItem | null>(null);
@@ -259,6 +267,16 @@ export default function DailyFocusPage() {
     }
   }, []);
 
+  const navigateTo = useCallback((item: { type: string; source_id: string }) => {
+    if (item.type === 'property' || item.type === 'colisting') {
+      router.push(`/properties/${item.source_id}`);
+    } else if (item.type === 'buyer') {
+      router.push(`/buyers?open=${item.source_id}`);
+    } else if (item.type === 'showing') {
+      router.push(`/showings?open=${item.source_id}`);
+    }
+  }, [router]);
+
   const visibleItems = focusItems.filter((i) => !i.done || fadingIds.has(i.id));
 
   const overdueItems   = visibleItems.filter((i) => i.is_overdue && !i.done && i.type !== "property");
@@ -343,7 +361,7 @@ export default function DailyFocusPage() {
           <Section colorBar="border-red-400" headerBg="bg-red-100" headerText="text-red-800"
             dotClass="bg-red-500" pulseDot label="逾期未處理" count={overdueItems.length}>
             {overdueItems.map((item) => (
-              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={setSelectedItem} />
+              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={navigateTo} />
             ))}
           </Section>
         )}
@@ -353,7 +371,7 @@ export default function DailyFocusPage() {
           <Section colorBar="border-blue-300" headerBg="bg-blue-100" headerText="text-blue-800"
             dotClass="bg-blue-500" label="今日任務" count={todayItems.length}>
             {todayItems.map((item) => (
-              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={setSelectedItem} />
+              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={navigateTo} />
             ))}
           </Section>
         )}
@@ -363,7 +381,7 @@ export default function DailyFocusPage() {
           <Section colorBar="border-amber-400" headerBg="bg-amber-100" headerText="text-amber-800"
             dotClass="bg-amber-500" label="委託到期提醒" count={propertyAlerts.length}>
             {propertyAlerts.map((item) => (
-              <PropertyAlertRow key={item.id} item={item} onClick={setSelectedItem} />
+              <PropertyAlertRow key={item.id} item={item} onClick={navigateTo} />
             ))}
           </Section>
         )}
@@ -399,7 +417,11 @@ export default function DailyFocusPage() {
                   return { icon: <CalendarCheck className="w-3.5 h-3.5" />, label: '新增帶看', color: 'bg-indigo-100 text-indigo-700' };
                 })();
                 return (
-                  <div key={i} className="flex items-start gap-3 bg-white rounded-xl border border-slate-100 px-3.5 py-3 shadow-sm">
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 bg-white rounded-xl border border-slate-100 px-3.5 py-3 shadow-sm cursor-pointer hover:border-violet-300 hover:shadow-md active:scale-[0.98] transition-all"
+                    onClick={() => navigateTo(entry)}
+                  >
                     <div className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shrink-0 mt-0.5 ${meta.color}`}>
                       {meta.icon}
                       <span>{meta.label}</span>
@@ -409,6 +431,9 @@ export default function DailyFocusPage() {
                       {entry.subtitle && (
                         <p className="text-xs text-slate-500 mt-0.5">{entry.subtitle}</p>
                       )}
+                      <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                        <ChevronRight className="w-3 h-3" />點擊查看詳情
+                      </p>
                     </div>
                   </div>
                 );
@@ -437,7 +462,7 @@ export default function DailyFocusPage() {
                 </div>
               ) : (
                 logEntries.map((entry, i) => (
-                  <LogEntryRow key={i} entry={entry} />
+                  <LogEntryRow key={i} entry={entry} onClick={navigateTo} />
                 ))
               )}
             </div>

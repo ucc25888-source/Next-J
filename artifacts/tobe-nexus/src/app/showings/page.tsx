@@ -84,6 +84,13 @@ const blankForm = {
 
 export default function ShowingsPage() {
   const properties = usePropertyStore((s) => s.properties);
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    setOpenId(p.get('open'));
+  }, []);
+
   const [showings, setShowings] = useState<Showing[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -105,6 +112,15 @@ export default function ShowingsPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // Auto-scroll and highlight when navigated from daily-focus
+  useEffect(() => {
+    if (!openId || loading) return;
+    setTimeout(() => {
+      const el = document.getElementById(`showing-${openId}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  }, [openId, loading]);
 
   useEffect(() => {
     const onVisible = () => { if (document.visibilityState === "visible") load(); };
@@ -247,9 +263,10 @@ export default function ShowingsPage() {
               const propTitle = getPropertyTitle(s.property_id);
               const cfg = REACTION_CARD_STYLE[s.reaction] ?? REACTION_CARD_STYLE['普通'];
               const ReactionIcon = cfg.icon;
+              const isHighlighted = openId === String(s.id);
               return (
-                <div key={s.id}
-                  className={`bg-white border border-slate-200 ${cfg.leftBorder} rounded-xl overflow-hidden hover:shadow-md transition-all group`}>
+                <div key={s.id} id={`showing-${s.id}`}
+                  className={`bg-white border border-slate-200 ${cfg.leftBorder} rounded-xl overflow-hidden hover:shadow-md transition-all group ${isHighlighted ? 'ring-4 ring-aurora-400 ring-offset-2' : ''}`}>
 
                   {/* Date header — colored per reaction */}
                   <div className={`flex items-center justify-between px-4 py-2.5 border-b border-slate-100 ${cfg.dateBg}`}>

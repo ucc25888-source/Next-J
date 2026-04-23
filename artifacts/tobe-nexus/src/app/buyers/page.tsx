@@ -109,6 +109,12 @@ function toForm(b: Buyer): FormState {
 
 export default function BuyersPage() {
   const properties = usePropertyStore((s) => s.properties);
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    setOpenId(p.get('open'));
+  }, []);
 
   const [buyers, setBuyers]           = useState<Buyer[]>([]);
   const [allShowings, setAllShowings] = useState<Showing[]>([]);
@@ -172,6 +178,16 @@ export default function BuyersPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // Auto-expand and scroll when navigated from daily-focus
+  useEffect(() => {
+    if (!openId || loading) return;
+    setExpandedBuyers((prev) => { const s = new Set(prev); s.add(openId); return s; });
+    setTimeout(() => {
+      const el = document.getElementById(`buyer-${openId}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  }, [openId, loading]);
 
   useEffect(() => {
     const onVisible = () => { if (document.visibilityState === "visible") load(); };
@@ -555,8 +571,9 @@ export default function BuyersPage() {
               const isExpanded    = expandedBuyers.has(b.id);
               const visibleShowings = isExpanded ? buyerShowings : buyerShowings.slice(0, 2);
 
+              const isHighlighted = openId === b.id;
               return (
-                <div key={b.id} className={`bg-white border-2 ${STATUS_LEFT_BORDER[b.status] ?? ""} rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col`}>
+                <div key={b.id} id={`buyer-${b.id}`} className={`bg-white border-2 ${STATUS_LEFT_BORDER[b.status] ?? ""} rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col ${isHighlighted ? 'ring-4 ring-aurora-400 ring-offset-2' : ''}`}>
 
                   {/* Card header */}
                   <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-slate-100">
