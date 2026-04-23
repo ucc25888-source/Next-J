@@ -139,11 +139,11 @@ export default function DashboardPage() {
         {/* ── 戰力標語 ── */}
         <div className="flex items-center justify-between gap-4 -mt-3 -mb-1">
           <p className="text-[15px] font-bold text-glacier-200 leading-snug flex-1">
-            把繁瑣交給系統，<br />把靈魂還給自己
+            把繁瑣交給系統，把靈魂還給自己
           </p>
           <div className="flex flex-col items-end shrink-0">
             <p className="text-[9px] text-glacier-600 tracking-wide leading-snug">TOBE Nexus · 執行長</p>
-            <p className="text-[11px] italic text-glacier-500 leading-snug tracking-wide">— Veda</p>
+            <p className="text-[11px] italic text-glacier-200 leading-snug tracking-wide font-semibold">— Veda</p>
           </div>
         </div>
 
