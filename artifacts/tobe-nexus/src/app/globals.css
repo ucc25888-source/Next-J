@@ -112,6 +112,10 @@ p > font {
   display: none !important;
 }
 
+.font-signature {
+  font-family: 'Great Vibes', cursive;
+}
+
 /* Prevent Chrome GT's wide injections from causing a horizontal page scrollbar */
 body { overflow-x: hidden; }
 html { overflow-x: hidden; }

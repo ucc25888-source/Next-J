@@ -141,8 +141,8 @@ export default function DashboardPage() {
           <p className="text-[10px] text-glacier-600 italic tracking-wide leading-relaxed text-right">
             數位雙生建檔，靈感鉤子成文，自由時間留白——讓工作回歸它應有的輕。
           </p>
-          <p className="text-[10px] text-glacier-600 tracking-widest leading-snug">TOBE Nexus AI 執行長—</p>
-          <p className="text-[13px] font-bold text-glacier-400 tracking-[0.2em] mr-5 leading-snug">Ｖｅｄａ．Ｄｕ</p>
+          <p className="text-[10px] text-glacier-600 tracking-wide leading-snug">TOBE Nexus AI · 執行長</p>
+          <p className="font-signature text-[26px] text-glacier-400 mr-4 leading-none">Veda · Du</p>
         </div>
 
         {/* Stats */}

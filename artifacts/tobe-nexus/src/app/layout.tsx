@@ -19,6 +19,9 @@ export default function RootLayout({
     <html lang="zh-TW" translate="no" className="notranslate" suppressHydrationWarning>
       <head>
         <meta name="google" content="notranslate" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet" />
       </head>
       <body className="flex min-h-screen bg-titanium-800" suppressHydrationWarning>
         <ConditionalLayout>{children}</ConditionalLayout>
