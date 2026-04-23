@@ -137,7 +137,10 @@ export default function DashboardPage() {
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-5 lg:space-y-6">
 
         {/* ── 品牌落款 ── */}
-        <div className="flex flex-col items-end -mt-1 -mb-1">
+        <div className="flex flex-col items-end -mt-1 -mb-1 gap-0.5">
+          <p className="text-[10px] text-glacier-600 italic tracking-wide leading-relaxed text-right">
+            數位雙生建檔，靈感鉤子成文，自由時間留白——讓工作回歸它應有的輕。
+          </p>
           <p className="text-[10px] text-glacier-600 tracking-widest leading-snug">TOBE Nexus AI 執行長—</p>
           <p className="text-[13px] font-bold text-glacier-400 tracking-[0.2em] mr-5 leading-snug">Ｖｅｄａ．Ｄｕ</p>
         </div>
@@ -304,7 +307,7 @@ export default function DashboardPage() {
 
         {/* ── 系統亮點 ── */}
         <div>
-          <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase mb-3">系統亮點</p>
+          <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase mb-3">工作解方</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
               {
