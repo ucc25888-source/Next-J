@@ -302,7 +302,7 @@ export default function DashboardPage() {
             {[
               {
                 emoji: "⚙️", title: "數位雙生建檔",
-                desc: "植入精通戰略的房仲大腦。用對的解方簡化流程，讓生活變好、壓力變少。",
+                desc: "像有個懂房子的人靜靜站在妳身旁。繁瑣的事它來扛，妳只需要好好呼吸、好好生活。",
                 href: "/properties/new",
                 from: "from-teal-600", to: "to-emerald-700", border: "border-teal-400/40",
                 titleColor: "text-white", descColor: "text-teal-100/80",
@@ -310,7 +310,7 @@ export default function DashboardPage() {
               },
               {
                 emoji: "🪄", title: "靈感鉤子生成",
-                desc: "告別長時間服務的疲累感。AI 戰略對接 DNA，一鍵產出妳專屬的高成交文案。",
+                desc: "靈感來了就用，不必苦思。風一樣的速度，讓對的文字自然落在買家心裡。",
                 href: "/properties",
                 from: "from-aurora-500", to: "to-rose-500", border: "border-aurora-400/40",
                 titleColor: "text-white", descColor: "text-rose-100/80",
@@ -318,7 +318,7 @@ export default function DashboardPage() {
               },
               {
                 emoji: "📈", title: "自由時間管理",
-                desc: "看見效率，奪回生活主導權。數據化妳的成功，支持妳去經營喜歡的人生。",
+                desc: "工作做完，陽光還在。讓系統替妳守著節奏，妳去過那個一直想過的日子。",
                 href: "/daily-focus",
                 from: "from-violet-600", to: "to-purple-700", border: "border-violet-400/40",
                 titleColor: "text-white", descColor: "text-violet-100/80",
