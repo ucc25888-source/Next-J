@@ -3,6 +3,9 @@ import { getSession } from '@/lib/session';
 import { query, queryOne } from '@/lib/db';
 import type { Property } from '@/types';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function nextListingId(clientId: string, areaCode: string): Promise<string> {
   const counterKey = `LISTING_${clientId}_${areaCode}`;
   const prefixLen = areaCode.length + 2;

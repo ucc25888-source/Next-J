@@ -111,6 +111,8 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
   const [form, setForm] = useState(blank);
   const [isLoadingProperty, setIsLoadingProperty] = useState(isEditMode);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const isLandType = LAND_PROPERTY_TYPES.includes(form.property_type);
   const isTransparentType = TRANSPARENT_TYPES.includes(form.property_type);
@@ -248,7 +250,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const clientId = form.client_id || currentClient?.client_id || 'A0001';
     const payload = {
@@ -301,12 +303,20 @@ export default function PropertyForm({ id }: PropertyFormProps) {
       colisting_company: form.colisting_company,
       colisting_contact: form.colisting_contact,
     };
-    if (isEditMode && id) {
-      updateProperty(id, payload);
-    } else {
-      addProperty(payload);
+    setSaveError('');
+    setIsSaving(true);
+    try {
+      if (isEditMode && id) {
+        await updateProperty(id, payload);
+      } else {
+        await addProperty(payload);
+      }
+      router.push('/properties');
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : '儲存失敗，請重試');
+    } finally {
+      setIsSaving(false);
     }
-    router.push('/properties');
   };
 
   const inputCls = 'w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-glacier-200 placeholder:text-glacier-500 focus:outline-none focus:border-aurora-500/60 focus:ring-1 focus:ring-aurora-500/20 transition-colors';
@@ -964,21 +974,42 @@ export default function PropertyForm({ id }: PropertyFormProps) {
               />
             ))}
           </div>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-5 py-2.5 text-sm font-medium text-glacier-400 bg-titanium-900 border border-glacier-200/[0.08] rounded-lg hover:border-glacier-200/15 transition-all"
-            >
-              取消
-            </button>
-            <button
-              type="submit"
-              className="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm"
-            >
-              <Save className="w-4 h-4" />
-              {isEditMode ? '儲存變更' : '新增物件'}
-            </button>
+          <div className="flex flex-col gap-2 items-end w-full">
+            {saveError && (
+              <p className="w-full text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-center">
+                ⚠️ {saveError}
+              </p>
+            )}
+            <div className="flex gap-3 w-full justify-end">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                disabled={isSaving}
+                className="px-5 py-2.5 text-sm font-medium text-glacier-400 bg-titanium-900 border border-glacier-200/[0.08] rounded-lg hover:border-glacier-200/15 transition-all disabled:opacity-50"
+              >
+                取消
+              </button>
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isSaving ? (
+                  <>
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    儲存中…
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    {isEditMode ? '儲存變更' : '新增物件'}
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </form>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { usePropertyStore } from "@/store/usePropertyStore";
 import { useSystemStore } from "@/store/useSystemStore";
 
-const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+const REFRESH_INTERVAL_MS = 30 * 1000; // 30 seconds
 
 export default function DataProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();

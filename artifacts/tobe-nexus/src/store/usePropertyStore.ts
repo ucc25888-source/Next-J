@@ -16,7 +16,7 @@ export const usePropertyStore = create<PropertyState>()((set, get) => ({
   setProperties: (properties) => set({ properties }),
 
   addProperty: async (property) => {
-    const tempId = crypto.randomUUID();
+    const tempId = `temp-${crypto.randomUUID()}`;
     const now = new Date().toISOString();
     const optimistic: Property = {
       ...property,
@@ -30,20 +30,33 @@ export const usePropertyStore = create<PropertyState>()((set, get) => ({
       const res = await fetch('/api/properties', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...property, id: tempId }),
+        body: JSON.stringify(property),
       });
-      if (res.ok) {
-        const { property: saved } = await res.json();
-        set((state) => ({
-          properties: state.properties.map((p) => (p.id === tempId ? saved : p)),
-        }));
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        // Revert optimistic update
+        set((state) => ({ properties: state.properties.filter((p) => p.id !== tempId) }));
+        throw new Error(errBody?.error ?? `儲存失敗（${res.status}），請重試`);
       }
-    } catch {
-      // Keep optimistic update; will sync on next page load
+
+      const { property: saved } = await res.json();
+      set((state) => ({
+        properties: state.properties.map((p) => (p.id === tempId ? saved : p)),
+      }));
+    } catch (err) {
+      // If it's already our thrown error, re-throw; otherwise it's a network error
+      if (err instanceof Error && (err.message.includes('儲存失敗') || err.message.includes('Failed to fetch'))) {
+        // Revert optimistic if still present
+        set((state) => ({ properties: state.properties.filter((p) => p.id !== tempId) }));
+        throw new Error(err.message.includes('Failed to fetch') ? '網路錯誤，請確認網路後重試' : err.message);
+      }
+      throw err;
     }
   },
 
   updateProperty: async (id, updatedFields) => {
+    const original = get().properties.find((p) => p.id === id);
     const now = new Date().toISOString();
     set((state) => ({
       properties: state.properties.map((p) =>
@@ -52,25 +65,46 @@ export const usePropertyStore = create<PropertyState>()((set, get) => ({
     }));
 
     try {
-      await fetch(`/api/properties/${id}`, {
+      const res = await fetch(`/api/properties/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedFields),
       });
-    } catch {
-      // Optimistic update kept; will resync on refresh
+      if (!res.ok) {
+        // Revert
+        if (original) {
+          set((state) => ({
+            properties: state.properties.map((p) => (p.id === id ? original : p)),
+          }));
+        }
+        throw new Error(`更新失敗（${res.status}），請重試`);
+      }
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('更新失敗')) throw err;
+      if (original) {
+        set((state) => ({
+          properties: state.properties.map((p) => (p.id === id ? original : p)),
+        }));
+      }
+      throw new Error('網路錯誤，請確認網路後重試');
     }
   },
 
   deleteProperty: async (id) => {
+    const original = get().properties.find((p) => p.id === id);
     set((state) => ({
       properties: state.properties.filter((p) => p.id !== id),
     }));
 
     try {
-      await fetch(`/api/properties/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/properties/${id}`, { method: 'DELETE' });
+      if (!res.ok && original) {
+        set((state) => ({ properties: [original, ...state.properties] }));
+      }
     } catch {
-      // Already removed from UI; DB will sync eventually
+      if (original) {
+        set((state) => ({ properties: [original, ...state.properties] }));
+      }
     }
   },
 
