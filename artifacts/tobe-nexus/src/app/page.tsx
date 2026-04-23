@@ -124,6 +124,7 @@ export default function DashboardPage() {
     <div className="flex flex-col min-h-screen">
       <PageHeader
         title={`早安！戰鬥力滿格的${currentClient?.display_name ?? "妳"}，今天準備好要讓哪一位買家心動成交了嗎？🚀`}
+        mobileTitle={`今天讓哪位買家心動成交？🚀`}
         subtitle="TOBE-Nexus Business AI Hub | 妳的成交戰略守護者"
         actions={
           <Link href="/properties/new"
@@ -310,25 +311,25 @@ export default function DashboardPage() {
                 emoji: "⚙️", title: "數位雙生建檔",
                 desc: "像有個懂房子的人靜靜站在妳身旁。繁瑣的事它來扛，妳只需要好好呼吸、好好生活。",
                 href: "/properties/new",
-                from: "from-teal-600", to: "to-emerald-700", border: "border-teal-400/40",
-                titleColor: "text-white", descColor: "text-teal-100/80",
-                ring: "hover:ring-2 hover:ring-teal-300/50",
+                from: "from-teal-50", to: "to-emerald-100", border: "border-teal-200/80",
+                titleColor: "text-teal-800", descColor: "text-teal-600",
+                ring: "hover:ring-2 hover:ring-teal-300/60",
               },
               {
                 emoji: "🪄", title: "靈感鉤子生成",
                 desc: "靈感來了就用，不必苦思。風一樣的速度，讓對的文字自然落在買家心裡。",
                 href: "/properties",
-                from: "from-aurora-500", to: "to-rose-500", border: "border-aurora-400/40",
-                titleColor: "text-white", descColor: "text-rose-100/80",
+                from: "from-orange-50", to: "to-rose-100", border: "border-orange-200/80",
+                titleColor: "text-orange-700", descColor: "text-rose-600",
                 ring: "hover:ring-2 hover:ring-aurora-300/60",
               },
               {
                 emoji: "📈", title: "自由時間管理",
                 desc: "工作做完，陽光還在。讓系統替妳守著節奏，妳去過那個一直想過的日子。",
                 href: "/daily-focus",
-                from: "from-violet-600", to: "to-purple-700", border: "border-violet-400/40",
-                titleColor: "text-white", descColor: "text-violet-100/80",
-                ring: "hover:ring-2 hover:ring-violet-300/50",
+                from: "from-violet-50", to: "to-purple-100", border: "border-violet-200/80",
+                titleColor: "text-violet-800", descColor: "text-violet-600",
+                ring: "hover:ring-2 hover:ring-violet-300/60",
               },
             ].map((item) => (
               <Link key={item.title} href={item.href}

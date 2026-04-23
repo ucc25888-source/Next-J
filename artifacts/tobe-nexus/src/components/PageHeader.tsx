@@ -1,5 +1,6 @@
 interface PageHeaderProps {
   title: string;
+  mobileTitle?: string;
   subtitle?: string;
   badge?: string;
   actions?: React.ReactNode;
@@ -7,6 +8,7 @@ interface PageHeaderProps {
 
 export default function PageHeader({
   title,
+  mobileTitle,
   subtitle,
   badge,
   actions,
@@ -21,7 +23,8 @@ export default function PageHeader({
         )}
         <div className="min-w-0">
           <h1 className="text-[15px] md:text-[17px] font-bold text-glacier-200 tracking-tight truncate">
-            {title}
+            <span className="hidden md:inline">{title}</span>
+            <span className="md:hidden">{mobileTitle ?? title}</span>
           </h1>
           {subtitle && (
             <p className="mt-0.5 text-[11px] md:text-xs text-glacier-500 truncate">{subtitle}</p>
