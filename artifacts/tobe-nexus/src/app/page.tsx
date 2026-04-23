@@ -135,6 +135,12 @@ export default function DashboardPage() {
 
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-5 lg:space-y-6">
 
+        {/* ── 品牌落款 ── */}
+        <div className="flex flex-col items-end -mt-1 -mb-1">
+          <p className="text-[10px] text-glacier-600 tracking-widest leading-snug">TOBE Nexus AI 執行長—</p>
+          <p className="text-[13px] font-bold text-glacier-400 tracking-[0.2em] mr-5 leading-snug">Ｖｅｄａ．Ｄｕ</p>
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
           {statCards.map((card) => (
@@ -370,15 +376,6 @@ export default function DashboardPage() {
               ))}
             </div>
           </div>
-        </div>
-        {/* ── 品牌落款 ── */}
-        <div className="pt-2 pb-6 text-right">
-          <p className="text-[11px] text-glacier-600 leading-relaxed tracking-wide">
-            TOBE Nexus AI 執行長—
-          </p>
-          <p className="text-[13px] font-bold text-glacier-400 tracking-widest mt-0.5">
-            Ｖｅｄａ．Ｄｕ
-          </p>
         </div>
 
       </main>
