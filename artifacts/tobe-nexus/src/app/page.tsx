@@ -279,10 +279,10 @@ export default function DashboardPage() {
                     </span>
                   </div>
                   {(property.img1_url || property.img2_url) && (
-                    <div className="flex gap-2 mt-2">
+                    <div className="flex gap-1.5 mt-2">
                       {[property.img1_url, property.img2_url].map((url, i) =>
                         url ? (
-                          <div key={i} className="w-24 h-16 rounded-lg overflow-hidden bg-titanium-800 shrink-0">
+                          <div key={i} className="w-14 h-10 rounded-md overflow-hidden bg-titanium-800 shrink-0">
                             <img src={url} alt="" className="w-full h-full object-cover" />
                           </div>
                         ) : null
