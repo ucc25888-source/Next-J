@@ -764,14 +764,40 @@ export default function PropertyForm({ id }: PropertyFormProps) {
                     placeholder="無"
                   />
                 </Field>
-                <Field label="目標客群">
-                  <NoTranslateSelect
-                    value={form.target_buyer}
-                    onChange={(v) => set('target_buyer', v)}
-                    options={targetBuyers.map((o) => ({ value: o.value, label: o.value.split(' | ')[0] }))}
-                    placeholder="請選擇"
-                  />
-                </Field>
+                <div className="md:col-span-3">
+                  <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-3">
+                    目標客群 <span className="text-glacier-600 normal-case tracking-normal font-normal">（最多選 2 個，已選 {form.target_buyer ? form.target_buyer.split('、').filter(Boolean).length : 0}/2）</span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {targetBuyers.map((o) => {
+                      const selected = form.target_buyer ? form.target_buyer.split('、').includes(o.value) : false;
+                      const count = form.target_buyer ? form.target_buyer.split('、').filter(Boolean).length : 0;
+                      return (
+                        <button
+                          key={o.value}
+                          type="button"
+                          onClick={() => {
+                            const current = form.target_buyer ? form.target_buyer.split('、').filter(Boolean) : [];
+                            if (selected) {
+                              set('target_buyer', current.filter(v => v !== o.value).join('、'));
+                            } else if (count < 2) {
+                              set('target_buyer', [...current, o.value].join('、'));
+                            }
+                          }}
+                          disabled={!selected && count >= 2}
+                          className={`px-3 py-1.5 rounded-full text-xs border transition-all ${
+                            selected
+                              ? 'bg-aurora-500 border-aurora-600 text-white font-semibold shadow-sm'
+                              : 'bg-titanium-800 border-glacier-200/[0.07] text-glacier-400 hover:border-glacier-200/15 disabled:opacity-40 disabled:cursor-not-allowed'
+                          }`}
+                          translate="no"
+                        >
+                          {o.value}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
                 <div className="md:col-span-3">
                   <p className="text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-3">

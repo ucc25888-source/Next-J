@@ -16,7 +16,31 @@ export const generateCopywriting = (
   const extractText = (val: string) => (val ? val.split(' | ')[0].trim() : '');
   const main = extractText(main_point);
   const second = extractText(second_point);
-  const target = extractText(target_buyer);
+
+  const audienceHooksMap: Record<string, string> = {
+    '首購族/小資族': '與其幫房東繳房貸，不如每月把錢存進自己的資產！',
+    '換屋家庭':     '孩子終於有自己的房間，長輩搭電梯不費力，一家人住得舒適才是真的賺。',
+    '新婚成家':     '免整理直接入住，質感裝潢省一筆，把預算留給更重要的事。',
+    '職業收租/房東': '租金穩進、每間獨立分表，帳務清晰零糾紛，這才叫真正的被動收入。',
+    '資產配置/抗通膨': '花蓮地段保值抗通膨，現在買進，未來的增值就是你最穩的一張牌。',
+    '醫護/軍公教':  '下班即到家，把通勤時間省下來好好休息，生活品質不將就。',
+    '創業/企業主':  '門面氣派吸人流，第一印象就是你最強的業績武器。',
+    '退休養生/長輩': '生活機能成熟、鄰里單純，把晚年安頓在花蓮最舒適的角落。',
+    '長照/子女代購': '幫長輩置產，不只是孝順，更是最聰明的資產規劃。',
+    '資產傳承/節稅': '不動產傳承省稅節稅，讓資產一代比一代值錢。',
+  };
+
+  const targetList = target_buyer
+    ? target_buyer.split('、').map(s => s.trim()).filter(Boolean)
+    : [];
+  const audienceLines = targetList
+    .map(t => audienceHooksMap[t] ? `• ${audienceHooksMap[t]}` : '')
+    .filter(Boolean);
+  const audienceBlock = audienceLines.length
+    ? `\n🎯 【為您量身打造】\n${audienceLines.join('\n')}`
+    : targetList.length
+      ? `\n🎯 【適合對象】\n這間房子特別適合：${targetList.join('、')} 的朋友`
+      : '';
 
   const title = `${subarea} ${property_type}`;
   const layoutStr = `${rooms}房${halls}廳${baths}衛${balconies}陽台`;
@@ -119,7 +143,7 @@ ${baseInfo}
 
 ${mustSayStr}
 ${second ? `\n✨ 【進階亮點】\n✓ ${second}` : ''}
-${target ? `\n🎯 【適合對象】\n這間房子特別適合：${target}的朋友` : ''}
+${audienceBlock}
 
 ${footer}`;
 
@@ -187,7 +211,7 @@ ${baseInfo}
 
 ${mustSayStr}
 ${second ? `\n✨ 【辦公環境加分項】\n✓ ${second}` : ''}
-${target ? `\n🎯 【最適合對象】\n${target}的企業主與投資人` : ''}
+${audienceBlock}
 
 ${footer}`
         : `${hookPrefix}【🏪 黃金店面 | ${subarea}${property_type} | ${price_wan}萬】
@@ -197,7 +221,7 @@ ${baseInfo}
 
 ${mustSayStr}
 ${second ? `\n✨ 【經營便利加分項】\n✓ ${second}` : ''}
-${target ? `\n🎯 【最適合對象】\n${target}的創業者與投資人` : ''}
+${audienceBlock}
 
 ${footer}`;
 
