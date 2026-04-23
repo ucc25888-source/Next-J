@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
-import { query, getPool } from '@/lib/db';
+import { query } from '@/lib/db';
 import type { Buyer } from '@/types';
 import { dbRowToBuyer } from './_utils';
 
@@ -11,25 +11,15 @@ async function nextBuyerNo(clientId: string): Promise<string> {
   const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
   const counterKey = `buyer_${clientId}_${dateStr}`;
 
-  const pool = getPool();
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    await client.query(
-      `INSERT INTO listing_counters (key, value, updated_at) VALUES ($1, 1, NOW())
-       ON CONFLICT (key) DO UPDATE SET value = listing_counters.value + 1, updated_at = NOW()`,
-      [counterKey]
-    );
-    const result = await client.query('SELECT value FROM listing_counters WHERE key = $1', [counterKey]);
-    await client.query('COMMIT');
-    const seq = result.rows[0]?.value ?? 1;
-    return `B${dateStr}-${String(seq).padStart(2, '0')}`;
-  } catch (e) {
-    await client.query('ROLLBACK');
-    throw e;
-  } finally {
-    client.release();
-  }
+  const rows = await query<{ value: number }>(
+    `INSERT INTO listing_counters (key, value, updated_at)
+     VALUES ('${counterKey}', 1, NOW())
+     ON CONFLICT (key) DO UPDATE
+       SET value = listing_counters.value + 1, updated_at = NOW()
+     RETURNING value`
+  );
+  const seq = rows[0]?.value ?? 1;
+  return `B${dateStr}-${String(seq).padStart(2, '0')}`;
 }
 
 export async function GET() {
@@ -49,8 +39,7 @@ export async function POST(req: NextRequest) {
   const now = new Date().toISOString();
   const buyerNo = await nextBuyerNo(session.clientId);
 
-  const pool = getPool();
-  const result = await pool.query(
+  const rows = await query(
     `INSERT INTO buyers (
       id, client_id, buyer_no, name, phone, email, line_id, source,
       budget_min, budget_max, pref_property_type, pref_area,
@@ -71,5 +60,5 @@ export async function POST(req: NextRequest) {
     ]
   );
 
-  return NextResponse.json({ buyer: dbRowToBuyer(result.rows[0] as Record<string, unknown>) }, { status: 201 });
+  return NextResponse.json({ buyer: dbRowToBuyer(rows[0] as Record<string, unknown>) }, { status: 201 });
 }
