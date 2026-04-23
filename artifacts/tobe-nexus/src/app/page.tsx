@@ -137,7 +137,7 @@ export default function DashboardPage() {
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-5 lg:space-y-6">
 
         {/* ── 戰力標語 ── */}
-        <div className="flex items-center justify-between gap-3 -mt-3 -mb-1">
+        <div className="flex items-center gap-2 -mt-3 -mb-1">
           <p className="text-[11px] font-bold text-glacier-200 leading-snug whitespace-nowrap">
             把繁瑣交給系統，把靈魂還給自己
           </p>
