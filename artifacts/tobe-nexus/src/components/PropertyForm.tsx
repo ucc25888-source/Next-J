@@ -49,7 +49,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const router = useRouter();
   const { addProperty, updateProperty, getPropertyById } = usePropertyStore();
   const {
-    mainPoints, landPoints, shopPoints, targetBuyers, propertyTypes,
+    mainPoints, landPoints, shopPoints, villaPoints, targetBuyers, propertyTypes,
     parkingOptions, statusNowOptions, statusPushOptions,
     getNextListingId, currentClient,
   } = useSystemStore();
@@ -115,7 +115,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
   const isTransparentType = TRANSPARENT_TYPES.includes(form.property_type);
   const isVilla = form.property_type === VILLA_TYPE;
   const isShopType = SHOP_PROPERTY_TYPES.includes(form.property_type);
-  const activePoints = isLandType ? landPoints : isShopType ? shopPoints : mainPoints;
+  const activePoints = isLandType ? landPoints : isVilla ? villaPoints : isShopType ? shopPoints : mainPoints;
 
   const availableSubareas = useMemo(
     () => form.region_key ? (GEOGRAPHIC_DATA[form.region_key] ?? []) : [],
@@ -208,6 +208,7 @@ export default function PropertyForm({ id }: PropertyFormProps) {
 
   const getPointCategory = (pt: string) => {
     if (LAND_PROPERTY_TYPES.includes(pt)) return 'land';
+    if (pt === VILLA_TYPE) return 'villa';
     if (SHOP_PROPERTY_TYPES.includes(pt)) return 'shop';
     return 'main';
   };
