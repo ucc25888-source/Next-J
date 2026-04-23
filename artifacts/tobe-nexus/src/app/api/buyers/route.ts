@@ -11,14 +11,16 @@ async function nextBuyerNo(clientId: string): Promise<string> {
   const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
   const counterKey = `buyer_${clientId}_${dateStr}`;
 
-  const rows = await query<{ value: number }>(
+  await query(
     `INSERT INTO listing_counters (key, value, updated_at)
      VALUES ('${counterKey}', 1, NOW())
      ON CONFLICT (key) DO UPDATE
-       SET value = listing_counters.value + 1, updated_at = NOW()
-     RETURNING value`
+       SET value = listing_counters.value + 1, updated_at = NOW()`
   );
-  const seq = rows[0]?.value ?? 1;
+  const seqRows = await query<{ value: number }>(
+    `SELECT value FROM listing_counters WHERE key = '${counterKey}'`
+  );
+  const seq = seqRows[0]?.value ?? 1;
   return `B${dateStr}-${String(seq).padStart(2, '0')}`;
 }
 
@@ -39,13 +41,13 @@ export async function POST(req: NextRequest) {
   const now = new Date().toISOString();
   const buyerNo = await nextBuyerNo(session.clientId);
 
-  const rows = await query(
+  await query(
     `INSERT INTO buyers (
       id, client_id, buyer_no, name, phone, email, line_id, source,
       budget_min, budget_max, pref_property_type, pref_area,
       pref_rooms, pref_min_ping, status, notes, last_contact_at,
       next_follow_up_date, created_at, updated_at
-    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20) RETURNING *`,
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)`,
     [
       id, session.clientId, buyerNo,
       body.name ?? '', body.phone ?? '', body.email ?? '', body.line_id ?? '',
@@ -60,5 +62,6 @@ export async function POST(req: NextRequest) {
     ]
   );
 
-  return NextResponse.json({ buyer: dbRowToBuyer(rows[0] as Record<string, unknown>) }, { status: 201 });
+  const row = await query('SELECT * FROM buyers WHERE id = $1', [id]);
+  return NextResponse.json({ buyer: dbRowToBuyer(row[0] as Record<string, unknown>) }, { status: 201 });
 }

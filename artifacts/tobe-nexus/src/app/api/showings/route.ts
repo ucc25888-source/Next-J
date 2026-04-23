@@ -36,12 +36,12 @@ export async function POST(req: NextRequest) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  const row = await queryOne(
+  await queryOne(
     `INSERT INTO showings (
       id, client_id, buyer_id, property_id, showing_date,
       buyer_name, buyer_phone, buyer_source, reaction,
       offer_wan, follow_up, follow_up_date, follow_up_done, notes, created_at
-    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *`,
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
     [
       id, session.clientId,
       body.buyer_id || null, body.property_id || null,
@@ -57,5 +57,6 @@ export async function POST(req: NextRequest) {
     ]
   );
 
+  const row = await queryOne('SELECT * FROM showings WHERE id = $1', [id]);
   return NextResponse.json({ showing: dbRowToShowing(row as Record<string, unknown>) }, { status: 201 });
 }

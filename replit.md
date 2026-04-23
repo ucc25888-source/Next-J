@@ -80,6 +80,12 @@ artifacts/tobe-nexus/src/
 | A1001 | A1001-2026 | professional | 200 | 福哥/杜美珍 花蓮房產顧問（21筆真實案件已匯入） |
 | ADMIN | TOBE-ADMIN-2026 | admin | 99999 | 管理員 |
 
+## Known Supabase exec_sql Limitation
+
+`exec_sql` RPC on Supabase does NOT support `INSERT ... RETURNING *` syntax.
+All INSERT queries must omit `RETURNING`, then do a separate `SELECT` to fetch the created row.
+Files affected: `api/properties/route.ts`, `api/buyers/route.ts`, `api/showings/route.ts`.
+
 ## Chrome Auto-translate Fix
 
 `<html>` has `translate="no"` + `className="notranslate"` + `suppressHydrationWarning`.
