@@ -102,7 +102,7 @@ export default function DashboardPage() {
   const loadFocus = useCallback(async () => {
     setFocusLoading(true);
     try {
-      const res = await fetch("/api/daily-focus");
+      const res = await fetch("/api/daily-focus", { cache: "no-store" });
       if (res.ok) {
         const d = await res.json();
         setFocusItems(d.items ?? []);

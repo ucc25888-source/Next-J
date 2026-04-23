@@ -184,7 +184,7 @@ export default function DailyFocusPage() {
   const loadFocus = useCallback(async () => {
     setFocusLoading(true);
     try {
-      const res = await fetch("/api/daily-focus");
+      const res = await fetch("/api/daily-focus", { cache: "no-store" });
       if (res.ok) {
         const d = await res.json();
         setFocusItems(d.items ?? []);
@@ -200,7 +200,8 @@ export default function DailyFocusPage() {
       const fullPrefix  = `[${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}]`;
       const shortPrefix = `[${d.getMonth() + 1}/${d.getDate()}]`;
       const res = await fetch(
-        `/api/daily-log?prefix=${encodeURIComponent(fullPrefix)}&shortPrefix=${encodeURIComponent(shortPrefix)}`
+        `/api/daily-log?prefix=${encodeURIComponent(fullPrefix)}&shortPrefix=${encodeURIComponent(shortPrefix)}`,
+        { cache: "no-store" }
       );
       if (res.ok) {
         const data = await res.json();
