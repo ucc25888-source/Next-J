@@ -348,25 +348,25 @@ export default function DashboardPage() {
         {/* ── 使用流程 ── */}
         <div>
           <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase mb-3">使用流程</p>
-          <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-2xl px-5 py-4">
-            <div className="flex items-center justify-between gap-2">
+          <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-2xl px-4 py-3">
+            <div className="grid grid-cols-2 md:flex md:items-center gap-2">
               {[
-                { step: "01", emoji: "🎯", title: "AI 建案分析", href: "/properties/new" },
-                { step: "02", emoji: "🔥", title: "帶看即時記錄", href: "/showings" },
-                { step: "03", emoji: "⚡", title: "一鍵生文案", href: "/properties" },
-                { step: "04", emoji: "🔔", title: "每日戰略追蹤", href: "/daily-focus" },
+                { step: "01", emoji: "🎯", title: "建案分析", href: "/properties/new" },
+                { step: "02", emoji: "🔥", title: "帶看記錄", href: "/showings" },
+                { step: "03", emoji: "⚡", title: "生成文案", href: "/properties" },
+                { step: "04", emoji: "🔔", title: "每日追蹤", href: "/daily-focus" },
               ].map((item, i, arr) => (
-                <div key={item.step} className="flex items-center gap-2 flex-1 min-w-0">
+                <div key={item.step} className="flex items-center gap-1.5 md:flex-1 min-w-0">
                   <Link href={item.href}
-                    className="group flex items-center gap-2.5 flex-1 min-w-0 px-3 py-2.5 rounded-xl hover:bg-titanium-800/60 transition-colors">
+                    className="group flex items-center gap-2 flex-1 min-w-0 px-2.5 py-2 rounded-xl hover:bg-titanium-800/60 transition-colors">
                     <span className="w-5 h-5 rounded-full bg-aurora-500 text-titanium-950 text-[9px] font-black flex items-center justify-center shrink-0">
                       {item.step}
                     </span>
-                    <span className="text-base leading-none">{item.emoji}</span>
-                    <span className="text-[11px] font-bold text-glacier-300 group-hover:text-aurora-400 transition-colors truncate">{item.title}</span>
+                    <span className="text-sm leading-none shrink-0">{item.emoji}</span>
+                    <span className="text-[11px] font-bold text-glacier-300 group-hover:text-aurora-400 transition-colors whitespace-nowrap">{item.title}</span>
                   </Link>
                   {i < arr.length - 1 && (
-                    <ChevronRight className="w-3 h-3 text-aurora-500/40 shrink-0" />
+                    <ChevronRight className="hidden md:block w-3 h-3 text-aurora-500/40 shrink-0" />
                   )}
                 </div>
               ))}
