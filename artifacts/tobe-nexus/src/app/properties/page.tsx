@@ -20,13 +20,17 @@ export default function PropertiesPage() {
   const { properties, deleteProperty } = usePropertyStore();
   const [search, setSearch] = useState("");
 
-  const filtered = properties.filter(
-    (p) =>
-      p.subarea.includes(search) ||
-      p.listing_id?.includes(search) ||
-      p.property_type.includes(search) ||
-      p.address_note?.includes(search)
-  );
+  const q = search.trim().toLowerCase();
+  const filtered = q
+    ? properties.filter(
+        (p) =>
+          p.subarea.toLowerCase().includes(q) ||
+          (p.listing_id ?? '').toLowerCase().includes(q) ||
+          p.property_type.toLowerCase().includes(q) ||
+          (p.address_note ?? '').toLowerCase().includes(q) ||
+          (p.colisting_company ?? '').toLowerCase().includes(q)
+      )
+    : properties;
 
   const getTitle = (p: typeof properties[0]) =>
     `${p.listing_id ? `[${p.listing_id}] ` : ""}${p.subarea} ${p.property_type}`;
