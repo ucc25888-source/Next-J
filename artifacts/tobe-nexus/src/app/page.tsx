@@ -125,7 +125,7 @@ export default function DashboardPage() {
       <PageHeader
         title={`早安！戰鬥力滿格的${currentClient?.display_name ?? "妳"}，今天準備好要讓哪一位買家心動成交了嗎？🚀`}
         mobileTitle={`今天讓哪位買家心動成交？🚀`}
-        subtitle="TOBE-Nexus Business AI Hub | 妳的成交戰略守護者"
+        subtitle="AI 成交戰略系統"
         actions={
           <Link href="/properties/new"
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm">
@@ -136,13 +136,12 @@ export default function DashboardPage() {
 
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-5 lg:space-y-6">
 
-        {/* ── 品牌落款 ── */}
-        <div className="flex flex-col items-end -mt-1 -mb-1 gap-0.5">
-          <p className="text-[10px] text-glacier-600 italic tracking-wide leading-relaxed text-right">
-            數位雙生建檔，靈感鉤子成文，自由時間留白——讓工作回歸它應有的輕。
+        {/* ── 戰力標語 ── */}
+        <div className="flex items-center justify-between gap-3 -mt-1 -mb-1">
+          <p className="text-[13px] font-bold text-glacier-300 leading-snug tracking-wide">
+            跟進一次，勝過沉默三週。今天先出手。⚡
           </p>
-          <p className="text-[10px] text-glacier-600 tracking-wide leading-snug">TOBE Nexus AI · 執行長</p>
-          <p className="font-signature text-[26px] text-glacier-400 mr-4 leading-none">Veda · Du</p>
+          <p className="font-signature text-[24px] text-glacier-500 leading-none shrink-0 mr-1">Veda · Du</p>
         </div>
 
         {/* Stats */}
