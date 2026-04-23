@@ -8,27 +8,25 @@ export async function GET() {
 
   const currentMonthKey = new Date().toISOString().slice(0, 7).replace('-', '');
 
-  const rows = await query(`
-    SELECT
-      c.client_id,
-      c.display_name,
-      c.plan_name,
-      c.monthly_quota,
-      CASE WHEN c.month_key = $1 THEN c.used_this_month ELSE 0 END AS used_this_month,
-      c.month_key,
-      c.status,
-      c.created_at,
-      c.has_line_service,
-      c.line_notify_token,
-      COUNT(DISTINCT p.id)::int AS property_count,
-      COUNT(DISTINCT cp.copy_id)::int AS total_copies
-    FROM clients c
-    LEFT JOIN properties p ON p.client_id = c.client_id
-    LEFT JOIN copies cp ON cp.client_id = c.client_id
-    WHERE c.role = 'user'
-    GROUP BY c.client_id
-    ORDER BY c.created_at ASC
-  `, [currentMonthKey]);
+  const [clients, propCounts, copyCounts] = await Promise.all([
+    query<{
+      client_id: string; display_name: string; plan_name: string; monthly_quota: number;
+      used_this_month: number; month_key: string; status: string; created_at: string;
+      has_line_service: boolean; line_notify_token: string | null;
+    }>(`SELECT client_id, display_name, plan_name, monthly_quota, used_this_month, month_key, status, created_at, has_line_service, line_notify_token FROM clients WHERE role = 'user' ORDER BY created_at ASC`),
+    query<{ client_id: string; cnt: number }>(`SELECT client_id, COUNT(*)::int AS cnt FROM properties GROUP BY client_id`),
+    query<{ client_id: string; cnt: number }>(`SELECT client_id, COUNT(*)::int AS cnt FROM copies GROUP BY client_id`),
+  ]);
 
-  return NextResponse.json({ clients: rows });
+  const propMap = Object.fromEntries(propCounts.map(r => [r.client_id, r.cnt]));
+  const copyMap = Object.fromEntries(copyCounts.map(r => [r.client_id, r.cnt]));
+
+  const result = clients.map(c => ({
+    ...c,
+    used_this_month: c.month_key === currentMonthKey ? c.used_this_month : 0,
+    property_count: propMap[c.client_id] ?? 0,
+    total_copies: copyMap[c.client_id] ?? 0,
+  }));
+
+  return NextResponse.json({ clients: result });
 }

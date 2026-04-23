@@ -4,11 +4,13 @@ let _client: SupabaseClient | undefined;
 
 function getClient(): SupabaseClient {
   if (!_client) {
-    const url = process.env.SUPABASE_URL;
+    let url = process.env.SUPABASE_URL ?? '';
     const key = process.env.SUPABASE_SERVICE_KEY;
     if (!url || !key) {
       throw new Error('SUPABASE_URL and SUPABASE_SERVICE_KEY must be set');
     }
+    // Strip any path suffix so supabase-js gets the bare project URL
+    url = url.replace(/\/rest\/v1\/?$/, '').replace(/\/$/, '');
     _client = createClient(url, key, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
@@ -40,7 +42,7 @@ export async function query<T = Record<string, unknown>>(
   params?: unknown[]
 ): Promise<T[]> {
   const sb = getClient();
-  const finalSql = params && params.length > 0 ? inlineParams(sql, params) : sql;
+  const finalSql = (params && params.length > 0 ? inlineParams(sql, params) : sql).trim();
 
   const { data, error } = await sb.rpc('exec_sql', { query_text: finalSql });
 
