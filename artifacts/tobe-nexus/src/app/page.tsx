@@ -138,10 +138,10 @@ export default function DashboardPage() {
 
         {/* ── 戰力標語 ── */}
         <div className="flex items-center justify-between gap-3 -mt-3 -mb-1">
-          <p className="text-[13px] font-bold text-glacier-200 leading-snug whitespace-nowrap">
+          <p className="text-[11px] font-bold text-glacier-200 leading-snug whitespace-nowrap">
             把繁瑣交給系統，把靈魂還給自己
           </p>
-          <p className="text-[11px] italic text-glacier-200 font-semibold shrink-0 whitespace-nowrap">— Veda</p>
+          <p className="text-[10px] italic text-glacier-200 font-semibold shrink-0 whitespace-nowrap">創辦人 — Veda</p>
         </div>
 
         {/* Stats */}
