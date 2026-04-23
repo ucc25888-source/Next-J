@@ -80,7 +80,7 @@ function FocusItemRow({
         <p className="text-sm text-slate-500 mt-1 leading-relaxed line-clamp-1">{item.subtitle}</p>
         {!item.done && (
           <p className="text-xs text-slate-400 mt-1.5 flex items-center gap-1">
-            <ChevronRight className="w-3 h-3" />點擊查看詳細內容
+            <ChevronRight className="w-3 h-3" />點擊填寫追蹤記錄
           </p>
         )}
       </div>
@@ -111,11 +111,11 @@ function PropertyAlertRow({ item, onClick }: { item: DailyFocusItem; onClick: (i
         <p className="text-lg font-black text-slate-900 leading-tight">{item.title}</p>
         <p className="text-sm text-slate-500 mt-1 line-clamp-1">{item.subtitle}</p>
         <p className="text-xs text-slate-400 mt-1.5 flex items-center gap-1">
-          <ChevronRight className="w-3 h-3" />點擊查看詳細內容
+          <ChevronRight className="w-3 h-3" />點擊填寫客戶經營記錄
         </p>
       </div>
       <span className="shrink-0 mt-1 text-sm font-black px-3 py-1.5 rounded-xl bg-amber-500 text-white whitespace-nowrap">
-        查看
+        記錄
       </span>
     </div>
   );
@@ -361,7 +361,7 @@ export default function DailyFocusPage() {
           <Section colorBar="border-red-400" headerBg="bg-red-100" headerText="text-red-800"
             dotClass="bg-red-500" pulseDot label="逾期未處理" count={overdueItems.length}>
             {overdueItems.map((item) => (
-              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={navigateTo} />
+              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={setSelectedItem} />
             ))}
           </Section>
         )}
@@ -371,7 +371,7 @@ export default function DailyFocusPage() {
           <Section colorBar="border-blue-300" headerBg="bg-blue-100" headerText="text-blue-800"
             dotClass="bg-blue-500" label="今日任務" count={todayItems.length}>
             {todayItems.map((item) => (
-              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={navigateTo} />
+              <FocusItemRow key={item.id} item={item} onDone={handleDone} onClick={setSelectedItem} />
             ))}
           </Section>
         )}
@@ -381,7 +381,7 @@ export default function DailyFocusPage() {
           <Section colorBar="border-amber-400" headerBg="bg-amber-100" headerText="text-amber-800"
             dotClass="bg-amber-500" label="委託到期提醒" count={propertyAlerts.length}>
             {propertyAlerts.map((item) => (
-              <PropertyAlertRow key={item.id} item={item} onClick={navigateTo} />
+              <PropertyAlertRow key={item.id} item={item} onClick={setSelectedItem} />
             ))}
           </Section>
         )}
