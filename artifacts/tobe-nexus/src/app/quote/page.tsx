@@ -14,7 +14,12 @@ function QuoteCard() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsMobile(/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent));
+  }, []);
 
   const today = new Date().toLocaleDateString("zh-TW", {
     year: "numeric", month: "long", day: "numeric", weekday: "long",
@@ -48,11 +53,9 @@ function QuoteCard() {
       const filename = `TOBE正能量_${dateStr}.png`;
       const file = new File([blob], filename, { type: "image/png" });
 
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: "TOBE 每日正能量",
-        });
+      const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      if (mobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: "TOBE 每日正能量" });
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -173,7 +176,9 @@ function QuoteCard() {
       </button>
 
       <p className="text-[10px] text-slate-400 text-center max-w-xs leading-relaxed">
-        儲存後直接貼到 LINE、FB、IG 等平台傳送，讓正能量自然散播 ✨
+        {isMobile
+          ? "手機可直接透過系統分享傳到 LINE、IG、FB 等平台 ✨"
+          : "圖片已下載到電腦，開啟 LINE 後手動傳送給朋友即可 ✨"}
       </p>
     </div>
   );
