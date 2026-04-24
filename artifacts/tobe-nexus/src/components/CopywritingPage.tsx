@@ -222,7 +222,7 @@ export default function CopywritingPage({ id }: { id: string }) {
 
   const handleDownloadImages = () => {
     if (!property) return;
-    [property.img1_url, property.img2_url, property.img3_url, property.img4_url]
+    [property.img1_url, property.img2_url, property.img3_url, property.img4_url, property.img5_url]
       .filter(Boolean)
       .forEach((imgUrl, i) => {
         const a = document.createElement('a');
