@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.104.0",
     "clsx": "catalog:",
+    "html2canvas": "^1.4.1",
     "iron-session": "^8.0.4",
     "lucide-react": "catalog:",
     "next": "^15.3.3",

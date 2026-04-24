@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { ImageDown, Loader2, CheckCircle2 } from "lucide-react";
 
 interface Quote { text: string; author: string; date: string; }
 
@@ -11,6 +12,13 @@ function QuoteCard() {
 
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const today = new Date().toLocaleDateString("zh-TW", {
+    year: "numeric", month: "long", day: "numeric", weekday: "long",
+  });
 
   useEffect(() => {
     fetch("/api/daily-quote")
@@ -19,116 +27,154 @@ function QuoteCard() {
       .catch(() => setLoading(false));
   }, []);
 
-  const today = new Date().toLocaleDateString("zh-TW", { year: "numeric", month: "long", day: "numeric", weekday: "long" });
+  const handleSaveImage = async () => {
+    if (!cardRef.current || !quote) return;
+    setSaving(true);
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 2.5,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        removeContainer: true,
+      });
+
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((b) => resolve(b!), "image/png", 1.0);
+      });
+
+      const dateStr = new Date().toLocaleDateString("zh-TW").replace(/\//g, "");
+      const filename = `TOBE正能量_${dateStr}.png`;
+      const file = new File([blob], filename, { type: "image/png" });
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "TOBE 每日正能量",
+        });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/40 flex items-center justify-center p-6">
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-gradient-to-br from-violet-100/40 to-indigo-100/30 blur-3xl -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-gradient-to-tr from-amber-100/40 to-orange-100/20 blur-3xl translate-y-1/3 -translate-x-1/4" />
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 rounded-full bg-gradient-to-br from-rose-100/20 to-pink-100/10 blur-2xl -translate-x-1/2 -translate-y-1/2" />
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-violet-50/30 flex flex-col items-center justify-center p-6 gap-5">
 
-        {/* Corner ornaments */}
-        <svg className="absolute top-6 left-6 w-20 h-20 text-violet-200/60" viewBox="0 0 80 80" fill="none">
-          <circle cx="8" cy="8" r="3" fill="currentColor"/>
-          <circle cx="24" cy="8" r="2" fill="currentColor" opacity="0.6"/>
-          <circle cx="8" cy="24" r="2" fill="currentColor" opacity="0.6"/>
-          <circle cx="40" cy="8" r="1.5" fill="currentColor" opacity="0.3"/>
-          <circle cx="8" cy="40" r="1.5" fill="currentColor" opacity="0.3"/>
-          <path d="M2 2 Q20 2 20 20" stroke="currentColor" strokeWidth="1" fill="none" opacity="0.4"/>
-        </svg>
-        <svg className="absolute bottom-6 right-6 w-20 h-20 text-amber-300/60" viewBox="0 0 80 80" fill="none">
-          <circle cx="72" cy="72" r="3" fill="currentColor"/>
-          <circle cx="56" cy="72" r="2" fill="currentColor" opacity="0.6"/>
-          <circle cx="72" cy="56" r="2" fill="currentColor" opacity="0.6"/>
-          <circle cx="40" cy="72" r="1.5" fill="currentColor" opacity="0.3"/>
-          <circle cx="72" cy="40" r="1.5" fill="currentColor" opacity="0.3"/>
-          <path d="M78 78 Q60 78 60 60" stroke="currentColor" strokeWidth="1" fill="none" opacity="0.4"/>
-        </svg>
+      {/* ── The shareable card (captured area) ── */}
+      <div ref={cardRef} className="relative w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-none"
+        style={{ fontFamily: "'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif" }}>
 
-        {/* Subtle diagonal lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.025]" preserveAspectRatio="none">
-          <defs>
-            <pattern id="lines" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M-10 10 l20-20 M0 40 l40-40 M30 50 l20-20" stroke="#7c3aed" strokeWidth="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#lines)"/>
-        </svg>
-      </div>
+        {/* Top accent bar */}
+        <div style={{ height: 6, background: "linear-gradient(90deg, #7c3aed, #a855f7, #6366f1)" }} />
 
-      {/* Main card */}
-      <div className="relative w-full max-w-sm">
-        {/* Card shadow layer */}
-        <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-3xl bg-gradient-to-br from-violet-200/40 to-amber-200/40 blur-sm" />
-
-        <div className="relative bg-white/95 backdrop-blur-sm rounded-3xl border border-white/80 shadow-2xl shadow-violet-900/10 overflow-hidden">
-          {/* Top accent bar */}
-          <div className="h-1.5 bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400" />
-
-          <div className="px-8 pt-8 pb-7">
-            {/* Header */}
-            <div className="flex items-center gap-2 mb-6">
-              <span className="text-lg">✨</span>
-              <div>
-                <p className="text-[11px] font-black text-violet-600 tracking-[0.2em] uppercase">每天一句正能量</p>
-                <p className="text-[9px] text-slate-400 mt-0.5 tracking-wide">{today}</p>
-              </div>
-            </div>
-
-            {/* Decorative divider */}
-            <div className="flex items-center gap-2 mb-6">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-violet-200 to-transparent" />
-              <div className="w-1.5 h-1.5 rounded-full bg-violet-300" />
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-violet-200 to-transparent" />
-            </div>
-
-            {/* Quote */}
-            {loading ? (
-              <div className="space-y-2 mb-6">
-                <div className="h-5 bg-slate-100 rounded-lg animate-pulse w-full" />
-                <div className="h-5 bg-slate-100 rounded-lg animate-pulse w-4/5" />
-                <div className="h-5 bg-slate-100 rounded-lg animate-pulse w-3/5" />
-              </div>
-            ) : quote ? (
-              <div className="mb-6">
-                <div className="text-4xl text-violet-200/70 font-serif leading-none mb-2 select-none">"</div>
-                <p className="text-[19px] font-bold text-slate-800 leading-[1.65] tracking-wide text-center">
-                  {quote.text}
-                </p>
-                <div className="text-4xl text-violet-200/70 font-serif leading-none text-right select-none mt-1">"</div>
-              </div>
-            ) : null}
-
-            {/* Decorative divider */}
-            <div className="flex items-center gap-2 mb-5">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent" />
-              <div className="w-1 h-1 rounded-full bg-amber-300" />
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent" />
-            </div>
-
-            {/* Author + Sender */}
-            <div className="flex items-end justify-between">
-              <div>
-                <p className="text-[9px] text-slate-400 mb-0.5">主題分類</p>
-                <p className="text-[11px] font-bold text-slate-500">— {quote?.author ?? ""}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[9px] text-slate-400 mb-0.5">由此傳達給您</p>
-                <p className="text-[13px] font-black text-violet-600">{senderName}</p>
-              </div>
+        <div style={{ padding: "32px 32px 0" }}>
+          {/* Header */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
+            <span style={{ fontSize: 20 }}>✨</span>
+            <div>
+              <p style={{ fontSize: 11, fontWeight: 900, color: "#7c3aed", letterSpacing: "0.18em", textTransform: "uppercase", margin: 0 }}>
+                每天一句正能量
+              </p>
+              <p style={{ fontSize: 9, color: "#94a3b8", marginTop: 2, letterSpacing: "0.05em", margin: "2px 0 0" }}>
+                {today}
+              </p>
             </div>
           </div>
 
-          {/* Bottom branding */}
-          <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border-t border-violet-100/60 px-8 py-3">
-            <p className="text-[9px] text-slate-400 text-center tracking-widest uppercase">
-              TOBE · 花蓮房產顧問 · 每日正能量
-            </p>
+          {/* Top divider */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
+            <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, transparent, #ddd6fe, transparent)" }} />
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#c4b5fd" }} />
+            <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, transparent, #ddd6fe, transparent)" }} />
+          </div>
+
+          {/* Quote marks + text */}
+          {loading ? (
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ height: 20, background: "#f1f5f9", borderRadius: 8, marginBottom: 8 }} />
+              <div style={{ height: 20, background: "#f1f5f9", borderRadius: 8, width: "80%", marginBottom: 8 }} />
+              <div style={{ height: 20, background: "#f1f5f9", borderRadius: 8, width: "60%" }} />
+            </div>
+          ) : quote ? (
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ fontSize: 40, color: "rgba(196,181,253,0.6)", lineHeight: 1, marginBottom: 8, fontFamily: "Georgia, serif" }}>"</div>
+              <p style={{ fontSize: 20, fontWeight: 700, color: "#1e293b", lineHeight: 1.65, letterSpacing: "0.04em", textAlign: "center", margin: "0 0 8px" }}>
+                {quote.text}
+              </p>
+              <div style={{ fontSize: 40, color: "rgba(196,181,253,0.6)", lineHeight: 1, textAlign: "right", fontFamily: "Georgia, serif" }}>"</div>
+            </div>
+          ) : null}
+
+          {/* Bottom divider */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+            <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, transparent, #fde68a, transparent)" }} />
+            <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#fcd34d" }} />
+            <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, transparent, #fde68a, transparent)" }} />
+          </div>
+
+          {/* Author + Sender */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingBottom: 28 }}>
+            <div>
+              <p style={{ fontSize: 9, color: "#94a3b8", margin: "0 0 2px" }}>主題分類</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "#64748b", margin: 0 }}>— {quote?.author ?? ""}</p>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <p style={{ fontSize: 9, color: "#94a3b8", margin: "0 0 2px" }}>由此傳達給您</p>
+              <p style={{ fontSize: 14, fontWeight: 900, color: "#7c3aed", margin: 0 }}>{senderName}</p>
+            </div>
           </div>
         </div>
+
+        {/* Bottom branding */}
+        <div style={{
+          background: "linear-gradient(90deg, #f5f3ff, #eef2ff)",
+          borderTop: "1px solid rgba(221,214,254,0.5)",
+          padding: "10px 32px",
+          textAlign: "center",
+        }}>
+          <p style={{ fontSize: 9, color: "#94a3b8", letterSpacing: "0.12em", textTransform: "uppercase", margin: 0 }}>
+            TOBE NEXUS · AI房仲系統 | 每日正能量
+          </p>
+        </div>
       </div>
+
+      {/* ── Save/share button (NOT captured) ── */}
+      <button
+        onClick={handleSaveImage}
+        disabled={saving || loading || !quote}
+        className={`flex items-center gap-2.5 px-8 py-3.5 rounded-2xl text-sm font-black transition-all duration-200 shadow-lg
+          ${saved
+            ? "bg-emerald-500 text-white shadow-emerald-200"
+            : saving
+              ? "bg-violet-300 text-white cursor-not-allowed"
+              : "bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-500 hover:to-purple-500 active:scale-95 shadow-violet-200"
+          }`}
+      >
+        {saved ? (
+          <><CheckCircle2 className="w-5 h-5" /> 圖片已儲存！</>
+        ) : saving ? (
+          <><Loader2 className="w-5 h-5 animate-spin" /> 生成圖片中...</>
+        ) : (
+          <><ImageDown className="w-5 h-5" /> 儲存圖片 · 分享給朋友</>
+        )}
+      </button>
+
+      <p className="text-[10px] text-slate-400 text-center max-w-xs leading-relaxed">
+        儲存後直接貼到 LINE、FB、IG 等平台傳送，讓正能量自然散播 ✨
+      </p>
     </div>
   );
 }

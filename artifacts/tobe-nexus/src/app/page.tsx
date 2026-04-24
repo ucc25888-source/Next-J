@@ -79,16 +79,11 @@ export default function DashboardPage() {
     if (currentClient?.display_name && !shareName) setShareName(currentClient.display_name);
   }, [currentClient]);
 
-  const handleShareQuote = async () => {
+  const handleShareQuote = () => {
     const name = encodeURIComponent(shareName || currentClient?.display_name || "花蓮房產顧問福哥");
     const origin = typeof window !== "undefined" ? window.location.origin : "https://tobe-nexus.replit.app";
     const url = `${origin}/quote?name=${name}`;
-    const dateStr = new Date().toLocaleDateString("zh-TW", { month: "long", day: "numeric" });
-    const shareText = `✨ ${dateStr} 每日正能量，傳給你一起加油 💪`;
-    if (navigator.share) {
-      try { await navigator.share({ title: "TOBE 每日正能量", text: shareText, url }); return; } catch { /* fallback */ }
-    }
-    await navigator.clipboard.writeText(`${shareText}\n${url}`);
+    window.open(url, "_blank");
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
@@ -366,8 +361,8 @@ export default function DashboardPage() {
                     : "bg-white/10 text-white/80 border border-white/20 hover:bg-white/20 hover:text-white active:scale-95"
                   }`}>
                 {copied
-                  ? <><Check className="w-3.5 h-3.5" /> 已複製！</>
-                  : <><Share2 className="w-3.5 h-3.5" /> 分享給朋友</>
+                  ? <><Check className="w-3.5 h-3.5" /> 已開啟！</>
+                  : <><Share2 className="w-3.5 h-3.5" /> 產生分享圖片</>
                 }
               </button>
             </div>
@@ -403,7 +398,7 @@ export default function DashboardPage() {
             {copied && (
               <div className="mt-3 bg-emerald-400/15 border border-emerald-400/30 rounded-xl px-3 py-2">
                 <p className="text-[11px] text-emerald-300 text-center">
-                  連結已複製！貼到 LINE 傳給朋友，打開就是一張漂亮的正能量卡片 🎉
+                  已開啟圖片頁面，點「儲存圖片」後直接貼到 LINE / FB 傳送 🎉
                 </p>
               </div>
             )}
