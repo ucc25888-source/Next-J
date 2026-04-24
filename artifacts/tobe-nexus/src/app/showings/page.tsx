@@ -295,6 +295,7 @@ export default function ShowingsPage() {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((s) => {
               const propTitle = getPropertyTitle(s.property_id);
+              const prop = properties.find(pr => pr.id === s.property_id) ?? null;
               const cfg = REACTION_CARD_STYLE[s.reaction] ?? REACTION_CARD_STYLE['普通'];
               const ReactionIcon = cfg.icon;
               const isHighlighted = openId === String(s.id);
@@ -326,9 +327,35 @@ export default function ShowingsPage() {
                   <div className="p-4 space-y-3 cursor-pointer" onClick={() => openEditModal(s)}>
                     {/* Property tag */}
                     {propTitle && (
-                      <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-1.5">
-                        <Building2 className="w-3 h-3 text-blue-500 shrink-0" />
-                        <p className="text-[11px] text-blue-700 font-semibold truncate">{propTitle}</p>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-1.5 space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <Building2 className="w-3 h-3 text-blue-500 shrink-0" />
+                          <p className="text-[11px] text-blue-700 font-semibold truncate">{propTitle}</p>
+                        </div>
+                        {prop && (
+                          <div className="flex flex-wrap gap-x-2.5 gap-y-0.5 pl-4">
+                            {prop.price_wan > 0 && (
+                              <span className="text-[10px] font-bold text-rose-600">
+                                💰 {prop.price_wan.toLocaleString()} 萬
+                              </span>
+                            )}
+                            {prop.land_ping > 0 && (
+                              <span className="text-[10px] text-slate-500 font-medium">
+                                地 {prop.land_ping} 坪
+                              </span>
+                            )}
+                            {prop.build_ping > 0 && (
+                              <span className="text-[10px] text-slate-500 font-medium">
+                                建 {prop.build_ping} 坪
+                              </span>
+                            )}
+                            {prop.rooms && (
+                              <span className="text-[10px] text-slate-500 font-medium">
+                                {prop.rooms}房{prop.halls}廳{prop.baths}衛
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
 
