@@ -49,6 +49,7 @@ export default function SettingsPage() {
     if (res.ok) {
       setPwdMsg({ ok: true, text: '存取碼已更新，下次登入請使用新存取碼' });
       setCurPwd(""); setNewPwd(""); setConfirmPwd("");
+      if (currentClient) localStorage.setItem(`pwd_changed_${currentClient.client_id}`, '1');
     } else {
       setPwdMsg({ ok: false, text: data.error ?? '更新失敗，請稍後再試' });
     }

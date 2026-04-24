@@ -8,7 +8,7 @@ import PageHeader from "@/components/PageHeader";
 import {
   Building2, ChevronRight, Plus,
   AlertCircle, CheckCircle2, Bell, MoveRight,
-  CalendarCheck, Smile, Meh, ThumbsDown, Star,
+  CalendarCheck, Smile, Meh, ThumbsDown, Star, X, ShieldAlert,
 } from "lucide-react";
 import type { DailyFocusItem } from "@/types";
 
@@ -31,6 +31,18 @@ export default function DashboardPage() {
   const [focusLoading, setFocusLoading] = useState(true);
   const [showingReactions, setShowingReactions] = useState<ShowingReaction[]>([]);
   const [showingTotal, setShowingTotal] = useState(0);
+  const [showPwdBanner, setShowPwdBanner] = useState(false);
+
+  useEffect(() => {
+    if (!currentClient) return;
+    const key = `pwd_changed_${currentClient.client_id}`;
+    if (!localStorage.getItem(key)) setShowPwdBanner(true);
+  }, [currentClient]);
+
+  const dismissPwdBanner = () => {
+    if (currentClient) localStorage.setItem(`pwd_changed_${currentClient.client_id}`, '1');
+    setShowPwdBanner(false);
+  };
 
   const loadFocus = useCallback(async () => {
     setFocusLoading(true);
@@ -133,6 +145,24 @@ export default function DashboardPage() {
           </Link>
         }
       />
+
+      {/* ── 換密碼提示橫幅 ── */}
+      {showPwdBanner && (
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20">
+          <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+          <p className="text-[12px] text-amber-300 flex-1">
+            您目前使用的是初始存取碼，建議盡快
+            <Link href="/settings" onClick={dismissPwdBanner}
+              className="underline underline-offset-2 font-bold mx-1 hover:text-amber-200">
+              前往設定修改
+            </Link>
+            以保護帳號安全。
+          </p>
+          <button onClick={dismissPwdBanner} className="text-amber-500 hover:text-amber-300 transition-colors shrink-0">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-5 lg:space-y-6">
 
