@@ -679,6 +679,12 @@ export default function AdminPage() {
                   fields: ['客戶代碼', '客戶名稱', '操作', '物件編號', '消耗Tokens', '時間', '...'],
                   hasClientFilter: false,
                 },
+                {
+                  table: 'daily_quotes', label: '每日金句存檔', desc: 'AI 每天生成的正能量金句，含日期、內容、主題分類，可供整理與回顧',
+                  icon: Sparkles, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20',
+                  fields: ['日期', '金句內容', '主題分類', '生成時間'],
+                  hasClientFilter: false,
+                },
               ]).map(({ table, label, desc, icon: Icon, color, bg, fields, hasClientFilter }) => (
                 <div key={table} className={`rounded-2xl border p-5 ${bg} bg-titanium-900`}>
                   <div className="flex items-center gap-2.5 mb-3">

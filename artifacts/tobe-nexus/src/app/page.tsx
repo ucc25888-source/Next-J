@@ -67,6 +67,7 @@ export default function DashboardPage() {
   const [showingTotal, setShowingTotal] = useState(0);
   const [showPwdBanner, setShowPwdBanner] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [shareName, setShareName] = useState("");
 
   const todayQuote = (() => {
     const d = new Date();
@@ -74,13 +75,20 @@ export default function DashboardPage() {
     return DAILY_QUOTES[idx];
   })();
 
+  useEffect(() => {
+    if (currentClient?.display_name && !shareName) setShareName(currentClient.display_name);
+  }, [currentClient]);
+
   const handleShareQuote = async () => {
+    const name = encodeURIComponent(shareName || currentClient?.display_name || "花蓮房產顧問福哥");
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://tobe-nexus.replit.app";
+    const url = `${origin}/quote?name=${name}`;
     const dateStr = new Date().toLocaleDateString("zh-TW", { month: "long", day: "numeric" });
-    const shareText = `✨ TOBE 每日正能量（${dateStr}）\n\n「${todayQuote.text}」\n\n— ${todayQuote.author}\n\n來自 花蓮房產顧問福哥 · TOBE 系統`;
+    const shareText = `✨ ${dateStr} 每日正能量，傳給你一起加油 💪`;
     if (navigator.share) {
-      try { await navigator.share({ text: shareText }); return; } catch { /* fallback */ }
+      try { await navigator.share({ title: "TOBE 每日正能量", text: shareText, url }); return; } catch { /* fallback */ }
     }
-    await navigator.clipboard.writeText(shareText);
+    await navigator.clipboard.writeText(`${shareText}\n${url}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
@@ -371,16 +379,23 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {/* footer */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            {/* footer: author + name input */}
+            <div className="flex items-end justify-between gap-3">
+              <div className="shrink-0">
                 <span className="text-purple-300 text-[11px]">— {todayQuote.author}</span>
               </div>
-              <div className="text-right">
-                <p className="text-[10px] text-purple-300/60">署名</p>
-                <p className="text-[12px] font-black text-purple-200">
-                  {currentClient?.display_name ?? "您"}
-                </p>
+              <div className="flex-1 min-w-0">
+                <label className="block text-[9px] text-purple-300/60 mb-1 text-right tracking-widest uppercase">
+                  在 LINE / FB 希望朋友怎麼稱呼你？
+                </label>
+                <input
+                  type="text"
+                  value={shareName}
+                  onChange={(e) => setShareName(e.target.value)}
+                  placeholder={currentClient?.display_name ?? "輸入你的名字"}
+                  maxLength={20}
+                  className="w-full bg-white/10 border border-purple-300/30 rounded-lg px-3 py-1.5 text-[12px] font-bold text-white placeholder-purple-300/40 focus:outline-none focus:border-purple-300/60 focus:bg-white/15 transition-all text-right"
+                />
               </div>
             </div>
 
@@ -388,7 +403,7 @@ export default function DashboardPage() {
             {copied && (
               <div className="mt-3 bg-emerald-400/15 border border-emerald-400/30 rounded-xl px-3 py-2">
                 <p className="text-[11px] text-emerald-300 text-center">
-                  貼文已複製，貼到 LINE 或任何地方即可傳送給朋友 🎉
+                  連結已複製！貼到 LINE 傳給朋友，打開就是一張漂亮的正能量卡片 🎉
                 </p>
               </div>
             )}

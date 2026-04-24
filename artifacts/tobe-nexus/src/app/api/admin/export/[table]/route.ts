@@ -147,6 +147,19 @@ const QUERIES: Record<string, (clientId: string) => Promise<Record<string, unkno
       執行時間: fmtDate(r.created_at),
     }));
   },
+
+  daily_quotes: async (_clientId) => {
+    const rows = await query(
+      `SELECT date, text, author, created_at FROM daily_quotes_log ORDER BY date DESC`,
+      []
+    );
+    return rows.map((r) => ({
+      日期: r.date,
+      金句內容: r.text,
+      主題分類: r.author,
+      生成時間: fmtDate(r.created_at),
+    }));
+  },
 };
 
 export async function GET(
