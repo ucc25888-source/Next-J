@@ -9,10 +9,44 @@ import {
   Building2, ChevronRight, Plus,
   AlertCircle, CheckCircle2, Bell, MoveRight,
   CalendarCheck, Smile, Meh, ThumbsDown, Star, X, ShieldAlert,
+  Share2, Check,
 } from "lucide-react";
 import type { DailyFocusItem } from "@/types";
 
 interface ShowingReaction { reaction: string; cnt: number; }
+
+const DAILY_QUOTES = [
+  { text: "不要等到一切完美才出發，出發了才會完美。", author: "每日正能量" },
+  { text: "每一套房子背後，都是一個家的夢想。讓我們用心，幫夢想找到歸宿。", author: "房產智慧" },
+  { text: "你所做的每一個準備，都是在為某個美好的結果鋪路。", author: "每日正能量" },
+  { text: "成交不是終點，是信任的開始。", author: "房產哲學" },
+  { text: "今天比昨天進步一點點，就是成功。", author: "每日正能量" },
+  { text: "買家找的不只是房子，是對生活的想像。你的工作，是幫他們看見那個畫面。", author: "房產智慧" },
+  { text: "累了就停下來，但不要放棄。休息是為了走更長遠的路。", author: "每日正能量" },
+  { text: "一個真誠的問候，有時比任何話術都更有力量。", author: "溝通之道" },
+  { text: "每天早上都是一次重新開始的機會，好好把握它。", author: "每日正能量" },
+  { text: "好的房產顧問，賣的是安心，不只是坪數。", author: "房產哲學" },
+  { text: "不管昨天發生了什麼，今天的太陽是全新的。", author: "每日正能量" },
+  { text: "跟進是門藝術，堅持是種態度，成交是份禮物。", author: "房產智慧" },
+  { text: "你的努力，正在以你看不見的方式，悄悄發揮作用。", author: "每日正能量" },
+  { text: "花蓮的山海，是最好的鄰居。把這份美好，傳遞給每一位買家。", author: "在地情懷" },
+  { text: "信任需要時間建立，但只需要一個瞬間就能感受到。", author: "溝通之道" },
+  { text: "現代人最缺的不是資訊，而是讓人放鬆下來的安全感。你提供的，正是這個。", author: "房產智慧" },
+  { text: "做好眼前的每一件小事，大事自然水到渠成。", author: "每日正能量" },
+  { text: "有時候，最好的成交技巧，是真心聽對方說話。", author: "溝通之道" },
+  { text: "即使進度緩慢，只要你還在前進，就不算失敗。", author: "每日正能量" },
+  { text: "你的專業是你給客戶最好的禮物，不斷精進它。", author: "房產哲學" },
+  { text: "今天種下的種子，某一天會開出你意想不到的花。", author: "每日正能量" },
+  { text: "讓系統處理繁瑣，把你的精力留給最重要的人和事。", author: "工作哲學" },
+  { text: "好的服務，讓客戶想起你時會微笑。", author: "溝通之道" },
+  { text: "不是每天都容易，但你已經撐過了所有最難的那天。", author: "每日正能量" },
+  { text: "每一次拒絕，都讓你離下一個「好」更近了。", author: "房產智慧" },
+  { text: "生活的節奏由你掌控，工作的效率由系統輔助，美好的未來由你創造。", author: "工作哲學" },
+  { text: "真正的財富，是把自己的時間花在真正重要的事情上。", author: "每日正能量" },
+  { text: "你的溫度，是任何科技都取代不了的核心競爭力。", author: "工作哲學" },
+  { text: "不必羨慕別人，你正走在屬於自己的最好路上。", author: "每日正能量" },
+  { text: "把每一位客戶的信任當成禮物，用心對待，用行動回應。", author: "房產哲學" },
+];
 
 const STATUS_STYLE: Record<string, string> = {
   "銷售中":  "bg-emerald-100 text-emerald-700",
@@ -32,6 +66,24 @@ export default function DashboardPage() {
   const [showingReactions, setShowingReactions] = useState<ShowingReaction[]>([]);
   const [showingTotal, setShowingTotal] = useState(0);
   const [showPwdBanner, setShowPwdBanner] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const todayQuote = (() => {
+    const d = new Date();
+    const idx = (d.getFullYear() * 366 + d.getMonth() * 31 + d.getDate()) % DAILY_QUOTES.length;
+    return DAILY_QUOTES[idx];
+  })();
+
+  const handleShareQuote = async () => {
+    const dateStr = new Date().toLocaleDateString("zh-TW", { month: "long", day: "numeric" });
+    const shareText = `✨ TOBE 每日正能量（${dateStr}）\n\n「${todayQuote.text}」\n\n— ${todayQuote.author}\n\n來自 花蓮房產顧問福哥 · TOBE 系統`;
+    if (navigator.share) {
+      try { await navigator.share({ text: shareText }); return; } catch { /* fallback */ }
+    }
+    await navigator.clipboard.writeText(shareText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
 
   useEffect(() => {
     if (!currentClient) return;
@@ -170,21 +222,22 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
           {statCards.map((card) => (
             <div key={card.label}
-              className={`relative bg-gradient-to-br ${card.gradient} rounded-2xl p-5 border ${card.border} overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md group cursor-default`}>
-              <div className={`absolute -top-5 -right-5 w-24 h-24 rounded-full ${card.ringColor} transition-transform duration-500 group-hover:scale-110`} />
+              className={`relative bg-gradient-to-br ${card.gradient} rounded-2xl p-5 border-2 ${card.border} overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl group cursor-default`}>
+              <div className={`absolute -top-6 -right-6 w-28 h-28 rounded-full ${card.ringColor} transition-transform duration-500 group-hover:scale-125`} />
+              <div className={`absolute bottom-0 left-0 right-0 h-1 rounded-b-2xl ${card.ringColor} opacity-60`} />
               <div className="relative">
                 <div className="flex items-start justify-between mb-3">
-                  <span className="text-2xl leading-none">{card.emoji}</span>
-                  <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${card.badgeStyle} tracking-wider uppercase whitespace-nowrap`}>
+                  <span className="text-3xl leading-none drop-shadow-sm">{card.emoji}</span>
+                  <span className={`text-[9px] font-black px-2.5 py-1 rounded-full ${card.badgeStyle} tracking-wider uppercase whitespace-nowrap shadow-sm`}>
                     {card.badge}
                   </span>
                 </div>
                 <div className="flex items-baseline gap-1 mt-1">
-                  <span className={`text-[2.6rem] font-black leading-none ${card.numColor} tabular-nums`}>{card.value}</span>
-                  <span className={`text-base font-bold ${card.numColor} opacity-70`}>{card.sub}</span>
+                  <span className={`text-[3rem] font-black leading-none ${card.numColor} tabular-nums drop-shadow-sm`}>{card.value}</span>
+                  <span className={`text-lg font-black ${card.numColor} opacity-60`}>{card.sub}</span>
                 </div>
-                <p className={`mt-1 text-[13px] font-bold ${card.labelColor}`}>{card.label}</p>
-                <p className={`mt-1.5 text-[10px] font-semibold ${card.hintColor} opacity-80`}>{card.hint}</p>
+                <p className={`mt-1.5 text-[14px] font-black ${card.labelColor} tracking-tight`}>{card.label}</p>
+                <p className={`mt-1.5 text-[11px] font-bold ${card.hintColor} opacity-90`}>{card.hint}</p>
               </div>
             </div>
           ))}
@@ -278,6 +331,70 @@ export default function DashboardPage() {
           )}
         </Link>
 
+        {/* ── TOBE 每日一句正能量 ── */}
+        <div className="relative overflow-hidden rounded-2xl">
+          {/* layered background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.12)_0%,transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.3)_0%,transparent_60%)]" />
+          {/* decorative circles */}
+          <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/5" />
+          <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-white/5" />
+
+          <div className="relative px-5 pt-5 pb-4">
+            {/* header row */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">✨</span>
+                <div>
+                  <p className="text-[11px] font-black text-purple-200 tracking-[0.18em] uppercase">TOBE 每日一句正能量</p>
+                  <p className="text-[9px] text-purple-300/70 mt-0.5">房產 · 工作 · 現代人的向上力量</p>
+                </div>
+              </div>
+              <button onClick={handleShareQuote}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all duration-200 shrink-0
+                  ${copied
+                    ? "bg-emerald-400/20 text-emerald-300 border border-emerald-400/40"
+                    : "bg-white/10 text-white/80 border border-white/20 hover:bg-white/20 hover:text-white active:scale-95"
+                  }`}>
+                {copied
+                  ? <><Check className="w-3.5 h-3.5" /> 已複製！</>
+                  : <><Share2 className="w-3.5 h-3.5" /> 分享給朋友</>
+                }
+              </button>
+            </div>
+
+            {/* quote */}
+            <div className="border-l-4 border-purple-300/60 pl-4 mb-4">
+              <p className="text-white font-bold text-[16px] md:text-[18px] leading-relaxed tracking-wide">
+                「{todayQuote.text}」
+              </p>
+            </div>
+
+            {/* footer */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-purple-300 text-[11px]">— {todayQuote.author}</span>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] text-purple-300/60">署名</p>
+                <p className="text-[12px] font-black text-purple-200">
+                  {currentClient?.display_name ?? "您"}
+                </p>
+              </div>
+            </div>
+
+            {/* share hint */}
+            {copied && (
+              <div className="mt-3 bg-emerald-400/15 border border-emerald-400/30 rounded-xl px-3 py-2">
+                <p className="text-[11px] text-emerald-300 text-center">
+                  貼文已複製，貼到 LINE 或任何地方即可傳送給朋友 🎉
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* ── 最新案件（緊湊清單） ── */}
         <div>
           <div className="flex items-center justify-between mb-3">
@@ -326,46 +443,6 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* ── 系統亮點 ── */}
-        <div>
-          <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase mb-3">工作解方</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {[
-              {
-                emoji: "⚙️", title: "數位雙生建檔",
-                desc: "像有個懂房子的人靜靜站在妳身旁。繁瑣的事它來扛，妳只需要好好呼吸、好好生活。",
-                href: "/properties/new",
-                from: "from-teal-50", to: "to-emerald-100", border: "border-teal-200/80",
-                titleColor: "text-teal-800", descColor: "text-teal-600",
-                ring: "hover:ring-2 hover:ring-teal-300/60",
-              },
-              {
-                emoji: "🪄", title: "靈感鉤子生成",
-                desc: "靈感來了就用，不必苦思。風一樣的速度，讓對的文字自然落在買家心裡。",
-                href: "/properties",
-                from: "from-orange-50", to: "to-rose-100", border: "border-orange-200/80",
-                titleColor: "text-orange-700", descColor: "text-rose-600",
-                ring: "hover:ring-2 hover:ring-aurora-300/60",
-              },
-              {
-                emoji: "📈", title: "自由時間管理",
-                desc: "工作做完，陽光還在。讓系統替妳守著節奏，妳去過那個一直想過的日子。",
-                href: "/daily-focus",
-                from: "from-violet-50", to: "to-purple-100", border: "border-violet-200/80",
-                titleColor: "text-violet-800", descColor: "text-violet-600",
-                ring: "hover:ring-2 hover:ring-violet-300/60",
-              },
-            ].map((item) => (
-              <Link key={item.title} href={item.href}
-                className={`group bg-gradient-to-br ${item.from} ${item.to} border ${item.border} rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${item.ring} block`}>
-                <div className="text-3xl mb-3">{item.emoji}</div>
-                <p className={`text-[15px] font-black ${item.titleColor} leading-snug`}>{item.title}</p>
-                <p className={`text-[12px] ${item.descColor} mt-2 leading-relaxed`}>{item.desc}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-
         {/* ── 使用流程 ── */}
         <div>
           <p className="text-[10px] font-bold text-glacier-500 tracking-[0.15em] uppercase mb-3">使用流程</p>
@@ -374,7 +451,7 @@ export default function DashboardPage() {
               {[
                 { step: "01", emoji: "🎯", title: "建案分析", href: "/properties/new" },
                 { step: "02", emoji: "🔥", title: "帶看記錄", href: "/showings" },
-                { step: "03", emoji: "⚡", title: "生成文案", href: "/properties" },
+                { step: "03", emoji: "⚡", title: "生成文案", href: "/ai-copy" },
                 { step: "04", emoji: "🔔", title: "每日追蹤", href: "/daily-focus" },
               ].map((item, i, arr) => (
                 <div key={item.step} className="flex items-center gap-1.5 md:flex-1 min-w-0">
