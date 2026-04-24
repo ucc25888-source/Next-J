@@ -48,6 +48,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     updates.push(`line_notify_token = $${idx++}`);
     values.push(body.line_notify_token);
   }
+  if ((body as { login_token?: string }).login_token !== undefined) {
+    updates.push(`login_token = $${idx++}`);
+    values.push((body as { login_token: string }).login_token);
+  }
 
   if (updates.length === 0) {
     return NextResponse.json({ error: 'No fields to update' }, { status: 400 });

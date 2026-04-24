@@ -6,7 +6,7 @@ import {
   Users, BarChart3, Sparkles, ShieldOff, ShieldCheck,
   Plus, LogOut, RefreshCw, Network, PencilLine, X, Check, RotateCcw,
   Activity, FileText, Zap, Download, DatabaseBackup, Building2,
-  UserRound, CalendarCheck, Bot,
+  UserRound, CalendarCheck, Bot, KeyRound, Copy,
 } from "lucide-react";
 
 interface AdminClient {
@@ -177,6 +177,8 @@ export default function AdminPage() {
     client_id: '', display_name: '', login_token: '', plan_name: 'basic', monthly_quota: 30,
   });
   const [addLoading, setAddLoading] = useState(false);
+  const [resetingId, setResetingId] = useState<string | null>(null);
+  const [resetTokenMap, setResetTokenMap] = useState<Record<string, string>>({});
 
   const [logs, setLogs] = useState<AiLog[]>([]);
   const [logSummary, setLogSummary] = useState<UsageSummary[]>([]);
@@ -242,6 +244,18 @@ export default function AdminPage() {
       body: JSON.stringify({ has_line_service: newVal }),
     });
     setClients(clients.map(c => c.client_id === client.client_id ? { ...c, has_line_service: newVal } : c));
+  };
+
+  const handleResetToken = async (clientId: string) => {
+    setResetingId(clientId);
+    const newTok = generateToken();
+    await fetch(`/api/admin/clients/${clientId}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login_token: newTok }),
+    });
+    setResetingId(null);
+    setResetTokenMap(prev => ({ ...prev, [clientId]: newTok }));
+    setTimeout(() => setResetTokenMap(prev => { const n = { ...prev }; delete n[clientId]; return n; }), 60000);
   };
 
   const handleAddClient = async () => {
@@ -503,16 +517,33 @@ export default function AdminPage() {
                               )}
                             </td>
                             <td className="px-6 py-4">
-                              <button onClick={() => handleToggleStatus(c)}
-                                className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
-                                  c.status === 'active'
-                                    ? 'text-red-400 bg-red-500/10 hover:bg-red-500/20'
-                                    : 'text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
-                                }`}>
-                                {c.status === 'active'
-                                  ? <><ShieldOff className="w-3 h-3" /> 停用 AI</>
-                                  : <><ShieldCheck className="w-3 h-3" /> 恢復</>}
-                              </button>
+                              <div className="flex flex-col gap-1.5">
+                                <button onClick={() => handleToggleStatus(c)}
+                                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-bold rounded-lg transition-all ${
+                                    c.status === 'active'
+                                      ? 'text-red-400 bg-red-500/10 hover:bg-red-500/20'
+                                      : 'text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
+                                  }`}>
+                                  {c.status === 'active'
+                                    ? <><ShieldOff className="w-3 h-3" /> 停用</>
+                                    : <><ShieldCheck className="w-3 h-3" /> 恢復</>}
+                                </button>
+                                <button onClick={() => handleResetToken(c.client_id)}
+                                  disabled={resetingId === c.client_id}
+                                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-bold rounded-lg text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 transition-all disabled:opacity-50">
+                                  <KeyRound className="w-3 h-3" />
+                                  {resetingId === c.client_id ? '重設中...' : '重設密碼'}
+                                </button>
+                                {resetTokenMap[c.client_id] && (
+                                  <div className="flex items-center gap-1 mt-1 px-2 py-1.5 bg-amber-500/[0.08] border border-amber-500/20 rounded-lg">
+                                    <span className="font-mono text-[10px] text-amber-300 font-bold tracking-wider">{resetTokenMap[c.client_id]}</span>
+                                    <button onClick={() => navigator.clipboard.writeText(resetTokenMap[c.client_id])}
+                                      className="ml-1 text-amber-500 hover:text-amber-300 transition-colors" title="複製">
+                                      <Copy className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         );
