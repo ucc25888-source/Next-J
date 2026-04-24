@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Network, Sparkles, LogIn, Eye, EyeOff } from "lucide-react";
+import { Network, Sparkles, LogIn, Eye, EyeOff, KeyRound } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -126,6 +126,13 @@ export default function LoginPage() {
               )}
               {loading ? "登入中..." : "登入系統"}
             </button>
+
+            <div className="flex items-start gap-2.5 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3">
+              <KeyRound className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
+              <p className="text-[11px] text-indigo-700 leading-relaxed">
+                <span className="font-bold">首次登入提醒</span>｜登入後請至右上角選單 →「設定」修改初始存取碼，保護您的帳號安全。
+              </p>
+            </div>
           </form>
         </div>
 

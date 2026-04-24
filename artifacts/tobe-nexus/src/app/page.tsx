@@ -142,33 +142,33 @@ export default function DashboardPage() {
       label: "委託案件", value: properties.length, sub: "件", emoji: "🏘️",
       badge: "總管理", badgeStyle: "bg-amber-100 text-amber-600",
       gradient: "from-amber-50 to-orange-100", border: "border-amber-200/80",
-      numColor: "text-amber-600", labelColor: "text-amber-800", ringColor: "bg-amber-400/20",
+      numColor: "text-amber-700", labelColor: "text-slate-700", ringColor: "bg-amber-400/20",
       hint: properties.length > 0 ? `銷售中 ${activeListings} 件` : "開始登錄案件",
-      hintColor: "text-amber-500",
+      hintColor: "text-amber-700",
     },
     {
       label: "熱銷中案件", value: activeListings, sub: "件", emoji: "🔥",
       badge: "LIVE", badgeStyle: "bg-emerald-100 text-emerald-600",
       gradient: "from-emerald-50 to-green-100", border: "border-emerald-200/80",
-      numColor: "text-emerald-600", labelColor: "text-emerald-800", ringColor: "bg-emerald-400/20",
+      numColor: "text-emerald-700", labelColor: "text-slate-700", ringColor: "bg-emerald-400/20",
       hint: activeListings > 0 ? "買方都在找！" : "把案件狀態設為銷售中",
-      hintColor: "text-emerald-500",
+      hintColor: "text-emerald-700",
     },
     {
       label: "議價∕洽談中", value: negotiatingCount, sub: "件", emoji: "💬",
       badge: "成交在即", badgeStyle: "bg-sky-100 text-sky-600",
       gradient: "from-sky-50 to-blue-100", border: "border-sky-200/80",
-      numColor: "text-sky-600", labelColor: "text-sky-800", ringColor: "bg-sky-400/20",
+      numColor: "text-sky-700", labelColor: "text-slate-700", ringColor: "bg-sky-400/20",
       hint: negotiatingCount > 0 ? "把握機會，加把勁！" : "持續跟進，等待時機",
-      hintColor: "text-sky-500",
+      hintColor: "text-sky-700",
     },
     {
       label: "AI 文案生成", value: currentClient?.used_this_month ?? 0, sub: "次", emoji: "⚡",
       badge: "本月", badgeStyle: "bg-violet-100 text-violet-600",
       gradient: "from-violet-50 to-purple-100", border: "border-violet-200/80",
-      numColor: "text-violet-600", labelColor: "text-violet-800", ringColor: "bg-violet-400/20",
+      numColor: "text-violet-700", labelColor: "text-slate-700", ringColor: "bg-violet-400/20",
       hint: `配額 ${currentClient?.monthly_quota ?? 0} 次`,
-      hintColor: "text-violet-500",
+      hintColor: "text-violet-700",
     },
   ];
 
@@ -309,7 +309,7 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-xs font-bold text-orange-500 shrink-0">
+            <div className="flex items-center gap-1 text-xs font-bold text-slate-500 shrink-0">
               查看全部
               <MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
