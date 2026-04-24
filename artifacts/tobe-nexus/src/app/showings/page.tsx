@@ -500,18 +500,17 @@ export default function ShowingsPage() {
                   placeholder="例：850" min="0" />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelCls}>下次約定時間</label>
-                  <input type="date" className={inputCls} value={form.follow_up_date}
-                    onChange={(e) => setForm((f) => ({ ...f, follow_up_date: e.target.value }))} />
-                </div>
-                <div>
-                  <label className={labelCls}>追蹤事項</label>
-                  <textarea className={inputCls + ' resize-none'} rows={2} value={form.follow_up}
-                    onChange={(e) => setForm((f) => ({ ...f, follow_up: e.target.value }))}
-                    placeholder="例：3天後再電聯確認意願..." />
-                </div>
+              <div>
+                <label className={labelCls}>🔔 下次回訪日（自動加入每日重點）</label>
+                <input type="date" className={inputCls} value={form.follow_up_date}
+                  onChange={(e) => setForm((f) => ({ ...f, follow_up_date: e.target.value }))} />
+              </div>
+
+              <div>
+                <label className={labelCls}>追蹤事項</label>
+                <textarea className={inputCls + ' resize-none'} rows={2} value={form.follow_up}
+                  onChange={(e) => setForm((f) => ({ ...f, follow_up: e.target.value }))}
+                  placeholder="例：3天後再電聯確認意願..." />
               </div>
 
               <div>
