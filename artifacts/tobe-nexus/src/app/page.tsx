@@ -203,17 +203,17 @@ export default function DashboardPage() {
 
       {/* ── 換密碼提示橫幅 ── */}
       {showPwdBanner && (
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20">
-          <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
-          <p className="text-[12px] text-amber-300 flex-1">
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-orange-50 border-b border-orange-100 border-l-4 border-l-orange-400">
+          <ShieldAlert className="w-4 h-4 text-orange-500 shrink-0" />
+          <p className="text-[12px] text-slate-700 flex-1">
             您目前使用的是初始存取碼，建議盡快
             <Link href="/settings" onClick={dismissPwdBanner}
-              className="underline underline-offset-2 font-bold mx-1 hover:text-amber-200">
+              className="underline underline-offset-2 font-bold mx-1 text-violet-700 hover:text-violet-900 transition-colors">
               前往設定修改
             </Link>
             以保護帳號安全。
           </p>
-          <button onClick={dismissPwdBanner} className="text-amber-500 hover:text-amber-300 transition-colors shrink-0">
+          <button onClick={dismissPwdBanner} className="text-slate-400 hover:text-slate-600 transition-colors shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
