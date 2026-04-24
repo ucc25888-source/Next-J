@@ -54,6 +54,21 @@ const PLAN_LABELS: Record<string, string> = {
   enterprise: 'Enterprise',
 };
 
+function generateToken(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let r = '';
+  for (let i = 0; i < 4; i++) r += chars[Math.floor(Math.random() * chars.length)];
+  r += '-';
+  for (let i = 0; i < 4; i++) r += chars[Math.floor(Math.random() * chars.length)];
+  return r;
+}
+
+function autoToken(clientId: string): string {
+  const num = parseInt(clientId.replace(/^[A-Z]+/, ''), 10);
+  if (!isNaN(num) && num <= 1000) return `${clientId}-2026`;
+  return generateToken();
+}
+
 const CHART_COLORS = [
   '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316',
 ];
@@ -366,7 +381,14 @@ export default function AdminPage() {
                         <label className="block text-[10px] font-bold text-glacier-500 uppercase tracking-[0.1em] mb-1">{label}</label>
                         <input type="text" placeholder={placeholder}
                           value={newClient[key as keyof NewClientForm] as string}
-                          onChange={(e) => setNewClient({ ...newClient, [key]: key === 'client_id' ? e.target.value.toUpperCase() : e.target.value })}
+                          onChange={(e) => {
+                            const val = key === 'client_id' ? e.target.value.toUpperCase() : e.target.value;
+                            if (key === 'client_id') {
+                              setNewClient({ ...newClient, client_id: val, login_token: val ? autoToken(val) : '' });
+                            } else {
+                              setNewClient({ ...newClient, [key]: val });
+                            }
+                          }}
                           className={`w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-glacier-200 focus:outline-none focus:border-aurora-500/50 transition-colors ${mono ? 'font-mono' : ''}`}
                         />
                       </div>

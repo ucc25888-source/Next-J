@@ -125,7 +125,7 @@ export default function DashboardPage() {
       <PageHeader
         title={`早安！戰鬥力滿格的${currentClient?.display_name ?? "妳"}，今天準備好要讓哪一位買家心動成交了嗎？🚀`}
         mobileTitle={`今天讓哪位買家心動成交？🚀`}
-        subtitle="AI 成交戰略系統"
+        subtitle="把繁瑣交給系統，把靈魂還給自己 — Veda"
         actions={
           <Link href="/properties/new"
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-titanium-950 bg-aurora-500 rounded-lg hover:bg-aurora-400 transition-all glow-aurora-sm">
@@ -135,14 +135,6 @@ export default function DashboardPage() {
       />
 
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-5 lg:space-y-6">
-
-        {/* ── 戰力標語 ── */}
-        <div className="flex items-center gap-2 -mt-3 -mb-1">
-          <p className="text-[11px] font-bold text-glacier-200 leading-snug whitespace-nowrap">
-            把繁瑣交給系統，把靈魂還給自己
-          </p>
-          <p className="text-[10px] italic text-glacier-200 font-semibold shrink-0 whitespace-nowrap">創辦人 — Veda</p>
-        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">

@@ -27,7 +27,7 @@ export default function PageHeader({
             <span className="md:hidden">{mobileTitle ?? title}</span>
           </h1>
           {subtitle && (
-            <p className="mt-0.5 text-[11px] md:text-xs text-glacier-500 truncate">{subtitle}</p>
+            <p className="mt-0.5 text-[11px] md:text-xs text-glacier-500">{subtitle}</p>
           )}
         </div>
       </div>

@@ -5,7 +5,7 @@ import { useSystemStore } from "@/store/useSystemStore";
 import PageHeader from "@/components/PageHeader";
 import {
   User, Sparkles, BarChart3, Phone, ShieldCheck,
-  MessageSquare, Eye, EyeOff, Check, Loader2, Lock,
+  MessageSquare, Eye, EyeOff, Check, Loader2, Lock, KeyRound,
 } from "lucide-react";
 
 function SkeletonBlock({ className }: { className?: string }) {
@@ -24,6 +24,34 @@ export default function SettingsPage() {
 
   const planLabel: Record<string, string> = {
     basic: 'Basic 方案', pro: 'Pro 方案', enterprise: 'Enterprise 方案',
+  };
+
+  /* ── Change password state ── */
+  const [curPwd, setCurPwd] = useState("");
+  const [newPwd, setNewPwd] = useState("");
+  const [confirmPwd, setConfirmPwd] = useState("");
+  const [showCur, setShowCur] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [pwdSaving, setPwdSaving] = useState(false);
+  const [pwdMsg, setPwdMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const handleChangePwd = async () => {
+    if (!curPwd || !newPwd || !confirmPwd) { setPwdMsg({ ok: false, text: '請填寫所有欄位' }); return; }
+    if (newPwd !== confirmPwd) { setPwdMsg({ ok: false, text: '新存取碼與確認碼不一致' }); return; }
+    if (newPwd.length < 6) { setPwdMsg({ ok: false, text: '新存取碼至少需要 6 個字元' }); return; }
+    setPwdSaving(true); setPwdMsg(null);
+    const res = await fetch('/api/auth/change-password', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ current_password: curPwd, new_password: newPwd }),
+    });
+    const data = await res.json();
+    setPwdSaving(false);
+    if (res.ok) {
+      setPwdMsg({ ok: true, text: '存取碼已更新，下次登入請使用新存取碼' });
+      setCurPwd(""); setNewPwd(""); setConfirmPwd("");
+    } else {
+      setPwdMsg({ ok: false, text: data.error ?? '更新失敗，請稍後再試' });
+    }
   };
 
   /* ── LINE token state ── */
@@ -266,6 +294,53 @@ export default function SettingsPage() {
             <div className="p-6 space-y-3 text-xs text-glacier-500 leading-relaxed">
               <p>• 每個帳號有固定月度文案生成次數上限，超過後文案功能暫停，但案件登錄、管理功能照常可用。</p>
               <p>• 配額每月一日自動重置。如有特殊需求，請聯繫您的業務窗口申請調整。</p>
+            </div>
+          </div>
+
+          {/* ── Change Password ── */}
+          <div className="bg-titanium-900 border border-glacier-200/[0.07] rounded-xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-glacier-200/[0.06] bg-titanium-950/30 flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-aurora-500/10">
+                <KeyRound className="w-3.5 h-3.5 text-aurora-500" />
+              </div>
+              <div>
+                <h2 className="text-[13px] font-bold text-glacier-200">修改存取碼</h2>
+                <p className="text-[11px] text-glacier-500 mt-0.5">更新您的登入密碼，至少 6 個字元</p>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              {[
+                { label: '目前存取碼', value: curPwd, setter: setCurPwd, show: showCur, toggle: () => setShowCur(p => !p) },
+                { label: '新存取碼', value: newPwd, setter: setNewPwd, show: showNew, toggle: () => setShowNew(p => !p) },
+                { label: '確認新存取碼', value: confirmPwd, setter: setConfirmPwd, show: showNew, toggle: () => setShowNew(p => !p) },
+              ].map(({ label, value, setter, show, toggle }) => (
+                <div key={label}>
+                  <label className="block text-[10px] font-bold text-glacier-500 uppercase tracking-[0.12em] mb-1">{label}</label>
+                  <div className="relative">
+                    <input
+                      type={show ? "text" : "password"}
+                      value={value}
+                      onChange={(e) => setter(e.target.value)}
+                      placeholder={label === '目前存取碼' ? '輸入目前的存取碼' : '輸入新存取碼（至少 6 碼）'}
+                      className="w-full bg-titanium-800 border border-glacier-200/[0.1] rounded-lg px-3 pr-10 py-2.5 text-sm text-glacier-200 placeholder:text-glacier-600 focus:outline-none focus:border-aurora-500/40 transition-colors"
+                    />
+                    <button type="button" onClick={toggle}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-glacier-600 hover:text-glacier-300 transition-colors">
+                      {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {pwdMsg && (
+                <p className={`text-[11px] ${pwdMsg.ok ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {pwdMsg.ok ? '✓ ' : '✗ '}{pwdMsg.text}
+                </p>
+              )}
+              <button onClick={handleChangePwd} disabled={pwdSaving || !curPwd || !newPwd || !confirmPwd}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-lg bg-aurora-500 text-titanium-950 hover:bg-aurora-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                {pwdSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                {pwdSaving ? '更新中……' : '更新存取碼'}
+              </button>
             </div>
           </div>
 
