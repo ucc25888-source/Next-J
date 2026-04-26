@@ -303,12 +303,14 @@ function QuoteCard() {
         onClick={handleForceRefresh}
         disabled={loading}
         style={{
-          background:"none", border:"none", cursor: loading ? "not-allowed" : "pointer",
-          fontSize:10, color:"rgba(167,139,250,0.28)", fontFamily:SANS,
-          letterSpacing:"0.08em", padding:"4px 8px", marginTop:-4,
-          textDecoration:"underline", textUnderlineOffset:3,
+          display:"flex", alignItems:"center", gap:6,
+          background:"rgba(109,40,217,0.18)", border:"1px solid rgba(167,139,250,0.3)",
+          borderRadius:10, cursor: loading ? "not-allowed" : "pointer",
+          fontSize:12, color:"rgba(196,181,253,0.75)", fontFamily:SANS,
+          letterSpacing:"0.06em", padding:"8px 20px",
+          transition:"all 0.2s",
         }}>
-        {loading ? "生成中…" : "🔄 重新生成今日話語"}
+        {loading ? "⏳ AI 生成中，請稍候…" : "🔄 重新生成今日話語"}
       </button>
     </div>
   );
