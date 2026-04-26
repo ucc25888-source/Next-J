@@ -21,6 +21,7 @@ interface AdminClient {
   total_copies: number;
   has_line_service: boolean;
   line_notify_token: string | null;
+  latest_prop_keyin: string | null;
 }
 
 interface NewClientForm {
@@ -447,7 +448,7 @@ export default function AdminPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-glacier-200/[0.05]">
-                        {['客戶代碼', '名稱', '方案', '本月用量', '案件數', '狀態', 'LINE', '操作'].map((h) => (
+                        {['客戶代碼', '名稱', '方案', '本月用量', '案件數', '最新案件KEY IN', '狀態', 'LINE', '操作'].map((h) => (
                           <th key={h} className="px-6 py-3 text-left text-[10px] font-bold text-glacier-500 uppercase tracking-[0.1em]">{h}</th>
                         ))}
                       </tr>
@@ -494,6 +495,15 @@ export default function AdminPage() {
                               )}
                             </td>
                             <td className="px-6 py-4 text-glacier-400 text-xs tabular-nums">{c.property_count} 件</td>
+                            <td className="px-6 py-4 text-glacier-500 text-[10px] tabular-nums whitespace-nowrap">
+                              {c.latest_prop_keyin
+                                ? new Date(c.latest_prop_keyin).toLocaleString('zh-TW', {
+                                    year: 'numeric', month: '2-digit', day: '2-digit',
+                                    hour: '2-digit', minute: '2-digit',
+                                    timeZone: 'Asia/Taipei',
+                                  })
+                                : '—'}
+                            </td>
                             <td className="px-6 py-4">
                               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                 c.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'

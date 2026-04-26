@@ -36,13 +36,23 @@ export default function PropertiesPage() {
     `${p.listing_id ? `[${p.listing_id}] ` : ""}${p.subarea} ${p.property_type}`;
 
   const statusCls: Record<string, string> = {
-    銷售中:   "bg-aurora-500/10 text-aurora-400 border-aurora-500/25",
+    銷售中:   "bg-white text-aurora-600 border-aurora-500",
     新進案:   "bg-glacier-500/10 text-glacier-400 border-glacier-500/20",
     議價中:   "bg-yellow-500/10 text-yellow-400 border-yellow-500/25",
     洽談中:   "bg-orange-500/10 text-orange-400 border-orange-500/25",
     已成交:   "bg-titanium-700/50 text-glacier-300 border-titanium-600/40",
     暫停:     "bg-titanium-700/30 text-glacier-500 border-titanium-600/30",
     評估排除: "bg-red-500/10 text-red-400 border-red-500/20",
+  };
+
+  const formatKeyIn = (iso: string) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleString('zh-TW', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit',
+      timeZone: 'Asia/Taipei',
+    });
   };
 
   const getContractDaysLeft = (endDate: string) => {
@@ -138,15 +148,15 @@ export default function PropertiesPage() {
                     />
                     {/* Status badge */}
                     {property.status_now && (
-                      <div translate="no" className={`absolute top-2 right-2 px-2 py-1 rounded-md text-[10px] font-semibold border ${sc}`}>
+                      <div translate="no" className={`absolute top-2 right-2 px-2.5 py-1 rounded-md text-xs font-bold border ${sc}`}>
                         {property.status_now}
                       </div>
                     )}
                     {/* Alert level + Commission type */}
                     <div translate="no" className="absolute top-2 left-2 flex gap-1 flex-col">
-                      <span className="text-sm leading-none">{alertEmoji}</span>
+                      <span className="text-xl leading-none drop-shadow">{alertEmoji}</span>
                       {property.commission_type && (
-                        <span translate="no" className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                        <span translate="no" className={`px-2 py-1 rounded text-[11px] font-bold ${
                           property.commission_type === '專任'
                             ? 'bg-aurora-500 text-titanium-950'
                             : property.commission_type === '同業聯賣'
@@ -211,6 +221,12 @@ export default function PropertiesPage() {
                       {(property.fb_post_count ?? 0) > 0 && (
                         <div className="text-[10px] text-glacier-600">
                           📢 已發文 {property.fb_post_count} 次
+                        </div>
+                      )}
+                      {/* KEY IN time */}
+                      {property.createdAt && (
+                        <div className="text-[9px] text-glacier-600 pt-0.5">
+                          🗓 KEY IN {formatKeyIn(property.createdAt)}
                         </div>
                       )}
                     </div>

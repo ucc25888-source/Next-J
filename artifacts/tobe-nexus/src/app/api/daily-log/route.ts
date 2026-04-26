@@ -135,72 +135,77 @@ export async function GET(req: NextRequest) {
   // ── TODAY'S NEW ENTRIES: records created today (Taiwan time UTC+8) ──
   const newEntries: TodayNewEntry[] = [];
 
-  // Taiwan today date string
-  const taiwanNow = new Date(Date.now() + 8 * 60 * 60 * 1000);
-  const taiwanToday = taiwanNow.toISOString().slice(0, 10); // e.g. "2026-04-23"
+  try {
+    // Taiwan today date string
+    const taiwanNow = new Date(Date.now() + 8 * 60 * 60 * 1000);
+    const taiwanToday = taiwanNow.toISOString().slice(0, 10); // e.g. "2026-04-26"
 
-  const newProperties = await query(
-    `SELECT id, listing_id, subarea, property_type, address_note, price_wan,
-            (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date AS created_date
-     FROM properties
-     WHERE client_id = $1
-       AND (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date = $2::date
-     ORDER BY created_at DESC`,
-    [clientId, taiwanToday]
-  );
-  for (const r of newProperties) {
-    const propLabel = r.listing_id
-      ? `[${r.listing_id}] ${r.subarea ?? ''} ${r.property_type ?? ''}`.trim()
-      : `${r.subarea ?? ''} ${r.property_type ?? ''}`.trim() || '新案件';
-    newEntries.push({
-      type: 'property',
-      source_id: String(r.id),
-      title: propLabel,
-      subtitle: [
-        r.address_note || '',
-        r.price_wan ? `${r.price_wan}萬` : '',
-      ].filter(Boolean).join(' · '),
-    });
-  }
+    const newProperties = await query(
+      `SELECT id, listing_id, subarea, property_type, address_note, price_wan,
+              (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date AS created_date
+       FROM properties
+       WHERE client_id = $1
+         AND (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date = $2::date
+       ORDER BY created_at DESC`,
+      [clientId, taiwanToday]
+    );
+    for (const r of newProperties) {
+      const propLabel = r.listing_id
+        ? `[${r.listing_id}] ${r.subarea ?? ''} ${r.property_type ?? ''}`.trim()
+        : `${r.subarea ?? ''} ${r.property_type ?? ''}`.trim() || '新案件';
+      newEntries.push({
+        type: 'property',
+        source_id: String(r.id),
+        title: propLabel,
+        subtitle: [
+          r.address_note || '',
+          r.price_wan ? `${r.price_wan}萬` : '',
+        ].filter(Boolean).join(' · '),
+      });
+    }
 
-  const newBuyers = await query(
-    `SELECT id, name, phone, status,
-            (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date AS created_date
-     FROM buyers
-     WHERE client_id = $1
-       AND (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date = $2::date
-     ORDER BY created_at DESC`,
-    [clientId, taiwanToday]
-  );
-  for (const r of newBuyers) {
-    newEntries.push({
-      type: 'buyer',
-      source_id: String(r.id),
-      title: r.name as string,
-      subtitle: [r.phone || '', r.status || ''].filter(Boolean).join(' · '),
-    });
-  }
+    const newBuyers = await query(
+      `SELECT id, name, phone, status,
+              (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date AS created_date
+       FROM buyers
+       WHERE client_id = $1
+         AND (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date = $2::date
+       ORDER BY created_at DESC`,
+      [clientId, taiwanToday]
+    );
+    for (const r of newBuyers) {
+      newEntries.push({
+        type: 'buyer',
+        source_id: String(r.id),
+        title: r.name as string,
+        subtitle: [r.phone || '', r.status || ''].filter(Boolean).join(' · '),
+      });
+    }
 
-  const newShowings = await query(
-    `SELECT s.id, s.buyer_name, p.listing_id, p.subarea, p.property_type,
-            (s.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date AS created_date
-     FROM showings s
-     LEFT JOIN properties p ON p.id = s.property_id
-     WHERE s.client_id = $1
-       AND (s.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date = $2::date
-     ORDER BY s.created_at DESC`,
-    [clientId, taiwanToday]
-  );
-  for (const r of newShowings) {
-    const propLabel = r.listing_id
-      ? `[${r.listing_id}] ${r.subarea ?? ''} ${r.property_type ?? ''}`.trim()
-      : '未指定物件';
-    newEntries.push({
-      type: 'showing',
-      source_id: String(r.id),
-      title: `帶看：${r.buyer_name ?? '買方'}`,
-      subtitle: propLabel,
-    });
+    const newShowings = await query(
+      `SELECT s.id, s.buyer_name, p.listing_id, p.subarea, p.property_type,
+              (s.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date AS created_date
+       FROM showings s
+       LEFT JOIN properties p ON p.id = s.property_id
+       WHERE s.client_id = $1
+         AND (s.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date = $2::date
+       ORDER BY s.created_at DESC`,
+      [clientId, taiwanToday]
+    );
+    for (const r of newShowings) {
+      const propLabel = r.listing_id
+        ? `[${r.listing_id}] ${r.subarea ?? ''} ${r.property_type ?? ''}`.trim()
+        : '未指定物件';
+      newEntries.push({
+        type: 'showing',
+        source_id: String(r.id),
+        title: `帶看：${r.buyer_name ?? '買方'}`,
+        subtitle: propLabel,
+      });
+    }
+  } catch (err) {
+    console.error('[daily-log] newEntries query failed:', err);
+    // Return empty newEntries — do not crash the whole response
   }
 
   return NextResponse.json({ entries, newEntries, date: fullPrefix });
