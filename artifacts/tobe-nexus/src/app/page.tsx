@@ -15,38 +15,7 @@ import type { DailyFocusItem } from "@/types";
 
 interface ShowingReaction { reaction: string; cnt: number; }
 
-const DAILY_QUOTES = [
-  { text: "不要等到一切完美才出發，出發了才會完美。", author: "每日正能量" },
-  { text: "每一套房子背後，都是一個家的夢想。讓我們用心，幫夢想找到歸宿。", author: "房產智慧" },
-  { text: "你所做的每一個準備，都是在為某個美好的結果鋪路。", author: "每日正能量" },
-  { text: "成交不是終點，是信任的開始。", author: "房產哲學" },
-  { text: "今天比昨天進步一點點，就是成功。", author: "每日正能量" },
-  { text: "買家找的不只是房子，是對生活的想像。你的工作，是幫他們看見那個畫面。", author: "房產智慧" },
-  { text: "累了就停下來，但不要放棄。休息是為了走更長遠的路。", author: "每日正能量" },
-  { text: "一個真誠的問候，有時比任何話術都更有力量。", author: "溝通之道" },
-  { text: "每天早上都是一次重新開始的機會，好好把握它。", author: "每日正能量" },
-  { text: "好的房產顧問，賣的是安心，不只是坪數。", author: "房產哲學" },
-  { text: "不管昨天發生了什麼，今天的太陽是全新的。", author: "每日正能量" },
-  { text: "跟進是門藝術，堅持是種態度，成交是份禮物。", author: "房產智慧" },
-  { text: "你的努力，正在以你看不見的方式，悄悄發揮作用。", author: "每日正能量" },
-  { text: "花蓮的山海，是最好的鄰居。把這份美好，傳遞給每一位買家。", author: "在地情懷" },
-  { text: "信任需要時間建立，但只需要一個瞬間就能感受到。", author: "溝通之道" },
-  { text: "現代人最缺的不是資訊，而是讓人放鬆下來的安全感。你提供的，正是這個。", author: "房產智慧" },
-  { text: "做好眼前的每一件小事，大事自然水到渠成。", author: "每日正能量" },
-  { text: "有時候，最好的成交技巧，是真心聽對方說話。", author: "溝通之道" },
-  { text: "即使進度緩慢，只要你還在前進，就不算失敗。", author: "每日正能量" },
-  { text: "你的專業是你給客戶最好的禮物，不斷精進它。", author: "房產哲學" },
-  { text: "今天種下的種子，某一天會開出你意想不到的花。", author: "每日正能量" },
-  { text: "讓系統處理繁瑣，把你的精力留給最重要的人和事。", author: "工作哲學" },
-  { text: "好的服務，讓客戶想起你時會微笑。", author: "溝通之道" },
-  { text: "不是每天都容易，但你已經撐過了所有最難的那天。", author: "每日正能量" },
-  { text: "每一次拒絕，都讓你離下一個「好」更近了。", author: "房產智慧" },
-  { text: "生活的節奏由你掌控，工作的效率由系統輔助，美好的未來由你創造。", author: "工作哲學" },
-  { text: "真正的財富，是把自己的時間花在真正重要的事情上。", author: "每日正能量" },
-  { text: "你的溫度，是任何科技都取代不了的核心競爭力。", author: "工作哲學" },
-  { text: "不必羨慕別人，你正走在屬於自己的最好路上。", author: "每日正能量" },
-  { text: "把每一位客戶的信任當成禮物，用心對待，用行動回應。", author: "房產哲學" },
-];
+const QUOTE_REFRESH_KEY = "tobe_quote_refresh";
 
 const STATUS_STYLE: Record<string, string> = {
   "銷售中":  "bg-emerald-100 text-emerald-700",
@@ -69,11 +38,39 @@ export default function DashboardPage() {
   const [copied, setCopied] = useState(false);
   const [shareName, setShareName] = useState("");
 
-  const todayQuote = (() => {
-    const d = new Date();
-    const idx = (d.getFullYear() * 366 + d.getMonth() * 31 + d.getDate()) % DAILY_QUOTES.length;
-    return DAILY_QUOTES[idx];
-  })();
+  const [todayQuote, setTodayQuote] = useState({ text: "", author: "" });
+  const [quoteLoading, setQuoteLoading] = useState(true);
+  const [refreshCount, setRefreshCount] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const MAX_REFRESHES = 2;
+
+  useEffect(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    try {
+      const stored = JSON.parse(localStorage.getItem(QUOTE_REFRESH_KEY) ?? "{}") as { date?: string; count?: number };
+      setRefreshCount(stored.date === today ? (stored.count ?? 0) : 0);
+      if (stored.date !== today) localStorage.setItem(QUOTE_REFRESH_KEY, JSON.stringify({ date: today, count: 0 }));
+    } catch { /* ignore */ }
+
+    fetch("/api/daily-quote")
+      .then(r => r.json())
+      .then((d: { text: string; author: string }) => { setTodayQuote(d); setQuoteLoading(false); })
+      .catch(() => setQuoteLoading(false));
+  }, []);
+
+  const handleRefreshQuote = useCallback(async () => {
+    if (refreshCount >= MAX_REFRESHES || refreshing) return;
+    setRefreshing(true);
+    try {
+      const d = await fetch("/api/daily-quote?force=true").then(r => r.json()) as { text: string; author: string };
+      setTodayQuote(d);
+      const today = new Date().toISOString().slice(0, 10);
+      const newCount = refreshCount + 1;
+      setRefreshCount(newCount);
+      localStorage.setItem(QUOTE_REFRESH_KEY, JSON.stringify({ date: today, count: newCount }));
+    } catch { /* ignore */ }
+    finally { setRefreshing(false); }
+  }, [refreshCount, refreshing]);
 
   useEffect(() => {
     if (currentClient?.display_name && !shareName) setShareName(currentClient.display_name);
@@ -368,16 +365,36 @@ export default function DashboardPage() {
             </div>
 
             {/* quote */}
-            <div className="border-l-4 border-purple-300/60 pl-4 mb-4">
-              <p className="text-white font-bold text-[16px] md:text-[18px] leading-relaxed tracking-wide">
-                「{todayQuote.text}」
-              </p>
+            <div className="border-l-4 border-purple-300/60 pl-4 mb-3 min-h-[56px]">
+              {quoteLoading || refreshing ? (
+                <div className="space-y-2 py-1">
+                  <div className="h-4 bg-white/15 rounded animate-pulse w-full" />
+                  <div className="h-4 bg-white/10 rounded animate-pulse w-4/5" />
+                </div>
+              ) : (
+                <p className="text-white font-bold text-[16px] md:text-[18px] leading-relaxed tracking-wide">
+                  「{todayQuote.text}」
+                </p>
+              )}
             </div>
 
-            {/* footer: author + name input */}
+            {/* footer: author + refresh + name input */}
             <div className="flex items-end justify-between gap-3">
-              <div className="shrink-0">
-                <span className="text-purple-300 text-[11px]">— {todayQuote.author}</span>
+              <div className="flex flex-col gap-1.5 shrink-0">
+                <span className="text-purple-300 text-[11px]">— {todayQuote.author || "每日正能量"}</span>
+                {/* Refresh button */}
+                <button
+                  onClick={handleRefreshQuote}
+                  disabled={refreshCount >= MAX_REFRESHES || refreshing || quoteLoading}
+                  className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg transition-all border ${
+                    refreshCount >= MAX_REFRESHES
+                      ? "opacity-40 cursor-not-allowed border-purple-400/20 text-purple-400/50"
+                      : "border-purple-300/30 text-purple-200/80 hover:bg-white/10 hover:border-purple-300/50 active:scale-95 cursor-pointer"
+                  }`}
+                >
+                  🔄 換一句
+                  <span className="ml-0.5 opacity-60">（{MAX_REFRESHES - refreshCount} 次）</span>
+                </button>
               </div>
               <div className="flex-1 min-w-0">
                 <label className="block text-[9px] text-purple-300/60 mb-1 text-right tracking-widest uppercase">
