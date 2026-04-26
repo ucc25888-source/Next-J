@@ -136,18 +136,22 @@ export async function GET(req: NextRequest) {
   const newEntries: TodayNewEntry[] = [];
 
   try {
-    // Taiwan today date string
+    // ── UTC range for Taiwan today ────────────────────────────────────
+    // Taiwan is UTC+8. Taiwan midnight = UTC (today − 8h).
+    // e.g. 2026-04-26 Taiwan = 2026-04-25T16:00:00Z → 2026-04-26T16:00:00Z
     const taiwanNow = new Date(Date.now() + 8 * 60 * 60 * 1000);
-    const taiwanToday = taiwanNow.toISOString().slice(0, 10); // e.g. "2026-04-26"
+    const [yr, mo, dy] = [taiwanNow.getUTCFullYear(), taiwanNow.getUTCMonth(), taiwanNow.getUTCDate()];
+    const startUTC = new Date(Date.UTC(yr, mo, dy) - 8 * 3600 * 1000).toISOString();
+    const endUTC   = new Date(Date.UTC(yr, mo, dy) - 8 * 3600 * 1000 + 86400000).toISOString();
 
     const newProperties = await query(
-      `SELECT id, listing_id, subarea, property_type, address_note, price_wan,
-              (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date AS created_date
+      `SELECT id, listing_id, subarea, property_type, address_note, price_wan
        FROM properties
        WHERE client_id = $1
-         AND (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date = $2::date
+         AND created_at >= $2
+         AND created_at <  $3
        ORDER BY created_at DESC`,
-      [clientId, taiwanToday]
+      [clientId, startUTC, endUTC]
     );
     for (const r of newProperties) {
       const propLabel = r.listing_id
@@ -165,13 +169,13 @@ export async function GET(req: NextRequest) {
     }
 
     const newBuyers = await query(
-      `SELECT id, name, phone, status,
-              (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date AS created_date
+      `SELECT id, name, phone, status
        FROM buyers
        WHERE client_id = $1
-         AND (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date = $2::date
+         AND created_at >= $2
+         AND created_at <  $3
        ORDER BY created_at DESC`,
-      [clientId, taiwanToday]
+      [clientId, startUTC, endUTC]
     );
     for (const r of newBuyers) {
       newEntries.push({
@@ -183,14 +187,14 @@ export async function GET(req: NextRequest) {
     }
 
     const newShowings = await query(
-      `SELECT s.id, s.buyer_name, p.listing_id, p.subarea, p.property_type,
-              (s.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date AS created_date
+      `SELECT s.id, s.buyer_name, p.listing_id, p.subarea, p.property_type
        FROM showings s
        LEFT JOIN properties p ON p.id = s.property_id
        WHERE s.client_id = $1
-         AND (s.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Taipei')::date = $2::date
+         AND s.created_at >= $2
+         AND s.created_at <  $3
        ORDER BY s.created_at DESC`,
-      [clientId, taiwanToday]
+      [clientId, startUTC, endUTC]
     );
     for (const r of newShowings) {
       const propLabel = r.listing_id
@@ -205,7 +209,6 @@ export async function GET(req: NextRequest) {
     }
   } catch (err) {
     console.error('[daily-log] newEntries query failed:', err);
-    // Return empty newEntries — do not crash the whole response
   }
 
   return NextResponse.json({ entries, newEntries, date: fullPrefix });
