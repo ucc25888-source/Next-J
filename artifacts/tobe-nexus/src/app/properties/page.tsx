@@ -37,12 +37,12 @@ export default function PropertiesPage() {
 
   const statusCls: Record<string, string> = {
     銷售中:   "bg-white text-aurora-600 border-aurora-500",
-    新進案:   "bg-glacier-500/10 text-glacier-400 border-glacier-500/20",
-    議價中:   "bg-yellow-500/10 text-yellow-400 border-yellow-500/25",
-    洽談中:   "bg-orange-500/10 text-orange-400 border-orange-500/25",
-    已成交:   "bg-titanium-700/50 text-glacier-300 border-titanium-600/40",
-    暫停:     "bg-titanium-700/30 text-glacier-500 border-titanium-600/30",
-    評估排除: "bg-red-500/10 text-red-400 border-red-500/20",
+    新進案:   "bg-white text-slate-600 border-slate-400",
+    議價中:   "bg-white text-yellow-600 border-yellow-500",
+    洽談中:   "bg-white text-orange-600 border-orange-500",
+    已成交:   "bg-white text-slate-500 border-slate-400",
+    暫停:     "bg-white text-slate-400 border-slate-300",
+    評估排除: "bg-white text-red-600 border-red-400",
   };
 
   const formatKeyIn = (iso: string) => {
@@ -156,12 +156,12 @@ export default function PropertiesPage() {
                     <div translate="no" className="absolute top-2 left-2 flex gap-1 flex-col">
                       <span className="text-xl leading-none drop-shadow">{alertEmoji}</span>
                       {property.commission_type && (
-                        <span translate="no" className={`px-2 py-1 rounded text-[11px] font-bold ${
+                        <span translate="no" className={`px-2 py-1 rounded text-[11px] font-bold border ${
                           property.commission_type === '專任'
-                            ? 'bg-aurora-500 text-titanium-950'
+                            ? 'bg-white text-aurora-600 border-aurora-400'
                             : property.commission_type === '同業聯賣'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-titanium-800/80 text-glacier-400'
+                            ? 'bg-white text-blue-600 border-blue-400'
+                            : 'bg-white text-slate-600 border-slate-400'
                         }`}>
                           {property.commission_type === '同業聯賣' ? '🤝聯賣' : property.commission_type}
                         </span>
@@ -224,11 +224,12 @@ export default function PropertiesPage() {
                         </div>
                       )}
                       {/* KEY IN time */}
-                      {property.createdAt && (
-                        <div className="text-[9px] text-glacier-600 pt-0.5">
-                          🗓 KEY IN {formatKeyIn(property.createdAt)}
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1 pt-0.5 border-t border-glacier-200/[0.06] mt-1">
+                        <CalendarClock className="w-2.5 h-2.5 text-glacier-600 shrink-0" />
+                        <span className="text-[10px] text-glacier-500 font-medium">
+                          KEY IN {formatKeyIn(property.createdAt ?? new Date().toISOString())}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Actions */}
