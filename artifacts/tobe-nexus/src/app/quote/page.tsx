@@ -36,6 +36,16 @@ function QuoteCard() {
       .catch(() => setLoading(false));
   }, []);
 
+  const handleForceRefresh = async () => {
+    setLoading(true);
+    setQuote(null);
+    try {
+      const d = await fetch("/api/daily-quote?force=true").then(r => r.json()) as Quote;
+      setQuote(d);
+    } catch { /* ignore */ }
+    finally { setLoading(false); }
+  };
+
   const handleSaveImage = async () => {
     if (!captureRef.current || !quote) return;
     setSaving(true);
@@ -287,6 +297,19 @@ function QuoteCard() {
       <p style={{ fontSize:11, color:"rgba(167,139,250,0.38)", textAlign:"center", maxWidth:280, lineHeight:1.7, margin:0, fontFamily:SANS }}>
         {isMobile ? "手機可直接透過系統分享傳到 LINE、IG、FB ✨" : "圖片下載後，開啟 LINE 手動傳送給朋友即可 ✨"}
       </p>
+
+      {/* Admin: force regenerate */}
+      <button
+        onClick={handleForceRefresh}
+        disabled={loading}
+        style={{
+          background:"none", border:"none", cursor: loading ? "not-allowed" : "pointer",
+          fontSize:10, color:"rgba(167,139,250,0.28)", fontFamily:SANS,
+          letterSpacing:"0.08em", padding:"4px 8px", marginTop:-4,
+          textDecoration:"underline", textUnderlineOffset:3,
+        }}>
+        {loading ? "生成中…" : "🔄 重新生成今日話語"}
+      </button>
     </div>
   );
 }
