@@ -22,9 +22,9 @@ const GEOGRAPHIC_DATA: Record<string, string[]> = {
   '其他 | OT': ['外縣市聯動', '跨區整合案件'],
 };
 
-const LAND_PROPERTY_TYPES   = ['土地 / 農地', '建地 / 工業地'];
-const TRANSPARENT_TYPES     = ['透天厝 (住宅)', '透天厝 (店住)', '別墅 / 莊園'];
-const VILLA_TYPES            = ['別墅 / 莊園', '透天厝 (住宅)'];
+const LAND_PROPERTY_TYPES   = ['土地', '土地 / 農地', '建地 / 工業地'];
+const TRANSPARENT_TYPES     = ['透天厝 (住宅)', '透天厝 (店住)', '別墅 / 莊園', '農舍'];
+const VILLA_TYPES            = ['別墅 / 莊園', '透天厝 (住宅)', '農舍'];
 const SHOP_PROPERTY_TYPES    = ['透天厝 (店住)', '店面'];
 const OFFICE_PROPERTY_TYPES  = ['商辦'];
 const ELEVATOR_PROPERTY_TYPES = ['電梯大樓 / 華廈'];

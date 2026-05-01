@@ -1,5 +1,5 @@
-const LAND_ONLY_TYPES = ['土地 / 農地', '建地 / 工業地'];
-const BOTH_TYPES = ['透天厝 (住宅)', '透天厝 (店住)', '別墅 / 莊園'];
+const LAND_ONLY_TYPES = ['土地', '土地 / 農地', '建地 / 工業地'];
+const BOTH_TYPES = ['透天厝 (住宅)', '透天厝 (店住)', '別墅 / 莊園', '農舍'];
 
 export function getAreaDisplay(
   propertyType: string,

@@ -7,7 +7,7 @@ export const generateCopywriting = (
   hookType: HookType
 ): string => {
   const {
-    subarea, property_type, price_wan, build_ping, parking, 
+    subarea, property_type, price_wan, build_ping, land_ping, parking, 
     rooms, halls, baths, balconies,
     main_point, second_point, target_buyer, must_say_3,
     status_push,
@@ -47,7 +47,8 @@ export const generateCopywriting = (
 
   const isOffice = property_type === '商辦';
   const isShop   = property_type === '店面' || property_type === '透天厝 (店住)';
-  const isVilla  = property_type === '別墅 / 莊園' || property_type === '透天厝 (住宅)';
+  const isVilla  = property_type === '別墅 / 莊園' || property_type === '透天厝 (住宅)' || property_type === '農舍';
+  const isLand   = property_type === '土地' || property_type === '土地 / 農地' || property_type === '建地 / 工業地';
   const isSuite  = property_type === '套房';
 
   const baseInfo = isSuite
@@ -72,6 +73,11 @@ ${subarea}黃金地段的優質${property_type}，吸金人流就是您最大的
 總建坪 ${build_ping} 坪，${parking ? `附有${extractText(parking)}，` : ''}
 鄰近人潮聚集核心，進出卸貨方便，開店即有穩定客源。
 現在開價 ${price_wan} 萬，是創業自營、收租投資的首選！`
+    : isLand
+    ? `📍 【核心物件資訊】
+花蓮${subarea}難得釋出的優質${property_type}，地坪 ${land_ping ?? build_ping} 坪。
+產權清晰、地籍明確，位置絕佳，是建地自用或長期置產的極佳選擇。
+開價 ${price_wan} 萬，花蓮土地資產，數量有限，把握機會！`
     : `📍 【核心物件資訊】
 這是一間位於${subarea}的優質${property_type}。
 總建坪達 ${build_ping} 坪，擁有 ${layoutStr} 的格局，
