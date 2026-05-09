@@ -1,0 +1,12 @@
+lockfileVersion: '9.0'
+
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - msw
+  - sharp
+  - unrs-resolver
+
+settings:
+  autoInstallPeers: false
+  excludeLinksFromLockfile: false
